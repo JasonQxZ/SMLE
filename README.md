@@ -7,8 +7,7 @@
 
   <h3 align="center">SMLE R Package</h3
   
-  <h3 align="center"> 
-  
+  <p align="center"> 
   [![](http://www.r-pkg.org/badges/version/SMLE)](https://cran.r-project.org/package=SMLE)
   ![](https://cranlogs.r-pkg.org/badges/grand-total/SMLE)
   
