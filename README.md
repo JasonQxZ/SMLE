@@ -9,7 +9,8 @@
 
   <p align="center">
    <img src="http://www.r-pkg.org/badges/version/SMLE">
-</p>
+  </p>
+  
   <p align="center">
     <img src="https://cranlogs.r-pkg.org/badges/grand-total/SMLE">
   </p>
