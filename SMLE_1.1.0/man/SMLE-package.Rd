@@ -1,0 +1,60 @@
+\name{smle-package}
+\alias{smle-package}
+\docType{package}
+\title{
+Joint SMLE-screening for generalized linear models
+}
+\description{
+Feature screening is a powerful tool in processing ultrahigh dimensional data. It attempts to screen
+out most irrelevant features in preparation for a more elaborate analysis. This package provides an efficient implementation of SMLE-screening for linear, logistic, and Poisson models, where the joint effects among features are naturally incorporated in the screening process. The package also provides a function for conducting accurate post-screening feature selection based on an iterative hard-thresholding procedure and a user-specified selection criterion.
+}
+\details{
+\tabular{ll}{
+Package: \tab smle\cr
+Type: \tab Package\cr
+Version: \tab 0.2\cr
+Date: \tab 2020-01-29\cr
+License: \tab GPL-2\cr
+}
+Input a \eqn{n \times 1} response vector Y and a \eqn{n \times p} predictor (feature) matrix X. The package outputs a set of \eqn{k < n} features that seem to be most relevant for joint regression. Moreover, the package provides a data simulator that generates a synthetic datasets from high-dimensional GLMs, which accommodate both numerical and categorical features with commonly used correlation structures. \cr
+
+Key functions:\cr
+\code{Gen_Data}\cr
+\code{SMLE}\cr
+\code{smle_select}\cr
+}
+\author{Qianxiang Zang, Chen Xu, Kelly Burkett\cr
+Maintainer: Qianxiang Zang  <qzang023@uottawa.ca>
+}
+\references{Xu, C. and Chen, J. (2014)
+  The Sparse MLE for Ultrahigh-Dimensional Feature Screening
+  \emph{Journal of the American Statistical Association}, \bold{109}(507), 1257–1269.\cr
+
+  Friedman, J., Hastie, T. and Tibshirani, R. (2010)
+  Regularization Paths for Generalized Linear Models via Coordinate
+    Descent
+  \emph{Journal of Statistical Software}, \bold{33}(1), 1-22.\cr
+    }
+
+\examples{
+set.seed(123.456)
+#Generate correlated data
+Data<-Gen_Data(correlation="MA",family = "gaussian")
+print(Data)
+
+# joint feature screening via SMLE
+fit<-SMLE(Data$Y,Data$X,k=10,family = "gaussian")
+print(fit)
+plot(fit)
+
+#Are there any features missed after screening?
+setdiff(Data$index, fit$Retained_Feature_IDs)
+
+# Elaborative selection after screening
+E<-smle_select(fit,gamma_ebic = 0.5,vote = FALSE)
+
+#Are there any features missed after selection? %>% 
+setdiff( Data$index ,E$Retained_Feature_IDs)
+print(E)
+plot(E)
+}
