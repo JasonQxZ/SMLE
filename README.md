@@ -11,5 +11,6 @@
     Joint Feature Screening via Sparse MLE
     <br />
     <a href="https://github.com//JasonQxZ/SMLE"><strong>Explore the docs »</strong></a>
+  
 [![](http://www.r-pkg.org/badges/version/SMLE)](https://cran.r-project.org/package=SMLE)
 ![](https://cranlogs.r-pkg.org/badges/grand-total/SMLE)
