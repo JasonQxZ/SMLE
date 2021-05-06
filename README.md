@@ -8,7 +8,7 @@
   <h3 align="center">SMLE R Package</h3
   
   <p align="center">
-    <img src="http://www.r-pkg.org/badges/version/SMLE)](https://cran.r-project.org/package=SMLE">
+    <img src="http://www.r-pkg.org/badges/version/SMLE">
     <img src="https://cranlogs.r-pkg.org/badges/grand-total/SMLE">
   <p align="center">
     Joint Feature Screening via Sparse MLE
