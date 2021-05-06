@@ -6,11 +6,10 @@
   </a>
 
   <h3 align="center">SMLE R Package</h3>
-
+  <h3 align="center">[![](http://www.r-pkg.org/badges/version/SMLE)](https://cran.r-project.org/package=SMLE)![](https://cranlogs.r-pkg.org/badges/grand-total/SMLE)
   <p align="center">
     Joint Feature Screening via Sparse MLE
     <br />
     <a href="https://github.com//JasonQxZ/SMLE"><strong>Explore the docs »</strong></a>
   
-[![](http://www.r-pkg.org/badges/version/SMLE)](https://cran.r-project.org/package=SMLE)
-![](https://cranlogs.r-pkg.org/badges/grand-total/SMLE)
+
