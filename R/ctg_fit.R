@@ -308,7 +308,7 @@ ctg_fit<-function(Y , X , k ,
             group=group,
             fast =FALSE,
             FD= FD, 
-            Ctg =TRUE,Coef_dist=Coef_dist,
+            ctg =TRUE,Coef_dist=Coef_dist,
             CT = codingtype,
             fast=fast
             )
