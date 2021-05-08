@@ -9,21 +9,15 @@
 #' @param object A fitted object of class \code{'smle'} as the output from
 #' SMLE.
 #'
-#' @param newx Matrix of new values for x at which predictions are to be made,
+#' @param newdata Matrix of new values for x at which predictions are to be made,
 #' without the intercept term. If omitted, the function returns the fitted 
 #' response values based on the training data and the retained features in \code{'smle'}.
 #'
-#'
-#' @param type  The type of prediction required. Type "link" leads to a prediction 
-#' on the scale of linear predictors (i.e. linear combination of retained features); 
-#' type \code{'response'} leads to a prediction on the mean value of the response.
-#' When \code{'family=gaussian'} in \code{'smle'}, the two predication types are equivalent.
-#'
 #' @param ... 	Further arguments pass to \code{predict.glm()}.
 #'
-#' @return
+#' @return The object returned depends on type.
+#' @rdname predict
 #' 
-#' The object returned depends on type.
 #'
 #' @export
 #' @method predict smle
@@ -35,15 +29,17 @@
 #'
 #' fit<-SMLE(Data_sim$Y,Data_sim$X, family = "gaussian" , k=10)
 #'
-#' predict(fit,newdata= Data_sim$X[10:20,],type ="link")
+#' predict(fit,newdata= Data_sim$X[10:20,])
 #'
-predict.smle<-function(object,newdata = NULL,type = c("link", "response"),...){
+predict.smle<-function(object,newdata = NULL,...){
   
   family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
   
   data = data.frame(Y = object$Y, X= object$X[,object$ID_Retained])
   
-  if( object$Ctg ){
+  if(!exists("type")){type = "response"}
+  
+  if( object$ctg ){
     # Categorical prediction
     
     data<- suppressWarnings(dummy.data.frame(data ,sep="."))
@@ -75,20 +71,84 @@ predict.smle<-function(object,newdata = NULL,type = c("link", "response"),...){
     
     if(is.null(newdata)){
       
-      return(predict.glm(fit, newdata=NULL ,type = type,...))
+      return(predict.glm(fit, newdata=NULL ,type = "response",...))
       
     }else{
         
       new_data = suppressWarnings(data.frame( X= newdata[,object$ID_Retained]))
       
-      return(predict.glm(fit, newdata=new_data ,type = type,...))
+      return(predict.glm(fit, newdata=new_data ,type = "response",...))
       
       }
        
 
   }
-  }
+}
+#' @rdname predict
+#'
+#' @export
+#' @method predict selection
+#' @examples
+#'
+#'
+predict.selection<-function(object,newdata = NULL,...){
   
+  family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
+  
+  data = data.frame(Y = object$Y, X= object$X[,object$ID_Selected])
+  
+  if(!exists("type")){type = "response"}
+  
+  if( object$ctg ){
+    # Categorical prediction
+    
+    data<- suppressWarnings(dummy.data.frame(data ,sep="."))
+    
+    fit<-glm(Y~.,data = data ,family = family)
+    
+    if(is.null(newdata)){
+      
+      return(predict.glm(fit, newdata=NULL ,type = type,...))
+      
+    }else{
+      
+      new_data = suppressWarnings(data.frame( X= newdata[,object$ID_Selected]))
+      
+      newdata_dummy  <- suppressWarnings(dummy.data.frame(new_data ,sep="."))
+      
+      return(predict.glm(fit, newdata=new_data ,type = type,...))
+      
+    }
+    
+    
+    
+  }else{
+    
+    # Numerical prediction
+    data = data.frame(Y = object$Y, X= object$X[,object$ID_Selected])
+    
+    fit<-glm(Y~.,data = data ,family = family)
+    
+    if(is.null(newdata)){
+      
+      return(predict.glm(fit, newdata=NULL ,type = "response",...))
+      
+    }else{
+      
+      new_data = suppressWarnings(data.frame( X= newdata[,object$ID_Selected]))
+      
+      return(predict.glm(fit, newdata=new_data ,type = "response",...))
+      
+    }
+    
+    
+  }
+}
+
+
+
+
+
   
   
 

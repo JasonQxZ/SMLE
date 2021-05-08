@@ -68,18 +68,6 @@ Uh<-function(A, uh, b0, b1, family="gaussian")
   return(Bt)
 }
 
-#####Preprocessing Data
-PrePro<-function(X,standardize){
-  if(is.na(X)==T){
-    na_index<-(1:dim(X)[2])[apply(X,2,is.na)]
-    X<-X[,-na_index]
-  }
-  if(standardize == T){
-    X<-Standardize(X)
-  }
-  return(as.matrix(X))
-}
-
 ####likelihood function
 lh<-function(Y, X, beta, family=c("gaussian","binomial","poisson"))
 {

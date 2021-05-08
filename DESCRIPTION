@@ -1,28 +1,8 @@
 Package: SMLE
 Title: Joint Feature Screening via Sparse MLE
-Version: 1.1.0
-Authors@R: c(person(given = "Qianxiang", family = "Zang",
-                    role  = c("aut", "cre"),
-                    email = "qzang023@uottawa.ca"),
-             person(given = "Chen", family = "Xu",
-                    role  = "aut",
-                    email = "cx3@uottawa.ca"),
-             person(given = "Kelly.", family = "Berkett",
-                    role = "aut",
-                    email = "kburett@uottawa.ca"),
+Version: 1.1.1
 Maintainer: Qianxiang Zang <qzang023@uottawa.ca>
-Description: Feature screening is a powerful tool in processing ultrahigh 
-dimensional data. It attempts to screen out most irrelevant features in 
-preparation for a more elaborate analysis. 
-Xu and Chen (2014)<doi:10.1080/01621459.2013.879531> 
-proposed an effective screening method SMLE, 
-which naturally incorporates the joint effects among features in the 
-screening process. This package provides an efficient implementation 
-of SMLE-screening for high-dimensional linear, logistic, and Poisson 
-models. The package also provides a function for conducting accurate 
-post-screening feature selection based on an iterative hard-thresholding 
-procedure and a user-specified selection criterion.
-
+Description: Feature screening is a powerful tool in processing ultrahigh dimensional data. It attempts to screen out most irrelevant features in preparation for a more elaborate analysis. Xu and Chen (2014)<doi:10.1080/01621459.2013.879531> proposed an effective screening method SMLE, which naturally incorporates the joint effects among features in the screening process. This package provides an efficient implementation of SMLE-screening for high-dimensional linear, logistic, and Poisson models. The package also provides a function for conducting accurate post-screening feature selection based on an iterative hard-thresholding procedure and a user-specified selection criterion.
 License: GPL-3
 Depends: R(>= 3.5.0), glmnet
 Imports: stats, graphics, utils, matrixcalc, mvnfast

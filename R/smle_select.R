@@ -167,10 +167,12 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
                                                     all,standard,DV")}
 
   #-----------------------------Algorithm-start---------------------------------
-
+  ctg =FALSE
+  
   if( any(  (1:dim(X_s)[2])[sapply(X_s,is.factor)] )){
     #if sub matrix X_s has any categorical features
-
+    ctg= TRUE
+    
     criter_value<-ctg_ebicc(Y,X_s,family,tune,codingtype,
                             k_min,k_max,n,pp,gamma_ebic,para,num_clusters)
 
@@ -272,8 +274,12 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
           Criterion_value=criter_value,
 
           ID_Voted=ID_Voted,
+          
+          ctg = ctg,
 
           gamma_ebic=gamma_ebic,
+          
+          codingtype = codingtype,
 
           gamma_seq=gamma_seq, X = X , Y = Y)
   class(S)<-"selection"

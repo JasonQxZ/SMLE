@@ -6,11 +6,13 @@
 \alias{SMLE.formula}
 \title{Joint feature screening via sparse maximum likelihood estimation for GLMs}
 \usage{
-SMLE(Y, X, ...)
+SMLE(object, ...)
 
 \method{SMLE}{default}(
-  Y,
-  X,
+  object = NULL,
+  X = NULL,
+  Y = NULL,
+  data = NULL,
   k = NULL,
   family = c("gaussian", "binomial", "poisson"),
   categorical = NULL,
@@ -29,12 +31,13 @@ SMLE(Y, X, ...)
   ...
 )
 
-\method{SMLE}{formula}(formula, data, categorical = NULL, ...)
+\method{SMLE}{formula}(object, data, categorical = NULL, ...)
 }
 \arguments{
-\item{Y}{The response vector of dimension \eqn{n \times 1}. Quantitative for
-\code{family ='gaussian'}, non-negative counts for \code{family ='poisson'},
-binary (0-1) for \code{family ='binomial'}. Input Y should be \code{'numeric'}.}
+\item{object}{an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted.}
+
+\item{...}{Additional arguments to be passed to \code{smle_select()} if \code{selection=TRUE}. 
+See \code{smle_select()} documentation for more details.}
 
 \item{X}{The \eqn{n \times p} feature matrix with each column denoting a feature
 (covariate) and each row denoting an observation vector. The input should be
@@ -43,8 +46,11 @@ data (or a mixture of numerical and categorical data). The algorithm will
 treat covariates having class "factor" as categorical data and extend the data
 frame dimension by the dummy columns needed for coding the categorical features.}
 
-\item{...}{Additional arguments to be passed to \code{smle_select()} if \code{selection=TRUE}. 
-See \code{smle_select()} documentation for more details.}
+\item{Y}{The response vector of dimension \eqn{n \times 1}. Quantitative for
+\code{family ='gaussian'}, non-negative counts for \code{family ='poisson'},
+binary (0-1) for \code{family ='binomial'}. Input Y should be \code{'numeric'}.}
+
+\item{data}{an optional data frame, list or environment (or object coercible by as.data.frame to a data frame) containing the variables in the model.}
 
 \item{k}{Total number of features (including \code{'keyset'}) to be retained 
 after screening. Default is the largest integer not 
@@ -107,10 +113,6 @@ algorithm. See details.}
 ranking groups of features. This augment is applicable only when
 \code{categorical= TRUE} with \code{group=T}; the default is true:
 a factor of \eqn{\sqrt{J}} is divided from the \eqn{L_2} effect of a group with J members.}
-
-\item{formula}{an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted.}
-
-\item{data}{an optional data frame, list or environment (or object coercible by as.data.frame to a data frame) containing the variables in the model.}
 }
 \value{
 Returns a \code{'smle'} object with
@@ -200,8 +202,9 @@ selection method on the output of \code{SMLE()}.
 set.seed(123.456)
 Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
 Data
-fit<-SMLE(Data$Y, Data$X, k=9, family = "gaussian")
+fit<-SMLE(Y=Data$Y, X=Data$X, k=9, family = "gaussian")
 fit
+summary(fit)
 ## The important features we missed:
 setdiff(Data$subset_true,fit$ID_Retained)
 ## Check if the important featrues are retained.

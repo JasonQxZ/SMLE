@@ -8,11 +8,7 @@ ebicc<-function(Y,X_s,family,tune,k_min,k_max,
   fss<-function(v){
 
     ff<- SMLE(Y=Y, X=X_s, k=v, family=family,fast=TRUE)
-
-
-    return(lh(Y=Y, X=as.matrix(X_s[,ff$ID_Retained]),
-              beta=as.vector(glm(Y ~ as.matrix(X_s[,ff$ID_Retained])-1, family=family)$coefficients),
-              family=family))
+    return(logLik(ff))
   }
 
   ll<-unlist(lapply(k_min:k_max,fss))
@@ -56,18 +52,14 @@ ctg_ebicc<-function(Y,X_s,family,tune,codingtype,
         dummy_f <- sum(sapply(list(X_v[,Ci]),nlevels)-2)
 
       }
-
-      ll <- lh(Y=Y, X=X_dummy,   beta=as.vector(glm(Y ~ X_dummy-1, family=family)$coefficients), family=family)
+      fit <- glm(Y ~ X_dummy, family=family)
+      ll <- stats::logLik(fit)
       return(list(d_f= dummy_f + v, likelihood = ll))
 
     }else{
       #X_v is a matrix
       X_v =  as.matrix(X_v)
-
-      ll <- lh(Y=Y, X=X_v,
-                beta=as.vector(glm(Y ~ X_v-1, family=family)$coefficients),
-                family=family)
-
+      ll<-logLik(ff)
       return(list(d_f= v, likelihood = ll))
 
     }
