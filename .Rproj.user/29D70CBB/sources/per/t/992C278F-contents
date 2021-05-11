@@ -1,0 +1,32 @@
+#' summary a SMLE object from SMLE
+#'
+#' @description This functions prints a summary of a SMLE object.
+#' In particular, it shows the features retained after SMLE-screening
+#' and the related convergence information.
+#'
+#' @param object Fitted '\code{smle}' object.
+#'
+#' @param ... This argument is not used and listed for method consistency.
+#'
+#' @return
+#' No return value.
+#' @export
+#' @method summary smle
+#' @examples
+#' Data<-Gen_Data(correlation="MA",family = "gaussian")
+#' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
+#' summary(fit)
+#'
+summary.smle <- function(object, ...){
+  
+  lg<-LogLik(object)
+  ans<-data.frame(  Coefficients      = object$Coef_Retained,
+                    Subset            = object$ID_Retained,
+                    Log_likelihood    = lg,
+                    AIC               = stats::AIC(lg),
+                    BIC               = stats::BIC(lg))
+
+  class(ans)= "summary.smle"
+  ans
+}
+

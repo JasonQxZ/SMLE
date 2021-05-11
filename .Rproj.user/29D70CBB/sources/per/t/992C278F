@@ -1,0 +1,24 @@
+{
+    "id": "992C278F",
+    "path": "H:/SMLE/R/summary.smle.R",
+    "project_path": "R/summary.smle.R",
+    "type": "r_source",
+    "hash": "1568645427",
+    "contents": "",
+    "dirty": false,
+    "created": 1620408982674.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "13,23",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1620413570,
+    "encoding": "ISO8859-1",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1620413570388,
+    "read_only": false,
+    "read_only_alternatives": []
+}

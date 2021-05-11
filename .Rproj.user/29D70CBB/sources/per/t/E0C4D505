@@ -1,0 +1,24 @@
+{
+    "id": "E0C4D505",
+    "path": "H:/SMLE/R/coef.R",
+    "project_path": "R/coef.R",
+    "type": "r_source",
+    "hash": "3865011527",
+    "contents": "",
+    "dirty": false,
+    "created": 1620335124915.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "cursorPosition": "16,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1619634499,
+    "encoding": "ISO8859-1",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1619634499,
+    "read_only": false,
+    "read_only_alternatives": []
+}

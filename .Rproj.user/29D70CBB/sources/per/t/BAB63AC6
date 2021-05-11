@@ -1,0 +1,24 @@
+{
+    "id": "BAB63AC6",
+    "path": "H:/SMLE/R/logLik.smle.R",
+    "project_path": "R/logLik.smle.R",
+    "type": "r_source",
+    "hash": "795277022",
+    "contents": "",
+    "dirty": false,
+    "created": 1620413099003.0,
+    "source_on_save": false,
+    "relative_order": 10,
+    "properties": {
+        "cursorPosition": "37,20",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1620413455,
+    "encoding": "ISO8859-1",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1620413455782,
+    "read_only": false,
+    "read_only_alternatives": []
+}
