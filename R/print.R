@@ -4,7 +4,7 @@
 #' @importFrom utils capture.output
 #' @description This functions prints the retained subset of a SMLE object.
 #'
-#' @param x Fitted '\code{smle}' object.
+#' @param x Fitted object.
 #'
 #' @param ... This argument is not used and listed for method consistency.
 #'
