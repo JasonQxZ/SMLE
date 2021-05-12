@@ -1,5 +1,5 @@
 ctg_fit<-function(Y , X , k ,
-
+                  
                   family = c("gaussian","binomial","poisson"),
                   
                   categorical  , keyset ,Ci, 
