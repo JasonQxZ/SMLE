@@ -84,9 +84,11 @@
 #'
 #' \item{X}{Feature matrix or Dataframe (Matrix if \code{num_ctgidx =FALSE} and dataframe otherwise)}
 #'
-#' \item{index}{Vector of columns indices of X for the features that affect the response variables (relevant features).}
+#' \item{subset_true}{Vector of columns indices of X for the features that affect the response variables (relevant features).}
 #'
-#' \item{Beta}{Vector of effects for the relevant features.}
+#' \item{coef_true}{Vector of effects for the relevant features.}
+#' 
+#' \item{ctg}{Logical flag wether the model contains categorical features.}
 #'
 #' @export
 #'
@@ -288,7 +290,7 @@ Gen_Data<-function(n=200,p=5000,sigma=1,
 
     D<-list(call = cl, Y = D$Y,X = Z , subset_true = pos_truecoef, coef_true= effect_truecoef,
 
-            family = family, Ctg = TRUE, correlation = correlation)
+            family = family, ctg = TRUE, correlation = correlation)
 
     class(D) <- "sdata"
 
@@ -387,7 +389,7 @@ Gen_Data<-function(n=200,p=5000,sigma=1,
                        'CS'='compound symmetry')
 
     D<-list(call = cl, Y = Y,X = numeric_data , subset_true = pos_truecoef, coef_true= effect_truecoef,
-            family = family, Ctg = FALSE, correlation = correlation)
+            family = family, ctg = FALSE, correlation = correlation)
 
     class(D)<-"sdata"
 

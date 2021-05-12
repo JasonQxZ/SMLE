@@ -77,7 +77,7 @@
 #'
 #' @param keyset A vector to indicate a set of key features that do not
 #' participate in feature screening and are forced to remain in the model.
-#' Default is null.
+#' Default is NULL
 #'
 #' @param intercept A vector to indicate whether to an intercept be used in
 #' the model. An intercept will not participate in screening.
@@ -93,7 +93,7 @@
 #' \code{Codingtype = "standard"} conducts standard dummy coding for each level
 #' in comparison with the reference level (first level).
 #'
-#' @param Coef_initial A \eqn{p}-dimensional vector for the initial coefficient 
+#' @param coef_initial A \eqn{p}-dimensional vector for the initial coefficient 
 #' value of the IHT algorithm.  The default is to use Lasso with the sparsity 
 #' closest to \eqn{n-1}. 
 #' 
@@ -134,9 +134,7 @@
 #' Retrieved May 28, 2020.
 #'
 #' Xu, C. and Chen, J. (2014). The Sparse MLE for Ultrahigh-Dimensional Feature
-#' Screening, \emph{Journal of the American Statistical Association}, \bold{109}(507), 1257–1269.
-#'
-#'
+#' Screening, \emph{Journal of the American Statistical Association}, \bold{109}(507), 12571269.
 #'
 #'
 #'
@@ -148,7 +146,7 @@
 #'
 #' \code{CM}: Design matrix of class \code{'matrix'} for numeric features (or \code{'data.frame'} with categorical features).
 #'
-#' \code{DM}: A matrix with dummy variable featrues added. (only if there are categorical features).
+#' \code{DM}: A matrix with dummy variable features added. (only if there are categorical features).
 #'
 #' \code{IM}: Iteration path matrix with columns recording IHT coefficient updates.
 #'
@@ -176,7 +174,7 @@
 #'
 #' \item{steps}{Number of iterations.}
 #'
-#' \item{LH}{A list of log-likelihood updates over the IHT iterations }
+#' \item{likeihood_iter}{A list of log-likelihood updates over the IHT iterations }
 #'
 #' \item{Usearch}{Number of times in searching a proper \eqn{u^{-1}} at each step over the IHT iterations.}
 #'
@@ -197,7 +195,7 @@
 #' summary(fit)
 #' ## The important features we missed:
 #' setdiff(Data$subset_true,fit$ID_Retained)
-#' ## Check if the important featrues are retained.
+#' ## Check if the important features are retained.
 #' Data$index %in% fit$ID_Retained
 #' plot(fit)
 #'
@@ -210,15 +208,15 @@ SMLE <- function (object, ...)
 SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL, 
                        family=c("gaussian","binomial","poisson"),
                        categorical = NULL , keyset = NULL, intercept = TRUE ,
-                       group = TRUE , codingtype = NULL , Coef_initial=NULL,
+                       group = TRUE , codingtype = NULL , coef_initial=NULL,
                        max_iter = 500 , tol = 0.01 ,selection = F ,
                        standardize = TRUE , fast = FALSE , U_rate=0.5 ,
                        penalize_mod = TRUE,...){
-
+  
   #-------Input preprocess-------
-
+  
   family<-match.arg(family)
-
+  
   cl<-match.call()
   cl[[1]] <- as.name("SMLE")
   
@@ -227,6 +225,8 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
   if(is.null(X)&is.null(data)){stop("Featrue Matrix required")}
   if(is.null(Y)&!is.null(object)){Y<-object}
   if(is.null(X)&!is.null(data)){X<-data}
+  
+  Data_X<-X
   ####
   if(is.null(k)){
     
@@ -238,32 +238,32 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
     Ci<-(1:dim(X)[2])[sapply(X,is.factor)]
     
     if( any(Ci) ){
-    
-        categorical = TRUE
-    
-        }else{
-        
-          categorical= FALSE
-        
-          X<- as.matrix(X, ncol=dim(X)[2])
-        
-          }
-    
+      
+      categorical = TRUE
+      
+    }else{
+      
+      categorical= FALSE
+      
+      X<- as.matrix(X, ncol=dim(X)[2])
+      
     }
-
-
-  #-------Run Algoriathm------
-
-  if(!is.null(Coef_initial)){
-
-    stopifnot(length(Coef_initial)==dim(X)[2])
+    
   }
-
-
+  
+  
+  #-------Run Algoriathm------
+  
+  if(!is.null(coef_initial)){
+    
+    stopifnot(length(coef_initial)==dim(X)[2])
+  }
+  
+  
   if(categorical == TRUE){
     
     Ci<-(1:dim(X)[2])[sapply(X,is.factor)]
-  
+    
     if(is.null( codingtype )){codingtype<-"DV"}
     
     if(group==FALSE &codingtype!="all"){stop("codingtype should be 'all' when group = FALSE")}
@@ -288,7 +288,7 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
         Xs <- data.frame( X[,1] , Xs )
         
         colnames(Xs)<-c(names(X)[1],name)
-
+        
       }else if( Ci[i]>dim(Xs)[2]){
         
         name<-dimnames(Xs)[[2]]
@@ -296,7 +296,7 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
         Xs<-data.frame(Xs,X[,Ci[i]])
         
         colnames(Xs)<-c(name,names(X)[Ci[i]])
-
+        
       }else{ 
         
         name<- dimnames(Xs)[[2]]
@@ -304,27 +304,27 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
         Xs<-data.frame(Xs[,1:Ci[i]-1],X[,Ci[i]],Xs[,Ci[i]:dim(Xs)[2]])
         
         colnames(Xs)<-c(name[1:Ci[i]-1],names(X)[Ci[i]],name[Ci[i]:(length(name))])
-
-        }
+        
+      }
       
     }
     
     
     
-
-
+    
+    
     fit<- ctg_fit(Y, Xs, k, family, categorical, keyset, Ci, max_iter, tol, fast,
                   
                   intercept, group, codingtype, penalize_mod,
                   
-                  U_rate, X_mean = X_mean, X_sd=X_sd, Coef_initial, cl)
-
+                  U_rate, X_mean = X_mean, X_sd=X_sd, coef_initial, cl,Data_X=Data_X)
+    
     return(fit)
-
+    
   }else{
-  
+    
     X_mean = NULL;X_sd=NULL;Xs<-X
-
+    
     if(standardize== TRUE){
       
       S<-Standardize(X)
@@ -334,30 +334,30 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
       X_mean<-S$X_mean
       
       X_sd<- S$X_sd
-
+      
     }
     
     fit<-SMLE_fit(Y=Y, X= Xs, k= k, family=family, keyset=keyset,
-                
-                intercept=intercept, max_iter =max_iter, tol =tol, fast =fast,
-                
-                U_rate=U_rate, X_mean = X_mean, X_sd=X_sd, Coef_initial=Coef_initial)
+                  
+                  intercept=intercept, max_iter =max_iter, tol =tol, fast =fast,
+                  
+                  U_rate=U_rate, X_mean = X_mean, X_sd=X_sd, coef_initial=coef_initial, Data_X=Data_X)
   }
-
+  
   #------Adding method-----
-
+  
   fit$call=cl
-
+  
   class(fit)="smle"
-
+  
   #-----Stage II ---------
   if(selection==F){
-
+    
     return(fit)
-
-    }else{
-
-  return(smle_select(fit,...))
+    
+  }else{
+    
+    return(smle_select(fit,...))
   }
 }
 
@@ -366,7 +366,7 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
 #' @param data an optional data frame, list or environment (or object coercible by as.data.frame to a data frame) containing the variables in the model. 
 #' @export
 SMLE.formula<- function (object, data, categorical=NULL,...) {
-
+  
   ## keep call (of generic)
   cl <- match.call()
   cl[[1]] <- as.name("SMLE")
@@ -404,15 +404,15 @@ SMLE.formula<- function (object, data, categorical=NULL,...) {
       ans <- SMLE(Y=y, X=x, ...)
     }
   }
-
+  
   
   ## done
   ans
 }
 
-SMLE_fit<-function(Y , X, k, family="gaussian", keyset=NULL,
+SMLE_fit<-function(Y,X, k, family="gaussian", keyset=NULL,
                    intercept=TRUE, max_iter=500, tol=0.01, fast=FALSE,
-                   U_rate=0.5,X_mean=NULL,X_sd=NULL,Coef_initial=NULL){
+                   U_rate=0.5,X_mean=NULL,X_sd=NULL,coef_initial=NULL, Data_X){
   
   LH<-rep(0,max_iter)
   
@@ -420,7 +420,7 @@ SMLE_fit<-function(Y , X, k, family="gaussian", keyset=NULL,
   
   n<-dim(X)[1];p<-dim(X)[2]
   
-  if( is.null( Coef_initial ) ){
+  if( is.null( coef_initial ) ){
     
     fit_pre<-glmnet(x=X,y=Y,family=family)
     
@@ -428,7 +428,7 @@ SMLE_fit<-function(Y , X, k, family="gaussian", keyset=NULL,
     
   }else{ 
     
-    Beta0 <- Coef_initial }
+    Beta0 <- coef_initial }
   
   FD<-NULL
   
@@ -477,7 +477,7 @@ SMLE_fit<-function(Y , X, k, family="gaussian", keyset=NULL,
   
   Xs_0 <- X_iter[, ID_None0]
   
-  if(!is.null(Coef_initial) & sum(Coef_initial!=0)==0){ 
+  if(!is.null(coef_initial) & sum(coef_initial!=0)==0){ 
     
     R_0<-matrix(0, ncol=1, nrow=n) 
     
@@ -497,7 +497,7 @@ SMLE_fit<-function(Y , X, k, family="gaussian", keyset=NULL,
   V_0<-crossprod(X_iter,Y - R_0)
   
   
-  if(!is.null(Coef_initial) & sum(Coef_initial!=0)==0){
+  if(!is.null(coef_initial) & sum(coef_initial!=0)==0){
     
     if(intercept==T){
       
@@ -633,7 +633,7 @@ SMLE_fit<-function(Y , X, k, family="gaussian", keyset=NULL,
   
   if( intercept == T ){
     
-    #rescale beta_path
+    #resale beta_path
     
     beta_path<-beta_path[-1,]             
     
@@ -666,7 +666,7 @@ SMLE_fit<-function(Y , X, k, family="gaussian", keyset=NULL,
   
   
   
-  fit<-list(I=I,X=I$CM, Y=I$Y,
+  fit<-list(I=I,X=X, Y=Y,Data_X=Data_X, 
             
             keyset = keyset, family = family, k = k,
             
@@ -674,7 +674,7 @@ SMLE_fit<-function(Y , X, k, family="gaussian", keyset=NULL,
             
             steps = i,
             
-            LH=LH[1:i],
+            likeihood_iter=LH[1:i],
             
             Usearch=number_of_Ucheck[1:i],
             
@@ -691,4 +691,3 @@ SMLE_fit<-function(Y , X, k, family="gaussian", keyset=NULL,
             fast=fast
   )
 }
-
