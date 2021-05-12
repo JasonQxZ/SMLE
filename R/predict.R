@@ -30,42 +30,21 @@
 #' fit<-SMLE(Data_sim$Y,Data_sim$X, family = "gaussian" , k=10)
 #'
 #' predict(fit,newdata= Data_sim$X[10:20,])
+#' 
+#' predict(fit)[10:20]
 #'
 predict.smle<-function(object,newdata = NULL,...){
   
   family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
   
-  data = data.frame(Y = object$Y, X= object$X[,object$ID_Retained])
+  data = data.frame(Y = object$Y, X= object$Data_X[,object$ID_Retained])
   
   if(!exists("type")){type = "response"}
   
   if( object$ctg ){
     # Categorical prediction
     
-    data<- suppressWarnings(dummy.data.frame(data ,sep="."))
-    
-    fit<-glm(Y~.,data = data ,family = family)
-    
-    if(is.null(newdata)){
-      
-      return(predict.glm(fit, newdata=NULL ,type = type,...))
-      
-    }else{
-      
-      new_data = suppressWarnings(data.frame( X= newdata[,object$ID_Retained]))
-      
-      newdata_dummy  <- suppressWarnings(dummy.data.frame(new_data ,sep="."))
-      
-      return(predict.glm(fit, newdata=new_data ,type = type,...))
-      
-    }
-    
-
-    
-  }else{
-    
-    # Numerical prediction
-    data = data.frame(Y = object$Y, X= object$X[,object$ID_Retained])
+    data<- suppressWarnings(dummy.data.frame(data ,sep=".",codingtype = object$CT))
     
     fit<-glm(Y~.,data = data ,family = family)
     
@@ -74,14 +53,36 @@ predict.smle<-function(object,newdata = NULL,...){
       return(predict.glm(fit, newdata=NULL ,type = "response",...))
       
     }else{
-        
+      
       new_data = suppressWarnings(data.frame( X= newdata[,object$ID_Retained]))
+      
+      newdata_dummy  <- suppressWarnings(dummy.data.frame(new_data ,sep="."))
       
       return(predict.glm(fit, newdata=new_data ,type = "response",...))
       
-      }
-       
-
+    }
+    
+    
+    
+  }else{
+    
+    # Numerical prediction
+    
+    fit<-glm(Y~.,data = data ,family = family)
+    
+    if(is.null(newdata)){
+      
+      return(predict.glm(fit, newdata=NULL ,type = "response",...))
+      
+    }else{
+      
+      new_data = data.frame( X= newdata[,object$ID_Retained])
+      
+      return(predict.glm(fit, newdata=new_data ,type = "response",...))
+      
+    }
+    
+    
   }
 }
 #' @rdname predict
@@ -95,7 +96,7 @@ predict.selection<-function(object,newdata = NULL,...){
   
   family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
   
-  data = data.frame(Y = object$Y, X= object$X[,object$ID_Selected])
+  data = data.frame(Y = object$Y, X= object$Data_X[,object$ID_Selected])
   
   if(!exists("type")){type = "response"}
   
@@ -108,15 +109,15 @@ predict.selection<-function(object,newdata = NULL,...){
     
     if(is.null(newdata)){
       
-      return(predict.glm(fit, newdata=NULL ,type = type,...))
+      return(predict.glm(fit, newdata=NULL ,type = "response",...))
       
     }else{
       
       new_data = suppressWarnings(data.frame( X= newdata[,object$ID_Selected]))
       
-      newdata_dummy  <- suppressWarnings(dummy.data.frame(new_data ,sep="."))
+      newdata_dummy  <- suppressWarnings(dummy.data.frame(new_data ,sep=".",codingtype = object$CT))
       
-      return(predict.glm(fit, newdata=new_data ,type = type,...))
+      return(predict.glm(fit, newdata=new_data ,type = "response",...))
       
     }
     
@@ -125,7 +126,7 @@ predict.selection<-function(object,newdata = NULL,...){
   }else{
     
     # Numerical prediction
-    data = data.frame(Y = object$Y, X= object$X[,object$ID_Selected])
+    data = data.frame(Y = object$Y, X= object$Data_X[,object$ID_Selected])
     
     fit<-glm(Y~.,data = data ,family = family)
     
@@ -144,6 +145,11 @@ predict.selection<-function(object,newdata = NULL,...){
     
   }
 }
+
+
+
+
+
 
 
 
