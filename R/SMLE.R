@@ -194,9 +194,9 @@
 #' fit
 #' summary(fit)
 #' ## The important features we missed:
-#' setdiff(Data$subset_true,fit$ID_Retained)
+#' setdiff(Data$subset_true,fit$ID_retained)
 #' ## Check if the important features are retained.
-#' Data$index %in% fit$ID_Retained
+#' Data$index %in% fit$ID_retained
 #' plot(fit)
 #'
 #'
@@ -469,7 +469,7 @@ SMLE_fit<-function(Y,X, k, family="gaussian", keyset=NULL,
   
   beta_path<-as.matrix(Beta0,nrow=pp,ncol=1)
   
-  I<-list(CM=X,Y=Y,IM=X_iter,Beta0=Beta0,family=family)
+  I<-list(CM=X,Y=Y,IM=X_iter,beta0=Beta0,family=family)
   
   pp<-p+intercept
   
@@ -664,29 +664,27 @@ SMLE_fit<-function(Y,X, k, family="gaussian", keyset=NULL,
   }
   
   
-  
-  
-  fit<-list(I=I,X=X, Y=Y,Data_X=Data_X, 
+  fit<-list(data_info=I,X=Data_X, Y=Y, 
             
             keyset = keyset, family = family, k = k,
             
-            Intercept=Intercept_value,
+            intercept=Intercept_value,
             
             steps = i,
             
             likeihood_iter=LH[1:i],
             
-            Usearch=number_of_Ucheck[1:i],
+            usearch=number_of_Ucheck[1:i],
             
-            Path_Retained  = beta_path,
+            path_retained  = beta_path,
             
-            Num_Retained   = length(ID_None0),
+            num_Retained   = length(ID_None0),
             
-            ID_Retained    = ID_None0,
+            ID_retained    = ID_None0,
             
-            Coef_Retained  = coef_None0,
+            coef_retained  = coef_None0,
             
-            FD=FD, ctg = FALSE, Coef_dist=Coef_dist,
+            FD=FD, ctg = FALSE, coef_dist=Coef_dist,
             
             fast=fast
   )

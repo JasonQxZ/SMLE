@@ -34,7 +34,7 @@ ctg_ebicc<-function(Y,X_s,family,tune,codingtype,
 
     ff<- SMLE(Y=Y, X=X_s, k=v, family=family,codingtype = codingtype,categorical = T,group=T)
 
-    X_v <- X_s[,ff$ID_Retained]
+    X_v <- X_s[,ff$ID_retained]
 
     Ci <- sapply(X_v,is.factor)
 

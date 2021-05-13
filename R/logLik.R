@@ -11,7 +11,7 @@ logLik.smle<-function(object,...){
   codingtype = object$codingtype
   Y<-object$Y
   X_s <- object$X
-  X_v <- X_s[,object$ID_Retained]
+  X_v <- X_s[,object$ID_retained]
   Ci <- sapply(X_v,is.factor)
   family <- object$family
   if( any(sapply(X_v,is.factor)) ){
@@ -51,7 +51,7 @@ logLik.selection<-function(object,...){
   codingtype = object$codingtype
   Y<-object$Y
   X_s <- object$X
-  X_v <- X_s[,object$ID_Selected]
+  X_v <- X_s[,object$ID_selected]
   Ci <- sapply(X_v,is.factor)
   family <- object$family
   if( any(sapply(X_v,is.factor)) ){
