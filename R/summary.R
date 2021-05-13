@@ -24,35 +24,20 @@ summary.smle <- function(object, ...){
   
   family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
   
-
+  ans=list()
 
   
   if(object$ctg==TRUE){
-    
-    data = data.frame(Y = object$Y, X= object$X[,object$ID_Retained])
-    
-    data<- suppressWarnings(dummy.data.frame(data ,sep="."))
-    
-    ans<-summary(glm(Y~.,data = data ,family = family))
     
     ans$ctg = TRUE
     ans$CI = object$I$CI
     ans$levels = nlevels(object$X[,object$I$CI])
     
-  
+    
     
   }else{
     
-    if(is.null(colnames(object$X))){
-      
-      X = object$X
-      
-      colnames(X) <- paste0("X.",seq(1,ncol(X)))
-    }
-    
-    data = data.frame(Y = object$Y, X[,object$ID_Retained])
-    
-    ans<-summary(glm(Y~.,data = data ,family = family))
+
     
     
   }
@@ -70,9 +55,8 @@ summary.selection <- function(object, ...){
   
   lg<-logLik(object)
   
-  family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
   
-  
+  ans=list()
   
   
   if(object$ctg==TRUE){
@@ -81,8 +65,7 @@ summary.selection <- function(object, ...){
     
     data<- suppressWarnings(dummy.data.frame(data ,sep="."))
     
-    ans<-summary(glm(Y~.,data = data ,family = family))
-    
+
     ans$ctg = TRUE
     ans$CI = object$I$CI
     ans$levels = nlevels(object$X[,object$I$CI])
@@ -98,9 +81,7 @@ summary.selection <- function(object, ...){
       colnames(X) <- paste0("X.",seq(1,ncol(X)))
     }
     
-    data = data.frame(Y = object$Y, X[,object$ID_Retained])
-    
-    ans<-summary(glm(Y~.,data = data ,family = family))
+
     
     
   }
