@@ -154,29 +154,29 @@
 #'
 #' \code{CI}: Indices of categorical features in \code{CM}.
 #'
-#' \code{Beta0}: Inital value of regression coefficient for IHT.
+#' \code{beta0}: Inital value of regression coefficient for IHT.
 #'
 #' \code{DFI}: Indices of categorical features in \code{IM}.
 #'
 #' \code{codingtype}: Same as input.
 #'  }
 #'
-#' \item{ID_Retained}{A vector indicating the features retained after SMLE screening.
+#' \item{ID_retained}{A vector indicating the features retained after SMLE screening.
 #' The output includes both features retained by SMLE and the features specified in \code{'keyset'}.}
 #'
-#' \item{Coef_Retained}{The vector of coefficients for the retained features.}
+#' \item{coef_retained}{The vector of coefficients for the retained features.}
 #'
-#' \item{Path_Retained}{Iteration path matrix with columns recording the coefficient updates over the IHT procedure.}
+#' \item{path_retained}{Iteration path matrix with columns recording the coefficient updates over the IHT procedure.}
 #'
-#' \item{Num_Retained}{Number of retained featrues after screening.}
+#' \item{num_retained}{Number of retained featrues after screening.}
 #'
-#' \item{Intercept}{The value, if Intercept = TRUE.}
+#' \item{intercept}{The value, if Intercept = TRUE.}
 #'
 #' \item{steps}{Number of iterations.}
 #'
 #' \item{likeihood_iter}{A list of log-likelihood updates over the IHT iterations }
 #'
-#' \item{Usearch}{Number of times in searching a proper \eqn{u^{-1}} at each step over the IHT iterations.}
+#' \item{usearch}{Number of times in searching a proper \eqn{u^{-1}} at each step over the IHT iterations.}
 #'
 #'
 #'
