@@ -36,6 +36,8 @@ fit<-SMLE(Data_sim$Y,Data_sim$X, family = "gaussian" , k=10)
 
 predict(fit,newdata= Data_sim$X[10:20,])
 
+predict(fit)[10:20]
+
 
 
 }

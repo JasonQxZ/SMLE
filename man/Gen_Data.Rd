@@ -54,9 +54,11 @@ Returns a \code{"sdata"} object with
 
 \item{X}{Feature matrix or Dataframe (Matrix if \code{num_ctgidx =FALSE} and dataframe otherwise)}
 
-\item{index}{Vector of columns indices of X for the features that affect the response variables (relevant features).}
+\item{subset_true}{Vector of columns indices of X for the features that affect the response variables (relevant features).}
 
-\item{Beta}{Vector of effects for the relevant features.}
+\item{coef_true}{Vector of effects for the relevant features.}
+
+\item{ctg}{Logical flag wether the model contains categorical features.}
 }
 \description{
 This function generates synthetic datasets from GLMs with a user-specified correlation structure.
