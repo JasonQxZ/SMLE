@@ -44,7 +44,7 @@ predict.smle<-function(object,newdata = NULL,...){
   if( object$ctg ){
     # Categorical prediction
     
-    data<- suppressWarnings(dummy.data.frame(data ,sep=".",codingtype = object$CT))
+    data<- suppressWarnings(dummy.data.frame(data ,sep=".",codingtype = object$codingtype))
     
     fit<-glm(Y~.,data = data ,family = family)
     
@@ -56,9 +56,9 @@ predict.smle<-function(object,newdata = NULL,...){
       
       new_data = suppressWarnings(data.frame( X= newdata[,object$ID_retained]))
       
-      newdata_dummy  <- suppressWarnings(dummy.data.frame(new_data ,sep="."))
+      newdata_dummy  <- suppressWarnings(dummy.data.frame(new_data ,sep=".",codingtype = object$codingtype))
       
-      return(predict.glm(fit, newdata=new_data ,type = "response",...))
+      return(predict.glm(fit, newdata=newdata_dummy ,type = "response",...))
       
     }
     
@@ -103,7 +103,7 @@ predict.selection<-function(object,newdata = NULL,...){
   if( object$ctg ){
     # Categorical prediction
     
-    data<- suppressWarnings(dummy.data.frame(data ,sep="."))
+    data<- suppressWarnings(dummy.data.frame(data ,sep=".",codingtype = object$codingtype))
     
     fit<-glm(Y~.,data = data ,family = family)
     
@@ -115,9 +115,9 @@ predict.selection<-function(object,newdata = NULL,...){
       
       new_data = suppressWarnings(data.frame( X= newdata[,object$ID_selected]))
       
-      newdata_dummy  <- suppressWarnings(dummy.data.frame(new_data ,sep=".",codingtype = object$CT))
+      newdata_dummy  <- suppressWarnings(dummy.data.frame(new_data ,sep=".",codingtype = object$codingtype))
       
-      return(predict.glm(fit, newdata=new_data ,type = "response",...))
+      return(predict.glm(fit, newdata=newdata_dummy ,type = "response",...))
       
     }
     

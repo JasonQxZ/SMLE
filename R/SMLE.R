@@ -678,7 +678,7 @@ SMLE_fit<-function(Y,X, k, family="gaussian", keyset=NULL,
             
             path_retained  = beta_path,
             
-            num_Retained   = length(ID_None0),
+            num_retained   = length(ID_None0),
             
             ID_retained    = ID_None0,
             
