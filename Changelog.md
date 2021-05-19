@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Added 
+### Added summar and Print.summray methods.
 
-### Fixed
+### Fixed a bug related to categircal features in predict function.
 
 ## [1.1.3] - 2021-05-12
 
@@ -15,8 +15,10 @@ Fixed a bug for predict().
 
 
 ### Changed
+Uncapitialized names in smle and selection objects.
 
 Updated some document for SMLE().
+
 
 ## [1.1.2] - 2021-05-09
 

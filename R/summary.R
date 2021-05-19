@@ -25,21 +25,27 @@ summary.smle <- function(object, ...){
   family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
   
   ans=list()
-
+  ans$family = object$family
+  ans$steps = object$steps
+  ans$loglikelihood = lg
+  ans$DimY= dim(object$Y)
+  ans$DimX= dim(object$X)
+  ans$size = object$num_retained
+  ans$ID_retained  =object$ID_retained
+  ans$coef_retained = object$coef_retained
+  
+  if( !is.null(object$Intercept) ){
+    ans$intercept= object$intercept
+    
+  }else{ans$intercept =NULL}
+  
   
   if(object$ctg==TRUE){
     
     ans$ctg = TRUE
     ans$CI = object$I$CI
     ans$levels = nlevels(object$X[,object$I$CI])
-    
-    
-    
-  }else{
-    
-
-    
-    
+  
   }
   
   ans$call <- object$call
@@ -57,37 +63,34 @@ summary.selection <- function(object, ...){
   
   
   ans=list()
+  ans$steps = object$steps
+  ans$loglikelihood = lg
+  ans$DimY= dim(object$Y)
+  ans$DimX= dim(object$X)
+  ans$size = object$num_selected
+  ans$coef = object$coef_selected
+  ans$vote = object$vote
+  ans$ID_voted = object$ID_voted
+  ans$criterion = object$criterion
+  ans$ID_selected  =object$ID_selected
+  ans$coef_selected = object$coef_selected
+  ans$gamma_ebic = object$gamma_ebic 
   
+  
+  if( !is.null(object$Intercept) ){
+    ans$intercept= object$intercept
+    
+  }else{ans$intercept =NULL}
   
   if(object$ctg==TRUE){
-    
-    data = data.frame(Y = object$Y, X= object$X[,object$ID_Selected])
-    
-    data<- suppressWarnings(dummy.data.frame(data ,sep="."))
-    
-
     ans$ctg = TRUE
     ans$CI = object$I$CI
     ans$levels = nlevels(object$X[,object$I$CI])
     
-    
-    
-  }else{
-    
-    if(is.null(colnames(object$X))){
-      
-      X = object$X
-      
-      colnames(X) <- paste0("X.",seq(1,ncol(X)))
-    }
-    
-
-    
-    
   }
   
   ans$call <- object$call
-  class(ans)= "summary.smle"
+  class(ans)= "summary.selection"
   ans
 }
 
