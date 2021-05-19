@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Added summar and Print.summray methods.
+### Added
 
-### Fixed a bug related to categircal features in predict function.
+summar and Print.summray methods.
+
+### Fixed
+
+a bug related to categircal features in predict function.
 
 ## [1.1.3] - 2021-05-12
 
