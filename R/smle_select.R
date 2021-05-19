@@ -61,9 +61,10 @@ smle_select<-function(x, ...){
 #' @export
 #'
 smle_select.smle<-function(x,...){
-
+  cl<-match.call()
   Data<-structure(list( Y=x$Y, X=x$X, family=x$family),class = "sdata")
   S<-smle_select(Data,sub_model =x$ID_retained,...)
+  S$call <- cl
   return(S)
 }
 
@@ -110,6 +111,8 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
                             tune="ebic", codingtype = NULL,
                             gamma_seq=c(seq(0,1,0.2)), vote_threshold=NULL,
                             para = FALSE, num_clusters=NULL,...){
+  cl<-match.call()
+
   #input check
   X<-x$X
 
@@ -257,7 +260,10 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
 
   }
 
-  S<-list(ID_selected=ID_Selected, family = family,
+  S<-list(
+          call = cl,
+    
+          ID_selected=ID_Selected, family = family,
 
           coef_selected=f_s$coef_retained,
           
@@ -302,7 +308,7 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
 #' @export
 #'
 smle_select.default<-function(x, X=NULL, family='gaussian',...){
-
+  cl<-match.call()
   if ( any(sapply(X,as.factor) ==TRUE) ){
    Cate = TRUE
   }else{
@@ -313,7 +319,7 @@ smle_select.default<-function(x, X=NULL, family='gaussian',...){
 
 
   S<-smle_select(Data,sub_model=x$ID_retained,...)
-
+  S$call <- cl
   return(S)
 }
 
