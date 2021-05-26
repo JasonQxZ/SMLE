@@ -1,7 +1,7 @@
 #' Extract coefficient from fitted model
 #' 
 #' @param object Fitted model
-#' @param ... Forwarded arguments for generic function.
+#' @param ... Forwarded arguments
 #' @return Coefficients after screening or selection.
 #' 
 #' @rdname coef

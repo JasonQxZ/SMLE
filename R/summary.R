@@ -1,7 +1,7 @@
-#' summary a SMLE object from SMLE
+#' summary an object from SMLE and selection
 #'
 #' @rdname summary
-#' @description This functions prints a summary of a SMLE object.
+#' @description This functions prints a summary of a '\code{smle}' (or a '\code{seletion}') object.
 #' In particular, it shows the features retained after SMLE-screening
 #' and the related convergence information.
 #' @import stats
