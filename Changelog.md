@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 summar and Print.summray methods.
+vote function for seleciton object.
+
+### Changed 
+
+Documents modified.
 
 ### Fixed
 
