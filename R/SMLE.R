@@ -222,7 +222,7 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
   
   ####Input object is a design matrix
   if(is.null(Y)&is.null(object)){stop("Response required")}
-  if(is.null(X)&is.null(data)){stop("Featrue Matrix required")}
+  if(is.null(X)&is.null(data)){stop("Feature Matrix required")}
   if(is.null(Y)&!is.null(object)){Y<-object}
   if(is.null(X)&!is.null(data)){X<-data}
   
