@@ -61,9 +61,10 @@ smle_select<-function(x, ...){
 #' @export
 #'
 smle_select.smle<-function(x,...){
-
-  Data<-structure(list( Y=x$I$Y, X=x$I$CM, family=x$I$family),class = "sdata")
-  S<-smle_select(Data,sub_model =x$ID_Retained,...)
+  cl<-match.call()
+  Data<-structure(list( Y=x$Y, X=x$X, family=x$family),class = "sdata")
+  S<-smle_select(Data,sub_model =x$ID_retained,...)
+  S$call <- cl
   return(S)
 }
 
@@ -110,6 +111,8 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
                             tune="ebic", codingtype = NULL,
                             gamma_seq=c(seq(0,1,0.2)), vote_threshold=NULL,
                             para = FALSE, num_clusters=NULL,...){
+  cl<-match.call()
+
   #input check
   X<-x$X
 
@@ -189,7 +192,7 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
 
       v_s <- which.min(ebic_value)+k_min-1
 
-      return(SMLE(Y=Y, X=X_s, k=v_s, family=family,categorical = T)$ID_Retained)
+      return(SMLE(Y=Y, X=X_s, k=v_s, family=family,categorical = T)$ID_retained)
 
     }
 
@@ -211,7 +214,7 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
 
       v_s <- which.min(ebic_value)+k_min-1
 
-      return(SMLE(Y=Y, X=X_s, k=v_s, family=family)$ID_Retained)
+      return(SMLE(Y=Y, X=X_s, k=v_s, family=family)$ID_retained)
 
     }
 
@@ -247,33 +250,36 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
     }
   if(is.null(sub_model)){
 
-    ID_Selected=f_s$ID_Retained
+    ID_Selected=f_s$ID_retained
 
   }else{
 
-    ID_Selected<-sub_model[f_s$ID_Retained]
+    ID_Selected<-sub_model[f_s$ID_retained]
 
     ID_Voted<-sub_model[ID_Voted]
 
   }
 
-  S<-list(ID_Selected=ID_Selected, family = family,
+  S<-list(
+          call = cl,
+    
+          ID_selected=ID_Selected, family = family,
 
-          Coef_Selected=f_s$Coef_Retained,
+          coef_selected=f_s$coef_retained,
           
           intercept = f_s$intercept,
           
-          Num_Selected = length(f_s$Coef_Retained),
+          num_selected = length(f_s$coef_retained),
 
           vote=vote,criterion=tune,
           
-          ID_Pool= IP,
+          ID_pool= IP,
           
           sub_model = sub_model,
 
-          Criterion_value=criter_value,
+          criterion_value=criter_value,
 
-          ID_Voted=ID_Voted,
+          ID_voted=ID_Voted,
           
           ctg = ctg,
 
@@ -302,7 +308,7 @@ smle_select.sdata<-function(x, k_min=1, k_max=NULL, sub_model=NULL,
 #' @export
 #'
 smle_select.default<-function(x, X=NULL, family='gaussian',...){
-
+  cl<-match.call()
   if ( any(sapply(X,as.factor) ==TRUE) ){
    Cate = TRUE
   }else{
@@ -312,8 +318,8 @@ smle_select.default<-function(x, X=NULL, family='gaussian',...){
   Data<-structure(list(Y=x,X=X,family=family,Cate = Cate),class = "sdata")
 
 
-  S<-smle_select(Data,sub_model=x$ID_Retained,...)
-
+  S<-smle_select(Data,sub_model=x$ID_retained,...)
+  S$call <- cl
   return(S)
 }
 

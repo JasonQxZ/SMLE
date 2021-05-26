@@ -8,9 +8,9 @@
 #' @method coef smle
 #' @export
 coef.smle<-function(object,...)
-{return(object$Coef_Retained)}
+{return(object$coef_retained)}
 #' @rdname coef
 #' @method coef selection
 #' @export
 coef.selection<-function(object,...)
-{return(object$Coef_Selected)}
+{return(object$coef_selected)}

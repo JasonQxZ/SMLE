@@ -34,27 +34,27 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
   on.exit(par(oldpar))
 
   #-------------------check
-  N_steps<-x$step
+  nsteps<-x$steps
 
-  Feature_path<-x$Path_Retained
+  Feature_path<-x$path_retained
 
   #--------------------plot-------------
   if(out_plot==5){
 
   par(mfrow=c(2,2))
 
-  plot(y=x$LH,x=1:N_steps,xlab="steps",ylab="log-likelihood",type="b")
+  plot(y=x$likelihood_iter,x=1:nsteps,xlab="steps",ylab="log-likelihood",type="b")
 
   title("Likelihood convergence")
 
-  plot(x$Coef_dist, x=1:length(x$Coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
+  plot(x$coef_dist, x=1:length(x$coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
        main=" Coefficient convergence",type="b" )
 
-  plot(y=x$Usearch,x=1:N_steps,xlab="steps",ylab="No. of tries")
+  plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
 
   title("U-search")
 
-  plot(y=x$FD,x=1:N_steps,xlab="steps",ylab="No. of changes")
+  plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
 
   title("Retained feature change")
 
@@ -62,17 +62,17 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
 
   if(is.null(num_path)){num_path=x$k}
 
-  TOP_index<- x$ID_Retained[sort(abs(x$Coef_Retained),decreasing = T,index.return=T)$ix][1:num_path]
+  TOP_index<- x$ID_retained[sort(abs(x$coef_retained),decreasing = T,index.return=T)$ix][1:num_path]
 
   TOP_index<-unique(c(TOP_index,which_path))
 
   Feature_path<-Feature_path[TOP_index,]
 
-  plot(NULL, xlim=c(1,N_steps+1), ylim=c(floor(min(Feature_path[,N_steps])),ceiling(max(Feature_path[,N_steps]))),xlab="steps",ylab="coefficients",...)
+  plot(NULL, xlim=c(1,nsteps+1), ylim=c(floor(min(Feature_path[,nsteps])),ceiling(max(Feature_path[,nsteps]))),xlab="steps",ylab="coefficients",...)
 
   title("Solution path")
 
-  lines(rep(0,N_steps),lty=1,lwd=1,col="black")
+  lines(rep(0,nsteps),lty=1,lwd=1,col="black")
   
   A<-lapply(1:length(TOP_index),function(i){lines(Feature_path[i,],lty=i,col=rainbow(length(TOP_index))[i])})
 
@@ -89,34 +89,34 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
     
     TOP_value<-sort(abs(Feature_path[,ncol(Feature_path)]),decreasing = T)[1:num_path]
     
-    TOP_index<-(1:dim(x$I$CM)[2])[Feature_path[,ncol(Feature_path)]%in% unique(c(TOP_value,-TOP_value))]
+    TOP_index<-(1:dim(x$X)[2])[Feature_path[,ncol(Feature_path)]%in% unique(c(TOP_value,-TOP_value))]
     
     TOP_index<-unique(c(TOP_index,which_path))
     
     Feature_path<-Feature_path[TOP_index,]
     
-    plot(NULL, xlim=c(1,N_steps+1), ylim=c(floor(min(Feature_path[,N_steps])),ceiling(max(Feature_path[,N_steps]))),xlab="steps",ylab="coefficients",...)
+    plot(NULL, xlim=c(1,nsteps+1), ylim=c(floor(min(Feature_path[,nsteps])),ceiling(max(Feature_path[,nsteps]))),xlab="steps",ylab="coefficients",...)
     
     title("Solution path")
     
-    lines(rep(0,N_steps),lty=1,lwd=1,col="black")
+    lines(rep(0,nsteps),lty=1,lwd=1,col="black")
     
     A<-lapply(1:length(TOP_index),function(i){lines(Feature_path[i,],lty=i,col=rainbow(length(TOP_index))[i])})
     
     legend("topright",lty=1:length(TOP_index),cex=0.5,col=rainbow(length(TOP_index)),
            legend=TOP_index,bty="n")
     
-    plot(x$Coef_dist, x=1:length(x$Coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
+    plot(x$coef_dist, x=1:length(x$coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
          main=" Coefficient convergence",type="b" )
     title(' Coefficient convergence')
-    plot(y=x$Usearch,x=1:N_steps,xlab="steps",ylab="No. of tries")
+    plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
     title("U-search")
     #
-    plot(y=x$FD,x=1:N_steps,xlab="steps",ylab="No. of changes")
+    plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
     title("Retained feature change")
 
   dev.new()
-  plot(y=x$LH,x=1:N_steps,xlab="steps",ylab="Soulution path",type="b",...)
+  plot(y=x$likelihood_iter,x=1:nsteps,xlab="steps",ylab="Soulution path",type="b",...)
   title("Likelihood convergence")
   }else if(out_plot==2){
   
@@ -128,34 +128,32 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
     
     TOP_value<-sort(abs(Feature_path[,ncol(Feature_path)]),decreasing = T)[1:num_path]
     
-    TOP_index<-(1:dim(x$I$CM)[2])[Feature_path[,ncol(Feature_path)]%in% unique(c(TOP_value,-TOP_value))]
+    TOP_index<-(1:dim(x$X)[2])[Feature_path[,ncol(Feature_path)]%in% unique(c(TOP_value,-TOP_value))]
     
     TOP_index<-unique(c(TOP_index,which_path))
     
     Feature_path<-Feature_path[TOP_index,]
     
-    plot(NULL, xlim=c(1,N_steps+1), ylim=c(floor(min(Feature_path[,N_steps])),ceiling(max(Feature_path[,N_steps]))),xlab="steps",ylab="coefficients",...)
+    plot(NULL, xlim=c(1,nsteps+1), ylim=c(floor(min(Feature_path[,nsteps])),ceiling(max(Feature_path[,nsteps]))),xlab="steps",ylab="coefficients",...)
     
     title("Solution path")
     
-    lines(rep(0,N_steps),lty=1,lwd=1,col="black")
+    lines(rep(0,nsteps),lty=1,lwd=1,col="black")
     
     A<-lapply(1:length(TOP_index),function(i){lines(Feature_path[i,],lty=i,col=rainbow(length(TOP_index))[i])})
     
     legend("topright",lty=1:length(TOP_index),cex=0.5,col=rainbow(length(TOP_index)),
            legend=TOP_index,bty="n")
     
-    plot(y=x$LH,x=1:N_steps,xlab="steps",ylab="log-likelihood",type="b")
+    plot(y=x$likelihood_iter,x=1:nsteps,xlab="steps",ylab="log-likelihood",type="b")
     title("Likelihood convergence")
-    plot(y=x$Usearch,x=1:N_steps,xlab="steps",ylab="No. of tries")
+    plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
     title("U-search")
-    #plot(apply(x$Path_Retained[,-1],2,l2_norm),x=1:N_steps,xlab="steps",ylab="L2-dist b/w beta updates",type="b",ylab="L_2 norm")
-    #title("L_2 norm of Retained Features ")
-    plot(y=x$FD,x=1:N_steps,xlab="steps",ylab="No. of changes")
+    plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
     title("Retained feature change")
 
     dev.new()
-    plot(x$Coef_dist, x=1:length(x$Coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
+    plot(x$coef_dist, x=1:length(x$coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
          main=" Coefficient convergence",type="b" )
     title(' Coefficient convergence')
   
@@ -169,29 +167,27 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
       
       TOP_value<-sort(abs(Feature_path[,ncol(Feature_path)]),decreasing = T)[1:num_path]
       
-      TOP_index<-(1:dim(x$I$CM)[2])[Feature_path[,ncol(Feature_path)]%in% unique(c(TOP_value,-TOP_value))]
+      TOP_index<-(1:dim(x$X)[2])[Feature_path[,ncol(Feature_path)]%in% unique(c(TOP_value,-TOP_value))]
       
       TOP_index<-unique(c(TOP_index,which_path))
       
       Feature_path<-Feature_path[TOP_index,]
       
-      plot(NULL, xlim=c(1,N_steps+1), ylim=c(floor(min(Feature_path[,N_steps])),ceiling(max(Feature_path[,N_steps]))),xlab="steps",ylab="coefficients",...)
+      plot(NULL, xlim=c(1,nsteps+1), ylim=c(floor(min(Feature_path[,nsteps])),ceiling(max(Feature_path[,nsteps]))),xlab="steps",ylab="coefficients",...)
       
       title("Solution path")
       
-      lines(rep(0,N_steps),lty=1,lwd=1,col="black")
+      lines(rep(0,nsteps),lty=1,lwd=1,col="black")
       
       A<-lapply(1:length(TOP_index),function(i){lines(Feature_path[i,],lty=i,col=rainbow(length(TOP_index))[i])})
       
       legend("topright",lty=1:length(TOP_index),cex=0.5,col=rainbow(length(TOP_index)),
              legend=TOP_index,bty="n")
       title('Coefficient convergence')
-    #plot(apply(x$Path_Retained[,-1],2,l2_norm),x=1:N_steps,xlab="steps",ylab="L2-dist b/w beta updates",type="b",ylab="L_2 norm")
-    #title("L_2 norm of Retained Features ")
-    plot(y=x$FD,x=1:N_steps,xlab="steps",ylab="No. of changes")
+    plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
     title("Retained feature change")
     dev.new()
-    plot(y=x$Usearch,x=1:N_steps,xlab="steps",ylab="Soulution path",...)
+    plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="Soulution path",...)
     title("U-search")
   }else if(out_plot==4){
     par(mfrow=c(2,2))
@@ -202,17 +198,17 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
     
     TOP_value<-sort(abs(Feature_path[,ncol(Feature_path)]),decreasing = T)[1:num_path]
     
-    TOP_index<-(1:dim(x$I$CM)[2])[Feature_path[,ncol(Feature_path)]%in% unique(c(TOP_value,-TOP_value))]
+    TOP_index<-(1:dim(x$X)[2])[Feature_path[,ncol(Feature_path)]%in% unique(c(TOP_value,-TOP_value))]
     
     TOP_index<-unique(c(TOP_index,which_path))
     
     Feature_path<-Feature_path[TOP_index,]
     
-    plot(NULL, xlim=c(1,N_steps+1), ylim=c(floor(min(Feature_path[,N_steps])),ceiling(max(Feature_path[,N_steps]))),xlab="steps",ylab="coefficients",...)
+    plot(NULL, xlim=c(1,nsteps+1), ylim=c(floor(min(Feature_path[,nsteps])),ceiling(max(Feature_path[,nsteps]))),xlab="steps",ylab="coefficients",...)
     
     title("Solution path")
     
-    lines(rep(0,N_steps),lty=1,lwd=1,col="black")
+    lines(rep(0,nsteps),lty=1,lwd=1,col="black")
     
     A<-lapply(1:length(TOP_index),function(i){lines(Feature_path[i,],lty=i,col=rainbow(length(TOP_index))[i])})
     
@@ -220,17 +216,15 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
            legend=TOP_index,bty="n")
     
 
-    plot(y=x$LH,x=1:N_steps,xlab="steps",ylab="log-likelihood",type="b")
+    plot(y=x$likelihood_iter,x=1:nsteps,xlab="steps",ylab="log-likelihood",type="b")
     title("Likelihood convergence")
-    plot(x$Coef_dist, x=1:length(x$Coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
+    plot(x$coef_dist, x=1:length(x$coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
          main=" Coefficient convergence",type="b" )
     title(' Coefficient convergence')
-    plot(y=x$Usearch,x=1:N_steps,xlab="steps",ylab="No. of tries")
+    plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
     title("U-search")
     dev.new()
-    #plot(apply(x$Path_Retained[,-1],2,l2_norm),x=1:N_steps,xlab="steps",ylab="L2-dist b/w beta updates",type="b",ylab="L_2 norm",...)
-    #title("L_2 norm of Retained Features ")
-    plot(y=x$FD,x=1:N_steps,xlab="steps",ylab="No. of changes")
+    plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
     title("Retained feature change")
   }
 }

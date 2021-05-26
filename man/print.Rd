@@ -16,7 +16,7 @@
 \method{print}{sdata}(x, ...)
 }
 \arguments{
-\item{x}{Fitted '\code{smle}' object.}
+\item{x}{Fitted object.}
 
 \item{...}{This argument is not used and listed for method consistency.}
 }

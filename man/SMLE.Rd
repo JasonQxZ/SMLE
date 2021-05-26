@@ -20,7 +20,7 @@ SMLE(object, ...)
   intercept = TRUE,
   group = TRUE,
   codingtype = NULL,
-  Coef_initial = NULL,
+  coef_initial = NULL,
   max_iter = 500,
   tol = 0.01,
   selection = F,
@@ -65,7 +65,7 @@ be used in the screening process. Default is NULL.}
 
 \item{keyset}{A vector to indicate a set of key features that do not
 participate in feature screening and are forced to remain in the model.
-Default is null.}
+Default is NULL}
 
 \item{intercept}{A vector to indicate whether to an intercept be used in
 the model. An intercept will not participate in screening.}
@@ -81,7 +81,7 @@ comparison with the grand mean.
 \code{Codingtype = "standard"} conducts standard dummy coding for each level
 in comparison with the reference level (first level).}
 
-\item{Coef_initial}{A \eqn{p}-dimensional vector for the initial coefficient 
+\item{coef_initial}{A \eqn{p}-dimensional vector for the initial coefficient 
 value of the IHT algorithm.  The default is to use Lasso with the sparsity 
 closest to \eqn{n-1}.}
 
@@ -122,7 +122,7 @@ Returns a \code{'smle'} object with
 
 \code{CM}: Design matrix of class \code{'matrix'} for numeric features (or \code{'data.frame'} with categorical features).
 
-\code{DM}: A matrix with dummy variable featrues added. (only if there are categorical features).
+\code{DM}: A matrix with dummy variable features added. (only if there are categorical features).
 
 \code{IM}: Iteration path matrix with columns recording IHT coefficient updates.
 
@@ -130,29 +130,29 @@ Returns a \code{'smle'} object with
 
 \code{CI}: Indices of categorical features in \code{CM}.
 
-\code{Beta0}: Inital value of regression coefficient for IHT.
+\code{beta0}: Inital value of regression coefficient for IHT.
 
 \code{DFI}: Indices of categorical features in \code{IM}.
 
 \code{codingtype}: Same as input.
  }
 
-\item{ID_Retained}{A vector indicating the features retained after SMLE screening.
+\item{ID_retained}{A vector indicating the features retained after SMLE screening.
 The output includes both features retained by SMLE and the features specified in \code{'keyset'}.}
 
-\item{Coef_Retained}{The vector of coefficients for the retained features.}
+\item{coef_retained}{The vector of coefficients for the retained features.}
 
-\item{Path_Retained}{Iteration path matrix with columns recording the coefficient updates over the IHT procedure.}
+\item{path_retained}{Iteration path matrix with columns recording the coefficient updates over the IHT procedure.}
 
-\item{Num_Retained}{Number of retained featrues after screening.}
+\item{num_retained}{Number of retained featrues after screening.}
 
-\item{Intercept}{The value, if Intercept = TRUE.}
+\item{intercept}{The value, if Intercept = TRUE.}
 
 \item{steps}{Number of iterations.}
 
-\item{LH}{A list of log-likelihood updates over the IHT iterations }
+\item{likeihood_iter}{A list of log-likelihood updates over the IHT iterations }
 
-\item{Usearch}{Number of times in searching a proper \eqn{u^{-1}} at each step over the IHT iterations.}
+\item{usearch}{Number of times in searching a proper \eqn{u^{-1}} at each step over the IHT iterations.}
 }
 \description{
 Input a \eqn{n \times 1} response Y and a \eqn{n \times p} feature matrix X;
@@ -206,9 +206,9 @@ fit<-SMLE(Y=Data$Y, X=Data$X, k=9, family = "gaussian")
 fit
 summary(fit)
 ## The important features we missed:
-setdiff(Data$subset_true,fit$ID_Retained)
-## Check if the important featrues are retained.
-Data$index \%in\% fit$ID_Retained
+setdiff(Data$subset_true,fit$ID_retained)
+## Check if the important features are retained.
+Data$index \%in\% fit$ID_retained
 plot(fit)
 
 
@@ -220,5 +220,5 @@ variables in regression analysis}. \url{https://stats.idre.ucla.edu/spss
 Retrieved May 28, 2020.
 
 Xu, C. and Chen, J. (2014). The Sparse MLE for Ultrahigh-Dimensional Feature
-Screening, \emph{Journal of the American Statistical Association}, \bold{109}(507), 1257–1269.
+Screening, \emph{Journal of the American Statistical Association}, \bold{109}(507), 12571269.
 }
