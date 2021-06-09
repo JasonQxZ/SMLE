@@ -32,7 +32,7 @@ plot.selection<-function(x,...){
     }
     y<-data.frame("Proportion"= sort(summary(x$ID_pool),decreasing = T)/length(x$gamma_seq))
     ID_names<- x$subset[as.numeric(names(summary(x$ID_pool)[order(summary(x$ID_pool),decreasing= T)]))]
-    barplot(y$proportion,names.arg =ID_names ,
+    barplot(y$Proportion,names.arg =ID_names ,
             xlab = "Candidate Features IDs",ylab="Features Voting Proportion",main="Voting results"
             )
   }

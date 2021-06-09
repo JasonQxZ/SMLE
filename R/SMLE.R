@@ -174,7 +174,7 @@
 #'
 #' \item{steps}{Number of iterations.}
 #'
-#' \item{likeihood_iter}{A list of log-likelihood updates over the IHT iterations }
+#' \item{likelihood_iter}{A list of log-likelihood updates over the IHT iterations }
 #'
 #' \item{usearch}{Number of times in searching a proper \eqn{u^{-1}} at each step over the IHT iterations.}
 #'
@@ -672,7 +672,7 @@ SMLE_fit<-function(Y,X, k, family="gaussian", keyset=NULL,
             
             steps = i,
             
-            likeihood_iter=LH[1:i],
+            likelihood_iter=LH[1:i],
             
             usearch=number_of_Ucheck[1:i],
             

@@ -27,7 +27,7 @@ print.smle<-function(x,...){
   catln("  ", paste(deparse(x$call), sep = "\n", collapse = "\n"))
   
   catln("Subset:")
-  catln("model_size :", as.character(x$Num_retained))
+  catln("  Model_size :", as.character(x$num_retained))
   if( !is.null(colnames(x$X))){ catln("  Feature Name: ", paste(colnames(x$X)[x$ID_retained], sep = " ", collapse = ","))}
   catln("  Feature Index: ", paste(x$ID_retained, sep = "\n", collapse = ","))
   
@@ -58,7 +58,6 @@ print.selection<-function(x,...){
   catln("Subset:")
   if( !is.null(colnames(x$X))){ catln("  Feature Name: ", paste(colnames(x$X)[x$ID_selected], sep = " ", collapse = ","))}
   catln("  Feature Index: ", paste(x$ID_selected, sep = "\n", collapse = " "))
-  
   
   ## done
   invisible(x)
@@ -118,9 +117,9 @@ print.summary.selection <- function(x, ...){
   catln("  Dim of Y: " , paste(x$DimY,collapse = ' x '))
   catln("  Dim of X: " , paste(x$DimX,collapse = ' x '))
   catln("  Model type: " , x$family)
-  catln("  Recommanded model size : ", x$size)
+  catln("  K selected : ", x$size)
   if( !is.null(colnames(x$X))){ catln("  Feature Name: ", paste(colnames(x$X)[x$ID_selected], sep = " ", collapse = ","))}
-  catln("  Recommanded feature index: ", paste(x$ID_selected, sep = "\n", collapse = ","))
+  catln("  K features index: ", paste(x$ID_selected, sep = "\n", collapse = ","))
   catln("  Selection criterion : ", x$criterion)
   if(x$criterion=='ebic'){  catln("  Gamma for ebic : ", as.character(x$gamma_ebic))}
   if(x$vote=='T'){  catln("  Features selected by voting : ", x$ID_voted)}
