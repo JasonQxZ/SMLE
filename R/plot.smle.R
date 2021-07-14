@@ -1,6 +1,6 @@
 #' Plots to visualize the SMLE screening step
 #'
-#' This function returns two plot windows. By default, the first contains 4 plots to assess:
+#' This function returns two plot windows. By default, the first contains 4 plots to assess convergence:
 #' 1) log-likelihood,  2) Euclidean distance between the current
 #' and the previous coefficient estimates,   3)  the number of tries in tuning parameter "u" in IHT
 #' algorithm (see details of \code{SMLE()}),  and 4) the number of features changed in the current active set.
@@ -13,9 +13,9 @@
 #' @param which_path A vector to control which features are shown in addition to the paths for the most significant coefficients.
 #' @param out_plot A number from 1 to 5 indicating which plot is to be shown in the separate window; the default for solution path plot is "5".
 #' See Description for plot labels 1-4.
-#' @param ... Additional arguments to the second plot.
+#' @param ... Additional arguments passed to the second plot.
 #' @return
-#' The function returns a vector of the predicted or fitted response values depending on the specified arguments.
+#' No return value.
 #' @export
 #' @importFrom graphics plot.new
 #' @method plot smle

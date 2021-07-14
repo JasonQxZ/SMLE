@@ -1,21 +1,20 @@
 #' Prediction based on SMLE screening and selection
 #' 
 #' @description
-#' This function makes prediction for the response in new data based on the 
-#' features retained in \code{'smle'} object.
+#' This function returns predicted response values for a fitted model of class \code{'smle'} or \code{'selection'}.
 #' 
 #' @importFrom stats binomial gaussian glm.fit poisson
 #'
 #' @param object A fitted object of class \code{'smle'} as the output from
 #' SMLE.
 #'
-#' @param newdata Matrix of new values for x at which predictions are to be made,
-#' without the intercept term. If omitted, the function returns the fitted 
-#' response values based on the training data and the retained features in \code{'smle'}.
+#' @param newdata Matrix of new values for the features at which predictions are to be made using the final model 
+#' from SMLE() or smle_select(). If omitted, the function returns the fitted 
+#' response values based on the data.
 #'
-#' @param ... 	Further arguments pass to \code{predict.glm()}.
+#' @param ... 	Further arguments passed to \code{predict.glm()}.
 #'
-#' @return The object returned depends on type.
+#' @return A prediction vector. The length of the vector equals to the number of observations of the data fitted in.
 #' @rdname predict
 #' 
 #'
@@ -23,16 +22,13 @@
 #' @method predict smle
 #' @examples
 #'
-#' set.seed(123.456)
-#'
 #' Data_sim<-Gen_Data(n= 200, p =1000, correlation="AR",family = "gaussian", num_ctgidx =5)
-#'
 #' fit<-SMLE(Data_sim$Y,Data_sim$X, family = "gaussian" , k=10)
-#'
 #' predict(fit,newdata= Data_sim$X[10:20,])
+#' Selection <- smle_select(fit)
+#' predict(Selection)
 #' 
-#' predict(fit)[10:20]
-#'
+#' 
 predict.smle<-function(object,newdata = NULL,...){
   
   family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())

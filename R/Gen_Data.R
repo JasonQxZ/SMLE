@@ -29,20 +29,20 @@
 #'
 #' Compound symmetry (CS): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with cov\eqn{(x_j, x_h) =\frac{\rho}{2}} if \eqn{j} ,\eqn{h}
 #' are both in the set of important features and \eqn{cov(x_j, x_h) =  \rho } when only
-#' one of \eqn{j} or \eqn{h} are iOn the set of important features.
+#' one of \eqn{j} or \eqn{h} are in the set of important features.
 #'
-#' Auto-regressive (AR): candidate features \eqn{x_1,..., x_p} are joint normal marginally \eqn{N( 0, 1)}, with
+#' Auto-regressive (AR): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with
 #'
 #' cov\eqn{(x_j, x_h) = \rho^{|j-h|}} for all \eqn{j} and \eqn{h}.
 #'
 #' Then, generate the response variable Y according to its response type. For Gaussian model, \eqn{Y =x^T \cdot \beta + \epsilon} where \eqn{\epsilon\ \in} \eqn{N( 0, 1)}.
 #' For the binary model let \eqn{\pi = P(Y = 1|x)}. Sample y from Bernoulli(\eqn{\pi}) where \eqn{logit(\pi) = x^T \cdot\beta}.
 #' Finally, for the Poisson model, Y is generated from Poisson distribution with the link \eqn{\pi =exp(x^T \cdot \beta )}.
-#' For more details (see reference below)
+#' For more details see reference below.
 #'
 #' @param n Sample size, number of rows of for the feature matrix to be generated.
 #'
-#' @param p number of columns for the feature matrix to be generated.
+#' @param p Number of columns for the feature matrix to be generated.
 #'
 #' @param num_ctgidx The number of features that are categorical. Set to FALSE for only numerical features. Default is FALSE.
 #'
@@ -50,11 +50,11 @@
 #'
 #' @param level_ctgidx  A vector to indicate the levels of categorical features in 'pos_ctgidx'. Default is 2.
 #'
-#' @param effect_truecoef  Effects for the relevant features in 'pos_truecoef'. See details.
+#' @param effect_truecoef  Effects size corresponding to the features in \code{'pos_truecoef'}. If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled.  See Details.
 #'
 #' @param pos_ctgidx Vector of indices denoting which columns are categorical.
 #'
-#' @param pos_truecoef Vector of indices denoting which features (columns) affect the response variable.
+#' @param pos_truecoef Vector of indices denoting which features (columns) affect the response variable. If not specified, positions are randomly sampled. See Details for more information.
 #'
 #' @param family Models to generate the response from the synthetic features:
 #' \code{'gaussian'} for normally distributed data, \code{'poisson'} for non-negative counts,
@@ -78,21 +78,25 @@
 #'
 #'
 #' @return
-#' Returns a \code{"sdata"} object with
-#'
+#' \item{call}{The call that produced this object.}
 #' \item{Y}{Response variable vector of length \eqn{n}}
 #'
-#' \item{X}{Feature matrix or Dataframe (Matrix if \code{num_ctgidx =FALSE} and dataframe otherwise)}
+#' \item{X}{Feature matrix or dataframe (matrix if \code{num_ctgidx =FALSE} and dataframe otherwise).}
 #'
-#' \item{subset_true}{Vector of columns indices of X for the features that affect the response variables (relevant features).}
+#' \item{subset_true}{Vector of column indices of X for the features that affect the response variables (relevant features).}
 #'
 #' \item{coef_true}{Vector of effects for the relevant features.}
 #' 
 #' \item{ctg}{Logical flag wether the model contains categorical features.}
+#' 
+#' \item{family,correlation}{Return of arguments.}
+#' 
+#' \item{rho}{Value of correlation parameter, NULL if the features are independent.}
 #'
 #' @export
 #'
 #' @examples
+#' 
 #' #Simulating data with binomial response and independent strcture.
 #' Data<-Gen_Data(n =100, p = 1000,family ="binomial",correlation = "AR")
 #' cor(Data$X[,1:5])
@@ -104,7 +108,7 @@ Gen_Data<-function(n=200,p=5000,sigma=1,
                    num_truecoef = NULL,  pos_truecoef =   NULL,
                    level_ctgidx = NULL,  effect_truecoef= NULL,
                    correlation = c("ID","AR","MA","CS"),
-                   rho = 0.5,family = c("gaussian","binomial","poisson")){
+                   rho = NULL,family = c("gaussian","binomial","poisson")){
 
 
 
@@ -180,6 +184,8 @@ Gen_Data<-function(n=200,p=5000,sigma=1,
     }
 
   }
+  
+  if(is.null(rho)){rho =0.5}
 
   ##------------------------------------------Create Data-----------------------------------------------
 
@@ -388,8 +394,8 @@ Gen_Data<-function(n=200,p=5000,sigma=1,
 
                        'CS'='compound symmetry')
 
-    D<-list(call = cl, Y = Y,X = numeric_data , subset_true = pos_truecoef, coef_true= effect_truecoef,
-            family = family, ctg = FALSE, correlation = correlation)
+    D<-list(call = cl, Y = Y,X = numeric_data , subset_true = sort(pos_truecoef), coef_true= effect_truecoef[order(pos_truecoef)],
+            family = family, ctg = FALSE, correlation = correlation,rho=rho)
 
     class(D)<-"sdata"
 

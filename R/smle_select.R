@@ -2,7 +2,7 @@
 #'
 #' Elaborative feature selection with SMLE
 #'
-#' @description Given a response and a set of \code{K} features, this function
+#' @description Given a response and a set of \eqn{K} features, this function
 #' first runs \code{SMLE (fast=TRUE)} to generate a series of sub-models with
 #' sparsity \code{k} varying from \code{k_min} to \code{k_max}.
 #' It then selects the best model from the series based on a selection criterion.
@@ -10,7 +10,7 @@
 #' different values of the tuning parameter, \eqn{\gamma}, and
 #' conduct importance voting for each feature.
 #' 
-#' When \code{vote= T}, this function fits all the models with gammas in 
+#' When \code{vote= T}, this function fits all the models with gammas set to values in 
 #' \code{gamma_seq} and features whose frequency higher than \code{vote_threshold} 
 #' will be selected in \code{ID_voted}.
 #'
@@ -36,15 +36,19 @@
 #'
 #'
 #' @return
-#' Returns a \code{'selection'} object with
+#' \item{call}{The call that produced this object.}
 #' \item{ID_selected}{A list of selected features.}
 #' \item{coef_selected}{Fitted model coefficients based on the selected
 #' features.}
 #' \item{intercept}{Fitted model intercept based on the selected features.}
 #' \item{criterion_value}{Values of selection criterion for the candidate models
 #' with various sparsity.}
+#' \item{X,Y}{Original data input.}
+#' \item{ctg}{Logical flag whether the input feature matrix includes
+#' categorical features}
+#' \item{ID_pool}{A vector contains all features selected during voting. }
 #' \item{ID_voted}{Vector containing the features selected when \code{vote=T}.}
-#'
+#' \item{family,gamma_ebic,gamma_seq,criterion,vote,codyingtype,vote_threshold}{Return of arguments}
 #' @examples
 #'
 #' # This a simple example for Gaussian assumption.
@@ -67,6 +71,7 @@ smle_select<-function(object, ...){
 #'
 smle_select.smle<-function(object,...){
   cl<-match.call()
+  cl[[1]] <- as.name("Select")
   Data<-structure(list( Y=object$Y, X=object$X, family=object$family),class = "sdata")
   S<-smle_select(Data,subset =object$ID_retained,...)
   S$call <- cl
@@ -83,20 +88,19 @@ smle_select.smle<-function(object,...){
 #' @param k_min The lower bound of candidate model sparsity. Default is 1.
 #'
 #' @param k_max The upper bound of candidate model sparsity. Default is as same
-#' as the number of columns in input.
+#' as the number of columns in feature matrix.
 #'
 #' @param subset A index vector indicating which features (columns of the
 #' feature matrix) are to be selected.  Not applicable if a \code{'smle'}
 #' object is the input.
 #'
-#' @param gamma_ebic The EBIC parameter in \eqn{[0 , 1]}. Default is 0.5.
+#' @param gamma_ebic The EBIC tuning parameter, in \eqn{[0 , 1]}. Default is 0.5.
 #'
 #' @param vote The logical flag for whether to perform the voting procedure.
 #' Only available when \code{penalty ='ebic'}.
-#'fit
 #' @param penalty Selection criterion.One of \code{'ebic'},\code{'bic'},\code{'aic'}. Default is \code{'ebic'}.
 #'
-#' @param codingtype Coding types for categorical features; details see SMLE.
+#' @param codingtype Coding types for categorical features; for more details see SMLE documentation.
 #'
 #' @param gamma_seq The sequence of values for gamma_ebic when \code{vote =TRUE}.
 #'
@@ -117,7 +121,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
                             gamma_seq=c(seq(0,1,0.2)), vote_threshold=NULL,
                             parallel = FALSE, num_clusters=NULL,...){
   cl<-match.call()
-
+  cl[[1]] <- as.name("Select")
   #input check
   X<-object$X
 
@@ -300,9 +304,9 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
 #'
 #' @method smle_select default
 #'
-#' @param X Input features matrix. When feature matrix input by users.
+#' @param X Input features matrix (when feature matrix input by users).
 #'
-#' @param family Model assumption; see SMLE. Default is Gaussian linear.
+#' @param family Model assumption; see SMLE documentation. Default is Gaussian linear.
 #'
 #' When input is \code{'smle'} or \code{'sdata'}, the same
 #' model will be used in the selection.
@@ -313,6 +317,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
 #'
 smle_select.default<-function(object, X=NULL, family='gaussian',...){
   cl<-match.call()
+  cl[[1]] <- as.name("Select")
   if ( any(sapply(X,as.factor) ==TRUE) ){
    ctg = TRUE
   }else{

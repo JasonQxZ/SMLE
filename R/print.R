@@ -1,13 +1,24 @@
 #' Print an object
-#' 
+#' @description This functions prints information about the fitted model from a call to SMLE() or smle_select(),
+#'  or about the simulated data from a call to Gen_data(). The object passed as an argument to print is returned invisibly. 
 #' @rdname print
 #' @importFrom utils capture.output
 #'
 #' @param x Fitted object.
 #'
 #' @param ... This argument is not used and listed for method consistency.
-#' @return
-#' No return value.
+#' 
+#' @return Return argument invisibly.
+#' 
+#' @examples 
+#' Data<-Gen_Data(correlation="MA",family = "gaussian")
+#' Data
+#' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
+#' fit
+#' summary(E)
+#' E<-smle_select(fit,vote=T)
+#' E
+#' summary(E)
 #' @export
 #' @method print smle
 
@@ -25,9 +36,11 @@ print.smle<-function(x,...){
   ## call
   catln("Call:")
   catln("  ", paste(deparse(x$call), sep = "\n", collapse = "\n"))
-  
+  catln(" ")
+  catln(paste("An object of class",class(x)))
+  catln(" ")
   catln("Subset:")
-  catln("  Model_size :", as.character(x$num_retained))
+  catln("  Model size: ", as.character(x$num_retained))
   if( !is.null(colnames(x$X))){ catln("  Feature Name: ", paste(colnames(x$X)[x$ID_retained], sep = " ", collapse = ","))}
   catln("  Feature Index: ", paste(x$ID_retained, sep = "\n", collapse = ","))
   
@@ -54,10 +67,12 @@ print.selection<-function(x,...){
   ## call
   catln("Call:")
   catln("  ", paste(deparse(x$call), sep = "\n", collapse = "\n"))
-  
+  catln(" ")
+  catln(paste("An object of class",class(x)))
+  catln(" ")
   catln("Subset:")
   if( !is.null(colnames(x$X))){ catln("  Feature Name: ", paste(colnames(x$X)[x$ID_selected], sep = " ", collapse = ","))}
-  catln("  Feature Index: ", paste(x$ID_selected, sep = "\n", collapse = " "))
+  catln("  Feature Index: ", paste(x$ID_selected, sep = "\n", collapse = ","))
   
   ## done
   invisible(x)
@@ -80,7 +95,9 @@ print.summary.smle <- function(x, ...){
   }
   catln("Call:")
   catln("  ", paste(deparse(x$call), sep = "\n", collapse = "\n"))
-  
+  catln(" ")
+  catln(paste("An object of class",class(x)))
+  catln(" ")
   catln("Summary:")
   cat("\n")
   catln("  Dim of Y: " , paste(x$DimY,collapse = ' x '))
@@ -111,9 +128,11 @@ print.summary.selection <- function(x, ...){
   }
   catln("Call:")
   catln("  ", paste(deparse(x$call), sep = "\n", collapse = "\n"))
-  
+  catln(" ")
+  catln(paste("An object of class",class(x)))
+  catln(" ")
   catln("Summary:")
-  cat("\n")
+  catln(" ")
   catln("  Dim of Y: " , paste(x$DimY,collapse = ' x '))
   catln("  Dim of X: " , paste(x$DimX,collapse = ' x '))
   catln("  Model type: " , x$family)
@@ -144,14 +163,18 @@ print.sdata<-function(x,...){
   ## call
   catln("Call:")
   catln(" ", paste(deparse(x$call), sep = "\n", collapse = "\n"))
-  
-  catln("Subset:")
+  catln(" ")
+  catln(paste("An object of class",class(x)))
+  catln(" ")
+  catln("Simulated Dataset Properties:")
   catln(" Dim of Y: " , paste(c(length(x$Y),1),collapse = ' x '))
-  catln(" Dim_of X: " , paste(dim(x$X),collapse = ' x '))
+  catln(" Dim of X: " , paste(dim(x$X),collapse = ' x '))
   catln(" Correlation: " , x$correlation)
+  if(x$correlation != "independent"){catln(" Rho: ", x$rho)}
   catln(" Index of Causal Features: " , paste(x$subset_true,collapse = ','))
   if(x$ctg ==T){catln("Design matrix concludes categorical features" )}
   catln(" Model Type: ", x$family)
+
   ## done
   invisible(x)
   

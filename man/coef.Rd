@@ -3,20 +3,29 @@
 \name{coef.smle}
 \alias{coef.smle}
 \alias{coef.selection}
-\title{Extract coefficient from fitted model}
+\title{Extract coefficients from fitted model}
 \usage{
 \method{coef}{smle}(object, ...)
 
 \method{coef}{selection}(object, ...)
 }
 \arguments{
-\item{object}{Fitted model}
+\item{object}{Returned fitted model object from either the function \code{SMLE} or \code{smle_select}.}
 
-\item{...}{Forwarded arguments}
+\item{...}{This argument is not used and listed for method consistency.}
 }
 \value{
-Coefficients after screening or selection.
+Coefficients extracted from the fitted model object of class \code{'smle'} or class \code{'selection'}.
 }
 \description{
-Extract coefficient from fitted model
+Extract coefficients from fitted model for either a \code{'smle'} or \code{'selection'} object.
+}
+\examples{
+
+Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
+fit<-SMLE(Y=Data$Y, X=Data$X, k=9, family = "gaussian")
+coef(fit)
+}
+\seealso{
+SMLE
 }

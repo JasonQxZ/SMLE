@@ -22,7 +22,6 @@ This function constructs a sparsity vs. selection criterion curve for a selectio
 Data<-Gen_Data(correlation="MA",family = "gaussian")
 fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
 E<-smle_select(fit)
-#Then E is a object of "selection"
 plot(E)
 
 }

@@ -15,8 +15,19 @@
 \item{...}{Forwarded arguments.}
 }
 \value{
-Returns an object of class logLik. This is a number with at least one attribute, "df" (degrees of freedom), giving the number of (estimated) parameters in the model.
+Returns an object of class logLik. This is a number with at least one attribute,
+ "df" (degrees of freedom), giving the number of (estimated) parameters in the model. For more details, see the generic logLik().
 }
 \description{
-Extract log-likelihood
+This is a method function written to extract log-liklihood from \code{'smle'} and \code{'selection'} objects. 
+It refits the model by \code{glm} based on the response and  the selected features after screening( selection ), 
+and returns an object of \code{'LogLik'} from the generic.
+}
+\examples{
+Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
+Data
+fit<-SMLE(Y=Data$Y, X=Data$X, k=9, family = "gaussian")
+fit
+logLik(fit)
+
 }

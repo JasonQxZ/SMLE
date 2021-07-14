@@ -12,11 +12,11 @@ out most irrelevant features in preparation for a more elaborate analysis. This 
 \tabular{ll}{
 Package: \tab smle\cr
 Type: \tab Package\cr
-Version: \tab 0.2\cr
-Date: \tab 2020-01-29\cr
-License: \tab GPL-2\cr
+Version: \tab 1.1\cr
+Date: \tab 2020-06-30\cr
+License: \tab GPL-3\cr
 }
-Input a \eqn{n \times 1} response vector Y and a \eqn{n \times p} predictor (feature) matrix X. The package outputs a set of \eqn{k < n} features that seem to be most relevant for joint regression. Moreover, the package provides a data simulator that generates a synthetic datasets from high-dimensional GLMs, which accommodate both numerical and categorical features with commonly used correlation structures. \cr
+Input a \eqn{n \times 1} response vector Y and a \eqn{n \times p} predictor (feature) matrix X. The package outputs a set of \eqn{k < n} features that seem to be most relevant for joint regression. Moreover, the package provides a data simulator that generates synthetic datasets from high-dimensional GLMs, which accommodate both numerical and categorical features with commonly used correlation structures. \cr
 
 Key functions:\cr
 \code{Gen_Data}\cr
@@ -48,13 +48,13 @@ print(fit)
 plot(fit)
 
 #Are there any features missed after screening?
-setdiff(Data$index, fit$Retained_Feature_IDs)
+setdiff(Data$subset_true, fit$ID_retained)
 
 # Elaborative selection after screening
 E<-smle_select(fit,gamma_ebic = 0.5,vote = FALSE)
 
 #Are there any features missed after selection? %>% 
-setdiff( Data$index ,E$Retained_Feature_IDs)
+setdiff( Data$subset_true ,E$ID_selected)
 print(E)
 plot(E)
 }

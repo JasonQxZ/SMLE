@@ -1,11 +1,18 @@
 #' Extract and adjust voting from selection model
 #' 
 #' This function is a method for \code{'selection'} object from \code{smle_select()}.
-#' It extract voting result for \code{'selection'} and is able to change the threshold.
+#' It extracts voting result for \code{'selection'} and can be used to change the voting percentage threshold.
 #' @param object Object of class \code{'selection'}.
-#' @param ... keep for consistency.
-#' @return Vector containing the features selected
+#' @param ... This argument is not used and listed for method consistency
+#' @return Vector containing the features selected.
 #' @export
+#' @examples 
+#' Data<-Gen_Data(correlation="MA",family = "gaussian")
+#' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
+#' E<-smle_select(fit,vote=T)
+#' plot(E)
+#' vote(E,vote_threshold = 0.8)
+
 vote<-function(object, ...){
   UseMethod("vote")
 }
@@ -30,8 +37,4 @@ vote.selection<-function(object,vote_threshold=NULL,...){
     return(object$subset[ID_voted])
     
     }
-  
-  
-  
-  
 }

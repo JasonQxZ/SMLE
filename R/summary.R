@@ -1,11 +1,10 @@
 #' summary an object from SMLE and selection
 #'
 #' @rdname summary
-#' @description This functions prints a summary of a '\code{smle}' (or a '\code{seletion}') object.
-#' In particular, it shows the features retained after SMLE-screening
-#' and the related convergence information.
+#' @description This functions prints a summary of a '\code{smle}' (or a '\code{selection}') object.
+#' In particular, it shows the features retained after SMLE-screening (or selection) using the related convergence information.
 #' @import stats
-#' @param object Fitted '\code{smle}' object.
+#' @param object Fitted '\code{smle}' or '\code{selection}' object.
 #'
 #' @param ... This argument is not used and listed for method consistency.
 #'
@@ -17,6 +16,8 @@
 #' Data<-Gen_Data(correlation="MA",family = "gaussian")
 #' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
 #' summary(fit)
+#' Selection <- smle_select(fit)
+#' summary(Selection)
 #'
 summary.smle <- function(object, ...){
   

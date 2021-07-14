@@ -13,30 +13,26 @@
 \item{object}{A fitted object of class \code{'smle'} as the output from
 SMLE.}
 
-\item{newdata}{Matrix of new values for x at which predictions are to be made,
-without the intercept term. If omitted, the function returns the fitted 
-response values based on the training data and the retained features in \code{'smle'}.}
+\item{newdata}{Matrix of new values for the features at which predictions are to be made using the final model 
+from SMLE() or smle_select(). If omitted, the function returns the fitted 
+response values based on the data.}
 
-\item{...}{Further arguments pass to \code{predict.glm()}.}
+\item{...}{Further arguments passed to \code{predict.glm()}.}
 }
 \value{
-The object returned depends on type.
+A prediction vector. The length of the vector equals to the number of observations of the data fitted in.
 }
 \description{
-This function makes prediction for the response in new data based on the 
-features retained in \code{'smle'} object.
+This function returns predicted response values for a fitted model of class \code{'smle'} or \code{'selection'}.
 }
 \examples{
 
-set.seed(123.456)
-
 Data_sim<-Gen_Data(n= 200, p =1000, correlation="AR",family = "gaussian", num_ctgidx =5)
-
 fit<-SMLE(Data_sim$Y,Data_sim$X, family = "gaussian" , k=10)
-
 predict(fit,newdata= Data_sim$X[10:20,])
+Selection <- smle_select(fit)
+predict(Selection)
 
-predict(fit)[10:20]
 
 
 

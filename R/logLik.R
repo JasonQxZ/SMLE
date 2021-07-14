@@ -1,11 +1,22 @@
 #' Extract log-likelihood
 #' 
+#' This is a method function written to extract log-liklihood from \code{'smle'} and \code{'selection'} objects. 
+#' It refits the model by \code{glm} based on the response and  the selected features after screening( selection ), 
+#' and returns an object of \code{'LogLik'} from the generic.
 #' @import stats
 #' @param object Object of class \code{'smle'} or \code{'sdata'}. 
 #' @param ... Forwarded arguments.
-#' @return Returns an object of class logLik. This is a number with at least one attribute, "df" (degrees of freedom), giving the number of (estimated) parameters in the model.
+#' @return Returns an object of class logLik. This is a number with at least one attribute,
+#'  "df" (degrees of freedom), giving the number of (estimated) parameters in the model. For more details, see the generic logLik().
 #' @rdname logLik
 #' @method logLik smle
+#' @examples
+#' Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
+#' Data
+#' fit<-SMLE(Y=Data$Y, X=Data$X, k=9, family = "gaussian")
+#' fit
+#' logLik(fit)
+#' 
 #' @export 
 logLik.smle<-function(object,...){
   codingtype = object$codingtype
@@ -13,7 +24,7 @@ logLik.smle<-function(object,...){
   X_s <- object$X
   X_v <- X_s[,object$ID_retained]
   Ci <- sapply(X_v,is.factor)
-  family <- object$family
+  family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
   if( any(sapply(X_v,is.factor)) ){
     # if X_v contains categorical  features
     
@@ -28,8 +39,9 @@ logLik.smle<-function(object,...){
       dummy_f <- sum(sapply(list(X_v[,Ci]),nlevels)-2)
       
     }
-    
     refit <-glm(Y ~ X_dummy, family=family)
+
+
     ll <- stats::logLik(refit,...)
     return(ll)
     
@@ -37,6 +49,8 @@ logLik.smle<-function(object,...){
     #X_v is a matrix
     X_v =  as.matrix(X_v)
     refit <-glm(Y ~ X_v, family=family)
+
+    
     ll <- stats::logLik(refit,...)
     return(ll)
     
@@ -53,7 +67,7 @@ logLik.selection<-function(object,...){
   X_s <- object$X
   X_v <- X_s[,object$ID_selected]
   Ci <- sapply(X_v,is.factor)
-  family <- object$family
+  family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
   if( any(sapply(X_v,is.factor)) ){
     # if X_v contains categorical  features
     
@@ -68,8 +82,9 @@ logLik.selection<-function(object,...){
       dummy_f <- sum(sapply(list(X_v[,Ci]),nlevels)-2)
       
     }
-    
     refit <-glm(Y ~ X_dummy, family=family)
+
+    
     ll <- stats::logLik(refit,...)
     return(ll)
     

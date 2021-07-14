@@ -15,14 +15,14 @@ Gen_Data(
   level_ctgidx = NULL,
   effect_truecoef = NULL,
   correlation = c("ID", "AR", "MA", "CS"),
-  rho = 0.5,
+  rho = NULL,
   family = c("gaussian", "binomial", "poisson")
 )
 }
 \arguments{
 \item{n}{Sample size, number of rows of for the feature matrix to be generated.}
 
-\item{p}{number of columns for the feature matrix to be generated.}
+\item{p}{Number of columns for the feature matrix to be generated.}
 
 \item{sigma}{Parameter for noise level.}
 
@@ -32,11 +32,11 @@ Gen_Data(
 
 \item{num_truecoef}{The number of features (columns) that affect response. Default is 5.}
 
-\item{pos_truecoef}{Vector of indices denoting which features (columns) affect the response variable.}
+\item{pos_truecoef}{Vector of indices denoting which features (columns) affect the response variable. If not specified, positions are randomly sampled. See Details for more information.}
 
 \item{level_ctgidx}{A vector to indicate the levels of categorical features in 'pos_ctgidx'. Default is 2.}
 
-\item{effect_truecoef}{Effects for the relevant features in 'pos_truecoef'. See details.}
+\item{effect_truecoef}{Effects size corresponding to the features in \code{'pos_truecoef'}. If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled.  See Details.}
 
 \item{correlation}{Correlation structure among features. \code{correlation = 'ID'} for independent,
 \code{correlation = 'MA'} for moving average, \code{correlation = 'CS'} for compound symmetry, \code{correlation = 'AR'} for auto regressive Default is \code{'ID'}.For more information see details.}
@@ -48,17 +48,20 @@ Gen_Data(
 \code{'binomial'} for binary (0-1).}
 }
 \value{
-Returns a \code{"sdata"} object with
-
+\item{call}{The call that produced this object.}
 \item{Y}{Response variable vector of length \eqn{n}}
 
-\item{X}{Feature matrix or Dataframe (Matrix if \code{num_ctgidx =FALSE} and dataframe otherwise)}
+\item{X}{Feature matrix or dataframe (matrix if \code{num_ctgidx =FALSE} and dataframe otherwise).}
 
-\item{subset_true}{Vector of columns indices of X for the features that affect the response variables (relevant features).}
+\item{subset_true}{Vector of column indices of X for the features that affect the response variables (relevant features).}
 
 \item{coef_true}{Vector of effects for the relevant features.}
 
 \item{ctg}{Logical flag wether the model contains categorical features.}
+
+\item{family,correlation}{Return of arguments.}
+
+\item{rho}{Value of correlation parameter, NULL if the features are independent.}
 }
 \description{
 This function generates synthetic datasets from GLMs with a user-specified correlation structure.
@@ -84,18 +87,19 @@ cov\eqn{(x_j, x_{j-1}) = \rho}, cov\eqn{(x_j, x_{j-2}) = \frac{\rho}{2}} and cov
 
 Compound symmetry (CS): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with cov\eqn{(x_j, x_h) =\frac{\rho}{2}} if \eqn{j} ,\eqn{h}
 are both in the set of important features and \eqn{cov(x_j, x_h) =  \rho } when only
-one of \eqn{j} or \eqn{h} are iOn the set of important features.
+one of \eqn{j} or \eqn{h} are in the set of important features.
 
-Auto-regressive (AR): candidate features \eqn{x_1,..., x_p} are joint normal marginally \eqn{N( 0, 1)}, with
+Auto-regressive (AR): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with
 
 cov\eqn{(x_j, x_h) = \rho^{|j-h|}} for all \eqn{j} and \eqn{h}.
 
 Then, generate the response variable Y according to its response type. For Gaussian model, \eqn{Y =x^T \cdot \beta + \epsilon} where \eqn{\epsilon\ \in} \eqn{N( 0, 1)}.
 For the binary model let \eqn{\pi = P(Y = 1|x)}. Sample y from Bernoulli(\eqn{\pi}) where \eqn{logit(\pi) = x^T \cdot\beta}.
 Finally, for the Poisson model, Y is generated from Poisson distribution with the link \eqn{\pi =exp(x^T \cdot \beta )}.
-For more details (see reference below)
+For more details see reference below.
 }
 \examples{
+
 #Simulating data with binomial response and independent strcture.
 Data<-Gen_Data(n =100, p = 1000,family ="binomial",correlation = "AR")
 cor(Data$X[,1:5])

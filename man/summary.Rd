@@ -3,14 +3,14 @@
 \name{summary.smle}
 \alias{summary.smle}
 \alias{summary.selection}
-\title{summary a SMLE object from SMLE}
+\title{summary an object from SMLE and selection}
 \usage{
 \method{summary}{smle}(object, ...)
 
 \method{summary}{selection}(object, ...)
 }
 \arguments{
-\item{object}{Fitted '\code{smle}' object.}
+\item{object}{Fitted '\code{smle}' or '\code{selection}' object.}
 
 \item{...}{This argument is not used and listed for method consistency.}
 }
@@ -18,13 +18,14 @@
 No return value.
 }
 \description{
-This functions prints a summary of a SMLE object.
-In particular, it shows the features retained after SMLE-screening
-and the related convergence information.
+This functions prints a summary of a '\code{smle}' (or a '\code{selection}') object.
+In particular, it shows the features retained after SMLE-screening (or selection) using the related convergence information.
 }
 \examples{
 Data<-Gen_Data(correlation="MA",family = "gaussian")
 fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
 summary(fit)
+Selection <- smle_select(fit)
+summary(Selection)
 
 }
