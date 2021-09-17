@@ -12,8 +12,8 @@ out most irrelevant features in preparation for a more elaborate analysis. This 
 \tabular{ll}{
 Package: \tab smle\cr
 Type: \tab Package\cr
-Version: \tab 1.1\cr
-Date: \tab 2020-06-30\cr
+Version: \tab 1.2-5\cr
+Date: \tab 2020-08-30\cr
 License: \tab GPL-3\cr
 }
 Input a \eqn{n \times 1} response vector Y and a \eqn{n \times p} predictor (feature) matrix X. The package outputs a set of \eqn{k < n} features that seem to be most relevant for joint regression. Moreover, the package provides a data simulator that generates synthetic datasets from high-dimensional GLMs, which accommodate both numerical and categorical features with commonly used correlation structures. \cr
@@ -42,19 +42,22 @@ set.seed(123.456)
 Data<-Gen_Data(correlation="MA",family = "gaussian")
 print(Data)
 
+
 # joint feature screening via SMLE
 fit<-SMLE(Data$Y,Data$X,k=10,family = "gaussian")
 print(fit)
+summary(fit)
 plot(fit)
 
 #Are there any features missed after screening?
 setdiff(Data$subset_true, fit$ID_retained)
 
 # Elaborative selection after screening
-E<-smle_select(fit,gamma_ebic = 0.5,vote = FALSE)
+fit_s<-smle_select(fit,gamma_ebic = 0.5,vote = FALSE)
 
-#Are there any features missed after selection? %>% 
-setdiff( Data$subset_true ,E$ID_selected)
-print(E)
-plot(E)
+#Are there any features missed after selection? 
+setdiff( Data$subset_true ,fit_s$ID_selected)
+print(fit_s)
+summary(fit_s)
+plot(fit_s)
 }

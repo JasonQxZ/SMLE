@@ -15,19 +15,18 @@
 \item{...}{Forwarded arguments.}
 }
 \value{
-Returns an object of class logLik. This is a number with at least one attribute,
- "df" (degrees of freedom), giving the number of (estimated) parameters in the model. For more details, see the generic logLik().
+Returns an object of class \code{'logLik'}. This is a number with at least one attribute,
+ \code{"df"} (degrees of freedom), giving the number of (estimated) parameters in the model. For more details, see the generic \code{'logLik'} in \pkg{stats}.
 }
 \description{
 This is a method function written to extract log-liklihood from \code{'smle'} and \code{'selection'} objects. 
-It refits the model by \code{glm} based on the response and  the selected features after screening( selection ), 
-and returns an object of \code{'LogLik'} from the generic.
+It refits the model by \code{\link[stats]{glm}} based on the response and the selected features after screening(selection), 
+and returns an object of \code{\link[stats]{logLik}} from the generic.
 }
 \examples{
+set.seed(1)
 Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
-Data
 fit<-SMLE(Y=Data$Y, X=Data$X, k=9, family = "gaussian")
-fit
 logLik(fit)
 
 }

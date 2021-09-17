@@ -1,10 +1,10 @@
-#' summary an object from SMLE and selection
+#' Summary of an object from class \code{'smle'} or \code{'selection'}
 #'
 #' @rdname summary
-#' @description This functions prints a summary of a '\code{smle}' (or a '\code{selection}') object.
-#' In particular, it shows the features retained after SMLE-screening (or selection) using the related convergence information.
+#' @description This function prints a summary of a \code{'smle'} (or a \code{'selection'}) object.
+#' In particular, it shows the features retained after SMLE-screening (or selection) with the related convergence information.
 #' @import stats
-#' @param object Fitted '\code{smle}' or '\code{selection}' object.
+#' @param object Fitted \code{'smle'} or \code{'selection'} object.
 #'
 #' @param ... This argument is not used and listed for method consistency.
 #'
@@ -13,11 +13,12 @@
 #' @export
 #' @method summary smle
 #' @examples
+#' set.seed(1)
 #' Data<-Gen_Data(correlation="MA",family = "gaussian")
 #' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
 #' summary(fit)
-#' Selection <- smle_select(fit)
-#' summary(Selection)
+#' fit_s <- smle_select(fit)
+#' summary(fit_s)
 #'
 summary.smle <- function(object, ...){
   
@@ -29,7 +30,7 @@ summary.smle <- function(object, ...){
   ans$family = object$family
   ans$steps = object$steps
   ans$loglikelihood = lg
-  ans$DimY= dim(object$Y)
+  ans$DimY= length(object$Y)
   ans$DimX= dim(object$X)
   ans$size = object$num_retained
   ans$ID_retained  =object$ID_retained
@@ -62,11 +63,12 @@ summary.selection <- function(object, ...){
   
   lg<-logLik(object)
   
-  
+  family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
   ans=list()
+  ans$family = object$family
   ans$steps = object$steps
   ans$loglikelihood = lg
-  ans$DimY= dim(object$Y)
+  ans$DimY= length(object$Y)
   ans$DimX= dim(object$X)
   ans$size = object$num_selected
   ans$coef = object$coef_selected

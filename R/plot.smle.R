@@ -1,15 +1,15 @@
-#' Plots to visualize the SMLE screening step
+#' Plots to visualize SMLE screening
 #'
 #' This function returns two plot windows. By default, the first contains 4 plots to assess convergence:
 #' 1) log-likelihood,  2) Euclidean distance between the current
-#' and the previous coefficient estimates,   3)  the number of tries in tuning parameter "u" in IHT
-#' algorithm (see details of \code{SMLE()}),  and 4) the number of features changed in the current active set.
-#' By default, the second plot shows the solution path (estimated coefficient by iteration step) for selected features.
+#' and the previous coefficient estimates,   3)  the number of tries in u-search(see details of \code{\link{SMLE}}),  
+#' and 4) the number of features changed in the current active set.
+#' By default, the second plot shows the solution path (estimated coefficient by iteration step) for features.
 #'
-#' @param x Fitted  \code{"smle"} object from SMLE.
+#' @param x A \code{'smle'} object as the output from \code{\link{SMLE}}.
 #' 
-#' @param num_path Number of top coefficients to be shown in solution path plot.
-#' Default in solution path plot is equal to the number of features retained in the model.
+#' @param num_path Number of top coefficients to be shown.
+#' Default is equal to the number of features retained in the model.
 #' @param which_path A vector to control which features are shown in addition to the paths for the most significant coefficients.
 #' @param out_plot A number from 1 to 5 indicating which plot is to be shown in the separate window; the default for solution path plot is "5".
 #' See Description for plot labels 1-4.
@@ -20,6 +20,7 @@
 #' @importFrom graphics plot.new
 #' @method plot smle
 #' @examples
+#' set.seed(1)
 #' Data<-Gen_Data(correlation="MA",family = "gaussian")
 #' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
 #' plot(fit)

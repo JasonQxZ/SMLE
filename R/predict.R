@@ -1,18 +1,17 @@
 #' Prediction based on SMLE screening and selection
 #' 
 #' @description
-#' This function returns predicted response values for a fitted model of class \code{'smle'} or \code{'selection'}.
+#' This function returns the predicted response values for a fitted model of class \code{'smle'} or \code{'selection'}.
 #' 
 #' @importFrom stats binomial gaussian glm.fit poisson
 #'
-#' @param object A fitted object of class \code{'smle'} as the output from
-#' SMLE.
+#' @param object A \code{'smle'} or \code{'selection'} object.
 #'
 #' @param newdata Matrix of new values for the features at which predictions are to be made using the final model 
-#' from SMLE() or smle_select(). If omitted, the function returns the fitted 
-#' response values based on the data.
+#' from \code{\link{SMLE}} or \code{\link{smle_select}}. If omitted, the function returns the fitted 
+#' response values based on the training data.
 #'
-#' @param ... 	Further arguments passed to \code{predict.glm()}.
+#' @param ... 	Further arguments passed to \code{\link[stats]{predict.glm}}.
 #'
 #' @return A prediction vector. The length of the vector equals to the number of observations of the data fitted in.
 #' @rdname predict
@@ -21,12 +20,21 @@
 #' @export
 #' @method predict smle
 #' @examples
-#'
-#' Data_sim<-Gen_Data(n= 200, p =1000, correlation="AR",family = "gaussian", num_ctgidx =5)
-#' fit<-SMLE(Data_sim$Y,Data_sim$X, family = "gaussian" , k=10)
-#' predict(fit,newdata= Data_sim$X[10:20,])
-#' Selection <- smle_select(fit)
-#' predict(Selection)
+#' set.seed(1)
+#' Data_sim1<-Gen_Data(n= 200, p =1000, correlation="AR",family = "gaussian", num_ctgidx =5)
+#' fit1<-SMLE(Data_sim1$Y,Data_sim1$X, family = "gaussian" , k=10)
+#' predict(fit1,newdata= Data_sim1$X[10:20,])
+#' fit1_s <- smle_select(fit1)
+#' predict(fit1_s)
+#' 
+#' 
+#' #Prediction example with influential categorical feature. 
+#' set.seed(2)
+#' Data_sim2<-Gen_Data(n= 220, p =1000, correlation="AR",family = "gaussian", num_ctgidx =5)
+#' fit2<-SMLE(Data_sim2$Y[1:200],Data_sim2$X[1:200,], family = "gaussian" , k=10)
+#' predict(fit2)
+#' predict(fit2,newdata= Data_sim2$X[201:220,])
+#' 
 #' 
 #' 
 predict.smle<-function(object,newdata = NULL,...){
@@ -137,20 +145,5 @@ predict.selection<-function(object,newdata = NULL,...){
       return(predict.glm(fit, newdata=new_data ,type = "response",...))
       
     }
-    
-    
   }
 }
-
-
-
-
-
-
-
-
-
-
-  
-  
-

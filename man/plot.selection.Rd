@@ -2,26 +2,27 @@
 % Please edit documentation in R/plot.selection.R
 \name{plot.selection}
 \alias{plot.selection}
-\title{Plots to visualize the selection}
+\title{Plots to visualize the post-screening selection}
 \usage{
 \method{plot}{selection}(x, ...)
 }
 \arguments{
-\item{x}{Fitted \code{'selection'} object from \code{smle_select()}.}
+\item{x}{A \code{'selection'} object as the output from \code{smle_select}.}
 
-\item{...}{Additional arguments to the plot function.}
+\item{...}{Additional arguments to the \code{plot} function.}
 }
 \value{
 No return value.
 }
 \description{
-This function constructs a sparsity vs. selection criterion curve for a selection object.
+This function constructs a sparsity vs. selection criterion curve for a \code{'selection'} object.
  When EBIC is used with voting, it also constructs a histogram showing the voting result.
 }
 \examples{
+set.seed(1)
 Data<-Gen_Data(correlation="MA",family = "gaussian")
 fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
-E<-smle_select(fit)
-plot(E)
+fit_s<-smle_select(fit,vote=TRUE)
+plot(fit_s)
 
 }

@@ -1,27 +1,33 @@
-#' Extract and adjust voting from selection model
+#' Extract and adjust voting from a \code{'selection'} object
 #' 
-#' This function is a method for \code{'selection'} object from \code{smle_select()}.
-#' It extracts voting result for \code{'selection'} and can be used to change the voting percentage threshold.
-#' @param object Object of class \code{'selection'}.
+#' 
+#' When \code{'selection'} is used with \code{criterion="ebic"} and \code{vote=TRUE}, 
+#' users can use \code{vote_update} to adjust the voting threshold without a need 
+#' of rerun \code{smle_select}.
+#' 
+#' @param object A \code{'selection'} object as the output from \code{\link{smle_select}}.
 #' @param ... This argument is not used and listed for method consistency
-#' @return Vector containing the features selected.
+#' @return The function returns a vector indicating the features selected by
+#'  EBIC voting with the specified \code{vote_threhold}.
 #' @export
 #' @examples 
+#' set.seed(1)
 #' Data<-Gen_Data(correlation="MA",family = "gaussian")
 #' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
-#' E<-smle_select(fit,vote=T)
-#' plot(E)
-#' vote(E,vote_threshold = 0.8)
+#' fit_s<-smle_select(fit,vote=TRUE)
+#' plot(fit_s)
+#' vote_update(fit_s,vote_threshold = 0.3)
 
-vote<-function(object, ...){
-  UseMethod("vote")
+vote_update<-function(object, ...){
+  UseMethod("vote_update")
 }
-#' @method vote selection
-#' @rdname vote
-#' @param vote_threshold A relative voting threshold in percentage. A feature is
-#'  considered to be important when it receives votes passing the threshold. Default is 0.8.
+#' @method vote_update selection
+#' @rdname vote_update
+#' @param vote_threshold A voting threshold in percentage. A feature is
+#'  considered to be important when it receives votes passing the threshold.
+#'  Default is 0.6.
 #' @export
-vote.selection<-function(object,vote_threshold=NULL,...){
+vote_update.selection<-function(object,vote_threshold=NULL,...){
   
   if(is.null(vote_threshold)){
     

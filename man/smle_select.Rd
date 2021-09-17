@@ -5,7 +5,7 @@
 \alias{smle_select.smle}
 \alias{smle_select.sdata}
 \alias{smle_select.default}
-\title{Elaborative feature selection with SMLE}
+\title{Elaborative selection with SMLE}
 \usage{
 smle_select(object, ...)
 
@@ -18,7 +18,7 @@ smle_select(object, ...)
   subset = NULL,
   gamma_ebic = 0.5,
   vote = FALSE,
-  penalty = "ebic",
+  criterion = "ebic",
   codingtype = NULL,
   gamma_seq = c(seq(0, 1, 0.2)),
   vote_threshold = NULL,
@@ -37,38 +37,38 @@ input a response vector and a feature matrix. See examples}
 
 \item{k_min}{The lower bound of candidate model sparsity. Default is 1.}
 
-\item{k_max}{The upper bound of candidate model sparsity. Default is as same
-as the number of columns in feature matrix.}
+\item{k_max}{The upper bound of candidate model sparsity. Default is 
+the number of columns in feature matrix.}
 
-\item{subset}{A index vector indicating which features (columns of the
+\item{subset}{An index vector indicating which features (columns of the
 feature matrix) are to be selected.  Not applicable if a \code{'smle'}
 object is the input.}
 
 \item{gamma_ebic}{The EBIC tuning parameter, in \eqn{[0 , 1]}. Default is 0.5.}
 
 \item{vote}{The logical flag for whether to perform the voting procedure.
-Only available when \code{penalty ='ebic'}.}
+Only available when \code{criterion ='ebic'}.}
 
-\item{penalty}{Selection criterion.One of \code{'ebic'},\code{'bic'},\code{'aic'}. Default is \code{'ebic'}.}
+\item{criterion}{Selection criterion. One of \code{"ebic"},\code{"bic"},\code{"aic"}. Default is \code{"ebic"}.}
 
-\item{codingtype}{Coding types for categorical features; for more details see SMLE documentation.}
+\item{codingtype}{Coding types for categorical features; for more details see \code{\link{SMLE}} documentation.}
 
-\item{gamma_seq}{The sequence of values for gamma_ebic when \code{vote =TRUE}.}
+\item{gamma_seq}{The sequence of values for \code{gamma_ebic} when \code{vote =TRUE}.}
 
 \item{vote_threshold}{A relative voting threshold in percentage. A feature is
-considered to be important when it receives votes passing the threshold. Default is 0.8.}
+considered to be important when it receives votes passing the threshold. Default is 0.6.}
 
-\item{parallel}{Logical flag to use parallel computing to do voting selection.
-Default is FALSE. See Details.}
+\item{parallel}{A logical flag to use parallel computing to do voting selection.
+Default is \code{FALSE}. See Details.}
 
-\item{num_clusters}{The number of compute clusters to use. The default will be 2 times cores
-detected.}
+\item{num_clusters}{The number of compute clusters to use when parallel is 
+\code{TRUE}. The default will be 2 times cores detected.}
 
 \item{X}{Input features matrix (when feature matrix input by users).}
 
-\item{family}{Model assumption; see SMLE documentation. Default is Gaussian linear.
+\item{family}{Model assumption; see \code{\link{SMLE}} documentation. Default is Gaussian linear.
 
-When input is \code{'smle'} or \code{'sdata'}, the same
+When input is a \code{'smle'} or \code{'sdata'}, the same
 model will be used in the selection.}
 }
 \value{
@@ -80,33 +80,32 @@ features.}
 \item{criterion_value}{Values of selection criterion for the candidate models
 with various sparsity.}
 \item{X,Y}{Original data input.}
-\item{ctg}{Logical flag whether the input feature matrix includes
+\item{ctg}{A logical flag whether the input feature matrix includes
 categorical features}
 \item{ID_pool}{A vector contains all features selected during voting. }
 \item{ID_voted}{Vector containing the features selected when \code{vote=T}.}
-\item{family,gamma_ebic,gamma_seq,criterion,vote,codyingtype,vote_threshold}{Return of arguments}
+\item{CI}{Indices of categorical features when \code{ctg = TRUE}}
+\item{family,gamma_ebic,gamma_seq,criterion,vote,codyingtype,vote_threshold}{Return of arguments passed in the function call.}
 }
 \description{
 Given a response and a set of \eqn{K} features, this function
-first runs \code{SMLE (fast=TRUE)} to generate a series of sub-models with
+first runs \code{SMLE(fast=TRUE)} to generate a series of sub-models with
 sparsity \code{k} varying from \code{k_min} to \code{k_max}.
 It then selects the best model from the series based on a selection criterion.
+The features retained after screening are still likely to contain some that 
+are not related to the response. The function \code{smle_select} is designed to 
+further identify the relevant features using \code{SMLE}.
 When criterion EBIC is used, users can choose to repeat the selection with
-different values of the tuning parameter, \eqn{\gamma}, and
-conduct importance voting for each feature.
-
-When \code{vote= T}, this function fits all the models with gammas set to values in 
-\code{gamma_seq} and features whose frequency higher than \code{vote_threshold} 
-will be selected in \code{ID_voted}.
+different values of the tuning parameter, \code{gamma}, and
+conduct importance voting for each feature.When \code{vote=T}, this function 
+fits all the models with \code{gamma} set to values in \code{gamma_seq} and features 
+whose frequency higher than \code{vote_threshold} will be selected in \code{ID_voted}.
 }
 \details{
-Elaborative feature selection with SMLE
-
-
-This functions accepts three types of input for GLMdata;
-1. \code{'smle'} object, as the output from \code{SMLE()};
-2. \code{'sdata'} object, as the output from \code{Gen_Data()};
-3. Other response and feature matrix input by users.
+This function accepts three types of input for objects; 
+1) \code{'smle'} object, as the output from \code{SMLE}; 
+2) \code{'sdata'} object, as the output from \code{Gen_Data}; 
+3) Other response and feature matrix input by users.
 
 Note that this function is mainly design to conduct an elaborative selection
 after feature screening. We do not recommend using it directly for
@@ -114,13 +113,13 @@ ultra-high-dimensional data without screening.
 }
 \examples{
 
-# This a simple example for Gaussian assumption.
+set.seed(1)
 Data<-Gen_Data(correlation="MA",family = "gaussian")
 fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
-E<-smle_select(fit,vote=T)
-summary(E)
-E1<-smle_select(Data$Y,Data$X[,fit$ID_retained])
-plot(E1)
+fit_s<-smle_select(fit,vote=TRUE)
+summary(fit_s)
+
+
 }
 \references{
 Chen. J. and Chen. Z. (2012). "Extended BIC for small-n-large-p sparse GLM."

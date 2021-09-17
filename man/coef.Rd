@@ -10,22 +10,22 @@
 \method{coef}{selection}(object, ...)
 }
 \arguments{
-\item{object}{Returned fitted model object from either the function \code{SMLE} or \code{smle_select}.}
+\item{object}{Returned object from either the function \code{\link{SMLE}} or \code{\link{smle_select}}.}
 
 \item{...}{This argument is not used and listed for method consistency.}
 }
 \value{
-Coefficients extracted from the fitted model object of class \code{'smle'} or class \code{'selection'}.
+Fitted coefficients based on the screened or selected model specified in the object.
 }
 \description{
 Extract coefficients from fitted model for either a \code{'smle'} or \code{'selection'} object.
 }
 \examples{
 
+set.seed(1)
 Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
 fit<-SMLE(Y=Data$Y, X=Data$X, k=9, family = "gaussian")
 coef(fit)
-}
-\seealso{
-SMLE
+fits<-smle_select(fit)
+coef(fits)
 }

@@ -1,30 +1,31 @@
-#' Elaborative feature selection with SMLE
+#' @title
+#' Elaborative selection with SMLE
 #'
-#' Elaborative feature selection with SMLE
-#'
-#' @description Given a response and a set of \eqn{K} features, this function
-#' first runs \code{SMLE (fast=TRUE)} to generate a series of sub-models with
+#' @description
+#' Given a response and a set of \eqn{K} features, this function
+#' first runs \code{SMLE(fast=TRUE)} to generate a series of sub-models with
 #' sparsity \code{k} varying from \code{k_min} to \code{k_max}.
 #' It then selects the best model from the series based on a selection criterion.
+#' The features retained after screening are still likely to contain some that 
+#' are not related to the response. The function \code{smle_select} is designed to 
+#' further identify the relevant features using \code{SMLE}.
 #' When criterion EBIC is used, users can choose to repeat the selection with
-#' different values of the tuning parameter, \eqn{\gamma}, and
-#' conduct importance voting for each feature.
-#' 
-#' When \code{vote= T}, this function fits all the models with gammas set to values in 
-#' \code{gamma_seq} and features whose frequency higher than \code{vote_threshold} 
-#' will be selected in \code{ID_voted}.
+#' different values of the tuning parameter, \code{gamma}, and
+#' conduct importance voting for each feature.When \code{vote=T}, this function 
+#' fits all the models with \code{gamma} set to values in \code{gamma_seq} and features 
+#' whose frequency higher than \code{vote_threshold} will be selected in \code{ID_voted}.
 #'
 #' @details
-#' This functions accepts three types of input for GLMdata;
-#' 1. \code{'smle'} object, as the output from \code{SMLE()};
-#' 2. \code{'sdata'} object, as the output from \code{Gen_Data()};
-#' 3. Other response and feature matrix input by users.
+#' This function accepts three types of input for objects; 
+#' 1) \code{'smle'} object, as the output from \code{SMLE}; 
+#' 2) \code{'sdata'} object, as the output from \code{Gen_Data}; 
+#' 3) Other response and feature matrix input by users.
 #'
 #' Note that this function is mainly design to conduct an elaborative selection
 #' after feature screening. We do not recommend using it directly for
 #' ultra-high-dimensional data without screening.
+#' 
 #' @references
-#'
 #' Chen. J. and Chen. Z. (2012). "Extended BIC for small-n-large-p sparse GLM."
 #' \emph{Statistica Sinica}, \bold{22}(2), 555-574.
 #'
@@ -44,20 +45,21 @@
 #' \item{criterion_value}{Values of selection criterion for the candidate models
 #' with various sparsity.}
 #' \item{X,Y}{Original data input.}
-#' \item{ctg}{Logical flag whether the input feature matrix includes
+#' \item{ctg}{A logical flag whether the input feature matrix includes
 #' categorical features}
 #' \item{ID_pool}{A vector contains all features selected during voting. }
 #' \item{ID_voted}{Vector containing the features selected when \code{vote=T}.}
-#' \item{family,gamma_ebic,gamma_seq,criterion,vote,codyingtype,vote_threshold}{Return of arguments}
+#' \item{CI}{Indices of categorical features when \code{ctg = TRUE}}
+#' \item{family,gamma_ebic,gamma_seq,criterion,vote,codyingtype,vote_threshold}{Return of arguments passed in the function call.}
 #' @examples
 #'
-#' # This a simple example for Gaussian assumption.
+#' set.seed(1)
 #' Data<-Gen_Data(correlation="MA",family = "gaussian")
 #' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
-#' E<-smle_select(fit,vote=T)
-#' summary(E)
-#' E1<-smle_select(Data$Y,Data$X[,fit$ID_retained])
-#' plot(E1)
+#' fit_s<-smle_select(fit,vote=TRUE)
+#' summary(fit_s)
+#' 
+#' 
 #' @export
 #'
 smle_select<-function(object, ...){
@@ -87,41 +89,43 @@ smle_select.smle<-function(object,...){
 #'
 #' @param k_min The lower bound of candidate model sparsity. Default is 1.
 #'
-#' @param k_max The upper bound of candidate model sparsity. Default is as same
-#' as the number of columns in feature matrix.
+#' @param k_max The upper bound of candidate model sparsity. Default is 
+#' the number of columns in feature matrix.
 #'
-#' @param subset A index vector indicating which features (columns of the
+#' @param subset An index vector indicating which features (columns of the
 #' feature matrix) are to be selected.  Not applicable if a \code{'smle'}
 #' object is the input.
 #'
 #' @param gamma_ebic The EBIC tuning parameter, in \eqn{[0 , 1]}. Default is 0.5.
 #'
 #' @param vote The logical flag for whether to perform the voting procedure.
-#' Only available when \code{penalty ='ebic'}.
-#' @param penalty Selection criterion.One of \code{'ebic'},\code{'bic'},\code{'aic'}. Default is \code{'ebic'}.
+#' Only available when \code{criterion ='ebic'}.
+#' @param criterion Selection criterion. One of \code{"ebic"},\code{"bic"},\code{"aic"}. Default is \code{"ebic"}.
 #'
-#' @param codingtype Coding types for categorical features; for more details see SMLE documentation.
+#' @param codingtype Coding types for categorical features; for more details see \code{\link{SMLE}} documentation.
 #'
-#' @param gamma_seq The sequence of values for gamma_ebic when \code{vote =TRUE}.
+#' @param gamma_seq The sequence of values for \code{gamma_ebic} when \code{vote =TRUE}.
 #'
 #' @param vote_threshold A relative voting threshold in percentage. A feature is
-#'  considered to be important when it receives votes passing the threshold. Default is 0.8.
+#'  considered to be important when it receives votes passing the threshold. Default is 0.6.
 #'
-#' @param parallel Logical flag to use parallel computing to do voting selection.
-#' Default is FALSE. See Details.
+#' @param parallel A logical flag to use parallel computing to do voting selection.
+#' Default is \code{FALSE}. See Details.
 #'
-#' @param num_clusters The number of compute clusters to use. The default will be 2 times cores
-#' detected.
+#' @param num_clusters The number of compute clusters to use when parallel is 
+#' \code{TRUE}. The default will be 2 times cores detected.
 #'
 #' @export
 #'
 smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
                             gamma_ebic=0.5, vote= FALSE,
-                            penalty="ebic", codingtype = NULL,
+                            criterion="ebic", codingtype = NULL,
                             gamma_seq=c(seq(0,1,0.2)), vote_threshold=NULL,
                             parallel = FALSE, num_clusters=NULL,...){
   cl<-match.call()
+  
   cl[[1]] <- as.name("Select")
+  
   #input check
   X<-object$X
 
@@ -153,7 +157,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
   
   if ( is.null(vote_threshold) ){
 
-    vote_threshold=0.8
+    vote_threshold=0.6
 
   }
   if(parallel==TRUE && is.null(num_clusters)){ 
@@ -180,11 +184,15 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
   #-----------------------------Algorithm-start---------------------------------
   ctg =FALSE
   
-  if( any(  (1:dim(X_s)[2])[sapply(X_s,is.factor)] )){
+  CI = (1:dim(X_s)[2])[sapply(X_s,is.factor)]
+  
+  if( any(  CI )){
+    
     #if sub matrix X_s has any categorical features
+    
     ctg= TRUE
     
-    criter_value<-ctg_ebicc(Y,X_s,family,penalty,codingtype,
+    criter_value<-ctg_ebicc(Y,X_s,family,criterion,codingtype,
                             k_min,k_max,n,pp,gamma_ebic,parallel,num_clusters)
 
     v_s <- which.min(criter_value)+k_min-1
@@ -195,19 +203,21 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
 
     ebic_selection_by_gamma<-function(gamma){
 
-      ebic_value<-ctg_ebicc(Y,X_s,family,penalty,codingtype,
+      ebic_value<-ctg_ebicc(Y,X_s,family,criterion,codingtype,
                             k_min,k_max,n,pp,gamma,parallel,num_clusters)
 
       v_s <- which.min(ebic_value)+k_min-1
 
-      return(SMLE(Y=Y, X=X_s, k=v_s, family=family,categorical = T)$ID_retained)
+      ID <- SMLE(Y=Y, X=X_s, k=v_s, family=family,categorical = T)$ID_retained
+      
+      ID
 
     }
 
   }else{
 
 
-    criter_value<-ebicc(Y,X_s,family,penalty,k_min,k_max,n,pp,gamma_ebic,parallel,num_clusters)
+    criter_value<-ebicc(Y,X_s,family,criterion,k_min,k_max,n,pp,gamma_ebic,parallel,num_clusters)
 
     v_s <- which.min(criter_value)+k_min-1
 
@@ -216,26 +226,28 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
     #Feature selection by ebic voting.
 
     ebic_selection_by_gamma<-function(gamma){
-      library(SMLE)
 
-      ebic_value<-ebicc(Y,X_s,family,penalty,k_min,k_max,n,pp,gamma,parallel,num_clusters)
+      ebic_value<-ebicc(Y,X_s,family,criterion,k_min,k_max,n,pp,gamma,parallel,num_clusters)
 
       v_s <- which.min(ebic_value)+k_min-1
 
-      return(SMLE(Y=Y, X=X_s, k=v_s, family=family)$ID_retained)
+      ID <- SMLE(Y=Y, X=X_s, k=v_s, family=family)$ID_retained
+      
+      ID
 
     }
 
   }
 
 
-  if(vote==T){
+  if(vote==TRUE){
 
-    stopifnot(penalty == 'ebic')
+    stopifnot(criterion == 'ebic')
 
     vs<-c()
 
     if(parallel==TRUE){
+      
       if(.Platform$OS.type=="windows"){
         
         cl<-parallel::makeCluster(num_clusters)
@@ -245,6 +257,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
         vs<-unlist(mclapply(gamma_seq,ebic_selection_by_gamma,mc.cores = 2*num_clusters))
         
         }else{
+          
       vs<-unlist(lapply(gamma_seq,ebic_selection_by_gamma))
 
       }
@@ -253,7 +266,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
     IP_f<-summary(IP)[order(summary(IP),decreasing= T)]/max(summary(IP))
     
     ID_Voted<-as.numeric(names(IP_f[IP_f>=vote_threshold]))
-    #ID_Voted<-as.numeric(names(summary(IP)[order(summary(IP),decreasing= T)[1:min(length(summary(IP)),vote_threshold)]]))
+   
 
     }
   if(is.null(subset)){
@@ -279,7 +292,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
           
           num_selected = length(f_s$coef_retained),
 
-          vote=vote,criterion=penalty,
+          vote=vote,criterion=criterion,
           
           ID_pool= IP,
           
@@ -289,7 +302,9 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
 
           ID_voted=ID_Voted,
           
-          ctg = ctg,vote_threshold=vote_threshold,
+          ctg = ctg, CI= CI,
+          
+          vote_threshold=vote_threshold,
 
           gamma_ebic=gamma_ebic,
           
@@ -306,9 +321,9 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
 #'
 #' @param X Input features matrix (when feature matrix input by users).
 #'
-#' @param family Model assumption; see SMLE documentation. Default is Gaussian linear.
+#' @param family Model assumption; see \code{\link{SMLE}} documentation. Default is Gaussian linear.
 #'
-#' When input is \code{'smle'} or \code{'sdata'}, the same
+#' When input is a \code{'smle'} or \code{'sdata'}, the same
 #' model will be used in the selection.
 #'
 #' @param ... Further arguments passed to or from other methods.
