@@ -1,22 +1,24 @@
-#' Extract and adjust voting from a \code{'selection'} object
+#' Extract and adjust voting from SMLE selection
 #' 
 #' 
-#' When \code{'selection'} is used with \code{criterion="ebic"} and \code{vote=TRUE}, 
-#' users can use \code{vote_update} to adjust the voting threshold without a need 
-#' of rerun \code{smle_select}.
+#' When \code{\link{smle_select}()} is used with \code{criterion = "ebic"} and \code{vote = TRUE}, users 
+#' can use \code{\link{vote_update}()} to adjust the voting threshold without a need 
+#' of rerun \code{\link{smle_select}()}.
 #' 
-#' @param object A \code{'selection'} object as the output from \code{\link{smle_select}}.
-#' @param ... This argument is not used and listed for method consistency
+#' @param object A \code{'selection'} object as the output from \code{\link{smle_select}()}.
+#' @param ... This argument is not used and listed for method consistency.
 #' @return The function returns a vector indicating the features selected by
 #'  EBIC voting with the specified \code{vote_threhold}.
 #' @export
 #' @examples 
 #' set.seed(1)
-#' Data<-Gen_Data(correlation="MA",family = "gaussian")
-#' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
-#' fit_s<-smle_select(fit,vote=TRUE)
+#' Data <- Gen_Data(n = 100, p = 3000, correlation = "MA", rho = 0.7, family = "gaussian")
+#' colnames(Data$X)<- paste("X.",seq(3000) , sep = "")
+#' fit <- SMLE(Y = Data$Y, X = Data$X, k = 20, family = "gaussian")
+#' fit_s <- smle_select(fit, criterion = "ebic", vote = TRUE)
 #' plot(fit_s)
-#' vote_update(fit_s,vote_threshold = 0.3)
+#' fit_s
+#' vote_update(fit_s, vote_threshold = 0.4)
 
 vote_update<-function(object, ...){
   UseMethod("vote_update")
@@ -27,20 +29,21 @@ vote_update<-function(object, ...){
 #'  considered to be important when it receives votes passing the threshold.
 #'  Default is 0.6.
 #' @export
-vote_update.selection<-function(object,vote_threshold=NULL,...){
+vote_update.selection<-function(object, vote_threshold = 0.6, ...){
   
   if(is.null(vote_threshold)){
     
     return(object$ID_voted)
     
   }else{
+    
     IP<-object$ID_pool
     
     IP_f<-summary(IP)[order(summary(IP),decreasing= T)]/max(summary(IP))
     
-    ID_voted<-as.numeric(names(IP_f[IP_f>=vote_threshold]))  
+    object$ID_voted<-object$subset[as.numeric(names(IP_f[IP_f>=vote_threshold]))] 
     
-    return(object$subset[ID_voted])
+    return(object)
     
     }
 }

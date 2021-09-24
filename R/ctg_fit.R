@@ -2,7 +2,7 @@ ctg_fit<-function(Y , X , k ,
                   
                   family = c("gaussian","binomial","poisson"),
                   
-                  categorical  , keyset ,Ci, 
+                  categorical  , keyset ,CI, 
                   
                   max_iter, tol ,fast,
                   
@@ -21,11 +21,11 @@ ctg_fit<-function(Y , X , k ,
   
   if(codingtype=="all"|| group==FALSE){
     
-    dum_col<-sapply(X[,Ci],nlevels)
+    dum_col<-sapply(X[,CI],nlevels)
     
   }else{
     
-    dum_col<-sapply(X[,Ci],nlevels)-1
+    dum_col<-sapply(X[,CI],nlevels)-1
     
   }
   
@@ -41,9 +41,9 @@ ctg_fit<-function(Y , X , k ,
   
   Dummy_sum<-0
   
-  for(i in 1:length(Ci)){
+  for(i in 1:length(CI)){
     
-    Dummy_index<-c(Dummy_index,list(Ci[i]-1+seq(dum_col[i])+Dummy_sum))
+    Dummy_index<-c(Dummy_index,list(CI[i]-1+seq(dum_col[i])+Dummy_sum))
     
     Dummy_sum<-Dummy_sum+dum_col[i]-1
     
@@ -66,11 +66,11 @@ ctg_fit<-function(Y , X , k ,
     
     Beta0<- rep(0,dim(X_dummy)[2])
     
-    Beta0[-unlist(DFI)] <- Coef_initial[-Ci]
+    Beta0[-unlist(DFI)] <- Coef_initial[-CI]
     
-    for(i in 1:length(Ci)){
+    for(i in 1:length(CI)){
       
-      Beta0[Dummy_index[[i]]]<-rep(Coef_initial[Ci[i]],dum_col[i])
+      Beta0[Dummy_index[[i]]]<-rep(Coef_initial[CI[i]],dum_col[i])
       
     }
     
@@ -90,7 +90,7 @@ ctg_fit<-function(Y , X , k ,
   
   pp<-dim(X_iter)[2]
   
-  I<-list(Y=Y,CM=X,CI=Ci,dum_col=dum_col,IM=X_iter,
+  I<-list(Y=Y,CM=X,CI=sort(CI),dum_col=dum_col,IM=X_iter,
           DFI= lapply(DFI,function(x) x+1),DI= DI+1,family=family,codingtype=codingtype)
   
   
@@ -286,7 +286,7 @@ ctg_fit<-function(Y , X , k ,
     
   }else{
     
-    ID_None0<-ID_None0
+    ID_None0 <- DI2CI(I,ID_None0)
     
     coef_None0<-coef_None0[-1]
     

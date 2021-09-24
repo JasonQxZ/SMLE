@@ -23,7 +23,7 @@ dummy <- function( x, data=NULL, sep="_", drop=TRUE, fun=as.integer, verbose = F
   if( drop == FALSE && class(x) == "factor" ) {
     x <- factor( x, levels=levels(x), exclude=NULL )
   } else {
-    x<-factor( x, exclude=NULL )
+    x <- factor( x, levels=levels(x), exclude=NULL )
   }
 
 
@@ -92,7 +92,7 @@ dummy <- function( x, data=NULL, sep="_", drop=TRUE, fun=as.integer, verbose = F
 }
 
 
-dummy.data.frame <- function( data,codingtype, 
+dummy.data.frame <- function( data, codingtype, 
                               dummy.classes=getOption("dummy.classes"), all=TRUE, ... ) {
 
 

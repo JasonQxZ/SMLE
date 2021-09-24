@@ -8,35 +8,35 @@
 #' accounted; this makes the screening more reliable. The function uses
 #' efficient iterative hard thresholding (IHT) algorithm with step parameter
 #' adaptively tuned for fast convergence. Users can choose to further conduct
-#' an elaborative selection after SMLE-screening. See \code{\link{smle_select}} for more details.
+#' an elaborative selection after SMLE-screening. See \code{\link{smle_select}()} for more details.
 #'
 #' @importFrom glmnet glmnet
 #' @importFrom grDevices dev.new dev.off rainbow
 #' @importFrom graphics barplot legend lines par plot title
 #' @importFrom stats dpois glm lm model.frame model.matrix quantile rbinom rnorm rpois sd .getXlevels model.response
 #' @importFrom utils tail
+#' 
 #' @details
-#'
-#' With the input \eqn{\bold{y}} and \eqn{X}, \code{SMLE} conducts joint feature screening by running
+#' With the input \eqn{\bold{y}} and \eqn{X}, \code{\link{SMLE}()} conducts joint feature screening by running
 #' iterative hard thresholding algorithm (IHT), where the default initial value is set to
 #' be the Lasso estimate with the sparsity closest to the sample size minus one.
 #'
-#' In \code{SMLE}, the initial value for parameter \eqn{u^{-1}} is set to be
+#' In \code{\link{SMLE}()}, the initial value for parameter \eqn{u^{-1}} is set to be
 #' \eqn{\frac{1}{||X||^2_{\infty}}} and recursively decrease the value of 
 #' \eqn{u^{-1}} by \code{U_rate} to guarantee the likelihood increment.This strategy is called \eqn{u}-search.
 #'
-#' \code{SMLE} terminates IHT iterations when either \code{tol} or \code{max_iter} is
-#' satisfied. When \code{fast=TRUE}, the algorithm also stops when the non-zero
+#' \code{\link{SMLE}()} terminates IHT iterations when either \code{tol} or \code{max_iter} is
+#' satisfied. When \code{fast = TRUE}, the algorithm also stops when the non-zero
 #' members of the coefficient estimates remain the same for 10 successive
 #' iterations or the log-likelihood difference between coefficient estimates is less
-#' than \eqn{0.01\cdot}\code{"the log-likelihood increase of the first step"}, or 
+#' than \eqn{0.01} times the log-likelihood increase of the first step, or 
 #' \eqn{\sqrt{k}\cdot}\code{tol} is satisfied.
 #'
-#' In \code{SMLE}, categorical features are coded by dummy covariates with the
+#' In \code{\link{SMLE}()}, categorical features are coded by dummy covariates with the
 #' method specified in \code{codingtype}. Users can use \code{group} to specify
 #' whether to treat those dummy covariates as a single group feature or as
 #' individual features.
-#' When \code{group=TRUE} with \code{penalize_mod=TRUE}, the effect for a group
+#' When \code{group=TRUE} with \code{penalize_mod = TRUE}, the effect for a group
 #' of \eqn{J} dummy covariates is computed by
 #'
 #' \deqn{ \beta_i = \frac{1}{\sqrt{J}} \cdot \sqrt{(\beta_1)^2+...+(\beta_J)^2}}
@@ -45,47 +45,47 @@
 #'
 #' Since feature screening is usually a preprocessing step, users may wish to
 #' further conduct an elaborative feature selection after screening. This can
-#' be done by setting \code{selection=TRUE} in \code{SMLE} or applying any existing
-#' selection method on the output of \code{SMLE}.
+#' be done by setting \code{selection = TRUE} in \code{\link{SMLE}()} or applying any existing
+#' selection method on the output of \code{\link{SMLE}()}.
 #'
 #'
-#' @param Y The response vector of dimension \eqn{n \times 1}. Quantitative for
-#' \code{family ='gaussian'}, non-negative counts for \code{family ='poisson'},
-#' binary (0-1) for \code{family ='binomial'}. Input \code{Y} should be \code{'numeric'}.
+#' @param Y The response vector \eqn{\bold{y}} of dimension \eqn{n \times 1}. Quantitative for
+#' \code{family = "gaussian"}, non-negative counts for \code{family = "poisson"},
+#' binary (0-1) for \code{family = "binomial"}. Input \eqn{\bold{y}} should be \code{'numeric'}.
 #'
-#' @param X The \eqn{n \times p} feature matrix with each column denoting a feature
+#' @param X The \eqn{n \times p} feature matrix \eqn{X} with each column denoting a feature
 #' (covariate) and each row denoting an observation vector. The input should be
 #' a \code{'matrix'} object for numerical data, and \code{'data.frame'} for categorical
 #' data (or a mixture of numerical and categorical data). The algorithm will
 #' treat covariates having class \code{'factor'} as categorical data and extend the data
 #' frame dimension by the dummy columns needed for coding the categorical features.
 #'
-#' @param k Total number of features (including \code{'keyset'}) to be retained 
+#' @param k Total number of features (including \code{keyset}) to be retained 
 #' after screening. Default is the largest integer not 
-#' exceeding  \eqn{\frac{1}{2}\log(n)n^{1/3}}.
+#' exceeding \eqn{\frac{1}{2}\log(n)n^{1/3}}.
 #'
 #' @param family Model assumption between \eqn{\bold{y}} and \eqn{X}; the default model is Gaussian
 #' linear.
 #'
 #' @param categorical A logical flag whether the input feature matrix includes
-#' categorical features. If \code{categorical= TRUE}, a model intercept will
-#' be used in the screening process. Default is NULL.
+#' categorical features. If \code{categorical = TRUE}, a model intercept will
+#' be used in the screening process. Default is \code{NULL}.
 #'
 #' @param U_rate Decreasing rate in tuning step parameter \eqn{u^{-1}} in IHT
 #' algorithm. See Details.
 #'
 #' @param keyset A vector to indicate a set of key features that do not
 #' participate in feature screening and are forced to remain in the model.
-#' Default is NULL
+#' Default is \code{NULL}
 #'
 #' @param intercept A logical flag to indicate whether to an intercept be used in
 #' the model. An intercept will not participate in screening.
 #'
 #' @param group Logical flag for whether to treat the dummy covariates of a
 #' categorical feature as a group. (Only for categorical data, see Details).
-#' Default is TRUE.
+#' Default is \code{TRUE}.
 #'
-#' @param codingtype Coding types for categorical features; default is \code{'DV'}.
+#' @param codingtype Coding types for categorical features; default is \code{"DV"}.
 #' \code{Codingtype = "all"} Convert each level to a 0-1 vector.
 #' \code{Codingtype = "DV"} conducts deviation coding for each level in
 #' comparison with the grand mean.
@@ -119,12 +119,12 @@
 #' 
 #'
 #' @param selection A logical flag to indicate whether an elaborate selection
-#' is to be conducted by \code{smle_select} after screening.
-#'  If TRUE, the function will return a \code{'selection'} object, 
-#'  see \code{\link{smle_select}} documentation. Default is \code{FALSE}.
+#' is to be conducted by \code{\link{smle_select}()} after screening.
+#'  If \code{TRUE}, the function will return a \code{'selection'} object, 
+#'  see \code{\link{smle_select}()} documentation. Default is \code{FALSE}.
 #'
-#' @param ... Additional arguments to be passed to \code{smle_select} if \code{selection=TRUE}. 
-#' See \code{\link{smle_select}} documentation for more details. 
+#' @param ... Additional arguments to be passed to \code{\link{smle_select}()} if \code{selection=TRUE}. 
+#' See \code{\link{smle_select}()} documentation for more details. 
 #' 
 #' @references
 #' UCLA Statistical Consulting Group. \emph{coding systems for categorical
@@ -140,12 +140,12 @@
 #' @return
 #' \item{call}{The call that produced this object.}
 #' 
-#' \item{ID_retained}{A vector indicating the features retained after SMLE screening.
-#' The output includes both features retained by SMLE and the features specified in \code{'keyset'}.}
+#' \item{ID_retained}{A vector indicating the features retained after SMLE-screening.
+#' The output includes both features retained by \code{\link{SMLE}()} and the features specified in \code{keyset}.}
 #'
 #' \item{coef_retained}{The vector of coefficients estimated by IHT for the retained features.}
 #'
-#' \item{path_retained}{Iteration path matrix with columns recording the coefficient updates over the IHT procedure.}
+#' \item{path_retained}{IHT iteration path with columns recording the coefficient updates.}
 #'
 #' \item{num_retained}{Number of retained features after screening.}
 #'
@@ -176,7 +176,7 @@
 #'
 #' \code{IM}: Iteration path matrix with columns recording IHT coefficient updates.
 #'
-#' \code{nlevel}: Number of levels for all categorical features.
+#' \code{dum_col}: Number of levels for all categorical features.
 #'
 #' \code{CI}: Indices of categorical features in \code{CM}.
 #'
@@ -193,21 +193,37 @@
 #' @export
 #' 
 #' @examples
-#'
-#' #Example
+#' 
+#' # Example 1:
 #' set.seed(1)
-#' Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
-#' Data
-#' fit<-SMLE(Y=Data$Y, X=Data$X, k=9, family = "gaussian")
-#' fit
+#' Data <- Gen_Data(n= 200, p = 5000, family = "gaussian", correlation = "ID")
+#' fit <- SMLE(Y = Data$Y, X = Data$X, k = 9, family = "gaussian")
 #' summary(fit)
-#' 
-#' # The important features we missed:
-#' setdiff(Data$subset_true,fit$ID_retained)
-#' 
-#' # Check if the important features are retained.
-#' Data$subset_true %in% fit$ID_retained
+#' Data$subset_true %in% fit$ID_retained # Sure screening check.
 #' plot(fit)
+#' 
+#' # Example 2:
+#' set.seed(1)
+#' Data_sim2 <- Gen_Data(n = 420, p = 1000, family = "gaussian", num_ctgidx = 5, 
+#'                       pos_ctgidx = c(1,3,5,7,9), effect_truecoef= c(1,2,3,-4,-5),
+#'                       pos_truecoef = c(1,3,5,7,8), level_ctgidx = c(3,3,3,4,5))
+#' train_X <- Data_sim2$X[1:400,]; test_X <- Data_sim2$X[401:420,]
+#' train_Y <- Data_sim2$Y[1:400]; test_Y <- Data_sim2$Y[401:420]
+#' fit <- SMLE(train_Y, train_X, family = "gaussian", group = TRUE, k = 15)
+#' predict(fit, newdata = test_X)
+#' test_Y
+#' 
+#' # Example 3:
+#' library(datasets)
+#' data("attitude")
+#' set.seed(1)
+#' noise <- matrix(rnorm(30*100, mean = mean(attitude$rating) , sd = 1), ncol = 100)
+#' colnames(noise) <- paste("Noise", seq(100), sep = ".")
+#' df <- data.frame(cbind(attitude, noise))
+#' fit <- SMLE(rating ~., data = df)
+#' fit
+#' fit_s <- SMLE(rating ~., data = df, selection = TRUE)
+#' fit_s
 #' 
 SMLE <- function (object, ...)
   UseMethod("SMLE")
@@ -244,9 +260,9 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
   
   if(is.null(categorical)){
     
-    Ci<-(1:dim(X)[2])[sapply(X,is.factor)]
+    CI<-(1:dim(X)[2])[sapply(X,is.factor)]
     
-    if( any(Ci) ){
+    if( any(CI) ){
       
       categorical = TRUE
       
@@ -271,14 +287,14 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
   
   if(categorical == TRUE){
     
-    Ci<-(1:dim(X)[2])[sapply(X,is.factor)]
+    CI<-(1:dim(X)[2])[sapply(X,is.factor)]
     
     if(is.null( codingtype )){codingtype<-"DV"}
     
     if(group==FALSE &codingtype!="all"){stop("codingtype should be 'all' when group = FALSE")}
     
     
-    S<-Standardize(X[,-Ci])
+    S<-Standardize(X[,-CI])
     
     Xs<-S$Xs
     
@@ -287,10 +303,10 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
     X_sd<- S$X_sd
     
     
-    for(i in 1:length(Ci)){
+    for(i in 1:length(CI)){
       
       
-      if( Ci[i] == 1 ){
+      if( CI[i] == 1 ){
         
         name<-dimnames(Xs)[[2]]
         
@@ -298,21 +314,21 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
         
         colnames(Xs)<-c(names(X)[1],name)
         
-      }else if( Ci[i]>dim(Xs)[2]){
+      }else if( CI[i]>dim(Xs)[2]){
         
         name<-dimnames(Xs)[[2]]
         
-        Xs<-data.frame(Xs,X[,Ci[i]])
+        Xs<-data.frame(Xs,X[,CI[i]])
         
-        colnames(Xs)<-c(name,names(X)[Ci[i]])
+        colnames(Xs)<-c(name,names(X)[CI[i]])
         
       }else{ 
         
         name<- dimnames(Xs)[[2]]
         
-        Xs<-data.frame(Xs[,1:Ci[i]-1],X[,Ci[i]],Xs[,Ci[i]:dim(Xs)[2]])
+        Xs<-data.frame(Xs[,1:CI[i]-1],X[,CI[i]],Xs[,CI[i]:dim(Xs)[2]])
         
-        colnames(Xs)<-c(name[1:Ci[i]-1],names(X)[Ci[i]],name[Ci[i]:(length(name))])
+        colnames(Xs)<-c(name[1:CI[i]-1],names(X)[CI[i]],name[CI[i]:(length(name))])
         
       }
       
@@ -322,7 +338,7 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
     
     
     
-    fit<- ctg_fit(Y, Xs, k, family, categorical, keyset, Ci, max_iter, tol, fast,
+    fit<- ctg_fit(Y, Xs, k, family, categorical, keyset, CI, max_iter, tol, fast,
                   
                   intercept, group, codingtype, penalize_mod,
                   
@@ -372,7 +388,7 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
 
 #' @rdname SMLE
 #' @param object An object of class \code{'formula'} (or one that can be coerced to that class): a symbolic description of the model to be fitted.
-#' @param data An optional data frame, list or environment (or object coercible by \code{'as.data.frame'} to a \code{'data frame'}) containing the features in the model. 
+#' @param data An optional data frame, list or environment (or object coercible by \code{\link[base]{as.data.frame}()} to a \code{'data frame'}) containing the features in the model. 
 #' @export
 SMLE.formula<- function (object, data, categorical=NULL,...) {
   
@@ -398,9 +414,9 @@ SMLE.formula<- function (object, data, categorical=NULL,...) {
   
   if(is.null(categorical)){
     
-    Ci<-(1:dim(x)[2])[sapply(x,is.factor)]
+    CI<-(1:dim(x)[2])[sapply(x,is.factor)]
     
-    if( any(Ci) ){
+    if( any(CI) ){
       
       ans <- SMLE(Y=y, X=x, categorical = TRUE,...)
       

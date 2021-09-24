@@ -3,8 +3,8 @@
 #' @description
 #' This function constructs a sparsity vs. selection criterion curve for a \code{'selection'} object.
 #'  When EBIC is used with voting, it also constructs a histogram showing the voting result.
-#' @param x A \code{'selection'} object as the output from \code{smle_select}.
-#' @param ... Additional arguments to the \code{plot} function.
+#' @param x A \code{'selection'} object as the output from \code{\link{smle_select}()}.
+#' @param ... Additional arguments to the \code{\link[base]{plot}()} function.
 #' @method plot selection
 #' @return
 #' No return value.
@@ -12,9 +12,9 @@
 #' @importFrom graphics plot.new
 #' @examples
 #' set.seed(1)
-#' Data<-Gen_Data(correlation="MA",family = "gaussian")
-#' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
-#' fit_s<-smle_select(fit,vote=TRUE)
+#' Data <- Gen_Data(correlation = "MA", family = "gaussian")
+#' fit <- SMLE(Data$Y, Data$X, k = 20, family = "gaussian")
+#' fit_s <- smle_select(fit, vote = TRUE)
 #' plot(fit_s)
 #'
 #' @export

@@ -3,16 +3,16 @@
 \name{vote_update}
 \alias{vote_update}
 \alias{vote_update.selection}
-\title{Extract and adjust voting from a \code{'selection'} object}
+\title{Extract and adjust voting from SMLE selection}
 \usage{
 vote_update(object, ...)
 
-\method{vote_update}{selection}(object, vote_threshold = NULL, ...)
+\method{vote_update}{selection}(object, vote_threshold = 0.6, ...)
 }
 \arguments{
-\item{object}{A \code{'selection'} object as the output from \code{\link{smle_select}}.}
+\item{object}{A \code{'selection'} object as the output from \code{\link{smle_select}()}.}
 
-\item{...}{This argument is not used and listed for method consistency}
+\item{...}{This argument is not used and listed for method consistency.}
 
 \item{vote_threshold}{A voting threshold in percentage. A feature is
 considered to be important when it receives votes passing the threshold.
@@ -23,15 +23,17 @@ The function returns a vector indicating the features selected by
  EBIC voting with the specified \code{vote_threhold}.
 }
 \description{
-When \code{'selection'} is used with \code{criterion="ebic"} and \code{vote=TRUE}, 
-users can use \code{vote_update} to adjust the voting threshold without a need 
-of rerun \code{smle_select}.
+When \code{\link{smle_select}()} is used with \code{criterion = "ebic"} and \code{vote = TRUE}, users 
+can use \code{\link{vote_update}()} to adjust the voting threshold without a need 
+of rerun \code{\link{smle_select}()}.
 }
 \examples{
 set.seed(1)
-Data<-Gen_Data(correlation="MA",family = "gaussian")
-fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
-fit_s<-smle_select(fit,vote=TRUE)
+Data <- Gen_Data(n = 100, p = 3000, correlation = "MA", rho = 0.7, family = "gaussian")
+colnames(Data$X)<- paste("X.",seq(3000) , sep = "")
+fit <- SMLE(Y = Data$Y, X = Data$X, k = 20, family = "gaussian")
+fit_s <- smle_select(fit, criterion = "ebic", vote = TRUE)
 plot(fit_s)
-vote_update(fit_s,vote_threshold = 0.3)
+fit_s
+vote_update(fit_s, vote_threshold = 0.4)
 }

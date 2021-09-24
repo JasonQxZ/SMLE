@@ -10,7 +10,7 @@
 \method{coef}{selection}(object, ...)
 }
 \arguments{
-\item{object}{Returned object from either the function \code{\link{SMLE}} or \code{\link{smle_select}}.}
+\item{object}{Returned object from either the function \code{\link{SMLE}()} or \code{\link{smle_select}()}.}
 
 \item{...}{This argument is not used and listed for method consistency.}
 }
@@ -24,8 +24,8 @@ Extract coefficients from fitted model for either a \code{'smle'} or \code{'sele
 
 set.seed(1)
 Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
-fit<-SMLE(Y=Data$Y, X=Data$X, k=9, family = "gaussian")
+fit<-SMLE(Y=Data$Y, X=Data$X, k=15, family = "gaussian")
 coef(fit)
-fits<-smle_select(fit)
-coef(fits)
+fit_s<-smle_select(fit)
+coef(fit_s)
 }

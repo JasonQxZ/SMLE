@@ -30,43 +30,46 @@
 #' Compound symmetry (CS): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with cov\eqn{(x_j, x_h) =\frac{\rho}{2}} if \eqn{j} ,\eqn{h}
 #' are both in the set of important features and \eqn{cov(x_j, x_h) =  \rho } when only
 #' one of \eqn{j} or \eqn{h} are in the set of important features.
-#'
+#' 
 #' Auto-regressive (AR): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with
 #'
-#' cov\eqn{(x_j, x_h) = \rho^{|j-h|}} for all \eqn{j} and \eqn{h}. The correlation strength \eqn{\rho} is controlled by argument rho.
-#'
-#' Then, generate the response variable \eqn{Y} according to its response type. 
-#' For Gaussian model, \eqn{\bold{y} =X ^T \cdot \beta + \epsilon} where 
-#' \eqn{\epsilon\ \in} \eqn{N( 0, 1)}.
-#' For the binary model let \eqn{\pi = P(Y = 1|x)}. Sample \eqn{\bold{y}} from Bernoulli(\eqn{\pi}) where logit\eqn{(\pi) = X^T \cdot\beta}.
-#' Finally, for the Poisson model, \eqn{\bold{y}} is generated from Poisson distribution with the link \eqn{\pi} = exp\eqn{(X^T \cdot \beta )}.
-#' For more details see reference below.
+#' cov\eqn{(x_j, x_h) = \rho^{|j-h|}} for all \eqn{j} and \eqn{h}. 
+#' 
+#' The correlation strength \eqn{\rho} is controlled by argument \code{rho}. 
+#' Then, we generate the response variable \eqn{Y} according to its response type. 
+#' For Gaussian model, \eqn{y_i =\bold{x_i}^T \bold{\beta} + \epsilon_i} where 
+#' \eqn{\epsilon_i\ \in} \eqn{N( 0, 1)} for \eqn{i} from \eqn{1} to \eqn{n}. 
+#' For the binary model let \eqn{\pi_i = P(Y = 1|\bold{x_i})}. We sample \eqn{y_i} 
+#' from Bernoulli(\eqn{\pi_i}) where logit\eqn{(\pi_i) = \bold{x_i}^T \bold{\beta}}.
+#' Finally, for the Poisson model, \eqn{y_i} is generated from Poisson distribution 
+#' with the link \eqn{\pi_i} = exp\eqn{(\bold{x_i}^T \bold{\beta} )}.
+#' For more details see the reference below.
 #'
 #' @param n Sample size, number of rows of for the feature matrix to be generated.
 #'
 #' @param p Number of columns for the feature matrix to be generated.
 #'
-#' @param num_ctgidx The number of features that are categorical. Set to FALSE for only numerical features. Default is FALSE.
+#' @param num_ctgidx The number of features that are categorical. Set to \code{FALSE} for only numerical features. Default is \code{FALSE}.
 #'
 #' @param num_truecoef The number of features (columns) that affect response. Default is 5.
 #'
-#' @param level_ctgidx  A vector to indicate the levels of categorical features in \code{'pos_ctgidx'}. Default is 2.
+#' @param level_ctgidx  A vector to indicate the levels of categorical features in \code{pos_ctgidx}. Default is 2.
 #'
-#' @param effect_truecoef  Effects size corresponding to the features in \code{'pos_truecoef'}. If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled.  See Details.
+#' @param effect_truecoef  Effects size corresponding to the features in \code{pos_truecoef}. If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled.  See Details.
 #'
 #' @param pos_ctgidx Vector of indices denoting which columns are categorical.
 #'
 #' @param pos_truecoef Vector of indices denoting which features (columns) affect the response variable. If not specified, positions are randomly sampled. See Details for more information.
 #'
 #' @param family Model type for the response variable.
-#' \code{'gaussian'} for normally distributed data, \code{'poisson'} for non-negative counts,
-#' \code{'binomial'} for binary (0-1).
+#' \code{"gaussian"} for normally distributed data, \code{poisson} for non-negative counts,
+#' \code{"binomial"} for binary (0-1).
 #'
-#' @param correlation Correlation structure among features. \code{correlation = 'ID'} for independent,
-#' \code{correlation = 'MA'} for moving average, \code{correlation = 'CS'} for compound symmetry, \code{correlation = 'AR'} 
-#' for auto regressive Default is \code{'ID'}. For more information see Details.
+#' @param correlation Correlation structure among features. \code{correlation = "ID"} for independent,
+#' \code{correlation = 'MA'} for moving average, \code{correlation = "CS"} for compound symmetry, \code{correlation = "AR"} 
+#' for auto regressive Default is \code{"ID"}. For more information see Details.
 #'
-#' @param rho Parameter controlling the correlation strength. See Details.
+#' @param rho Parameter controlling the correlation strength, default is \code{0.2}. See Details.
 #'
 #' @param sigma Parameter for noise level.
 #'
@@ -103,17 +106,17 @@
 #' 
 #' #Simulating data with binomial response and auto-regressive structure.
 #' set.seed(1)
-#' Data<-Gen_Data(n =100, p = 1000,family ="binomial",correlation = "AR")
+#' Data <- Gen_Data(n = 500, p = 2000, family = "binomial", correlation = "AR")
 #' cor(Data$X[,1:5])
 #' print(Data)
 #'
 #'
-Gen_Data<-function(n=200,p=5000,sigma=1,
-                   num_ctgidx =   NULL,  pos_ctgidx =     NULL,
-                   num_truecoef = NULL,  pos_truecoef =   NULL,
+Gen_Data<-function(n = 200,p = 1000,sigma = 1,
+                   num_ctgidx = NULL,  pos_ctgidx = NULL,
+                   num_truecoef = NULL,  pos_truecoef = NULL,
                    level_ctgidx = NULL,  effect_truecoef= NULL,
                    correlation = c("ID","AR","MA","CS"),
-                   rho = NULL,family = c("gaussian","binomial","poisson")){
+                   rho = 0.2, family = c("gaussian","binomial","poisson")){
 
 
 
@@ -189,8 +192,6 @@ Gen_Data<-function(n=200,p=5000,sigma=1,
     }
 
   }
-  
-  if(is.null(rho)){rho =0.5}
 
   ##------------------------------------------Create Data-----------------------------------------------
 
@@ -301,7 +302,7 @@ Gen_Data<-function(n=200,p=5000,sigma=1,
 
     D<-list(call = cl, Y = D$Y,X = Z , subset_true = pos_truecoef, coef_true= effect_truecoef,
 
-            family = family, ctg = TRUE, correlation = correlation,CI=pos_ctgidx)
+            family = family, ctg = TRUE, correlation = correlation,CI= sort(pos_ctgidx))
 
     class(D) <- "sdata"
 

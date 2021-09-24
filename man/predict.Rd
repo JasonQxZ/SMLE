@@ -13,10 +13,10 @@
 \item{object}{A \code{'smle'} or \code{'selection'} object.}
 
 \item{newdata}{Matrix of new values for the features at which predictions are to be made using the final model 
-from \code{\link{SMLE}} or \code{\link{smle_select}}. If omitted, the function returns the fitted 
+from \code{\link{SMLE}()} or \code{\link{smle_select}()}. If omitted, the function returns the fitted 
 response values based on the training data.}
 
-\item{...}{Further arguments passed to \code{\link[stats]{predict.glm}}.}
+\item{...}{Further arguments passed to \code{\link[stats]{predict.glm}()}.}
 }
 \value{
 A prediction vector. The length of the vector equals to the number of observations of the data fitted in.
@@ -25,20 +25,20 @@ A prediction vector. The length of the vector equals to the number of observatio
 This function returns the predicted response values for a fitted model of class \code{'smle'} or \code{'selection'}.
 }
 \examples{
+
 set.seed(1)
-Data_sim1<-Gen_Data(n= 200, p =1000, correlation="AR",family = "gaussian", num_ctgidx =5)
-fit1<-SMLE(Data_sim1$Y,Data_sim1$X, family = "gaussian" , k=10)
-predict(fit1,newdata= Data_sim1$X[10:20,])
-fit1_s <- smle_select(fit1)
-predict(fit1_s)
+Data_sim <- Gen_Data(n = 420, p = 1000, sigma = 0.5, family = "gaussian")
+train_X <- Data_sim$X[1:400,]; test_X <- Data_sim$X[401:420,]
+train_Y <- Data_sim$Y[1:400]; test_Y <- Data_sim$Y[401:420]
+fit1 <- SMLE(train_Y, train_X, family = "gaussian", k = 10)
 
+#Fitted responses vs true responses in training data
+predict(fit1)[1:10]
+train_Y[1:10]
 
-#Prediction example with influential categorical feature. 
-set.seed(2)
-Data_sim2<-Gen_Data(n= 220, p =1000, correlation="AR",family = "gaussian", num_ctgidx =5)
-fit2<-SMLE(Data_sim2$Y[1:200],Data_sim2$X[1:200,], family = "gaussian" , k=10)
-predict(fit2)
-predict(fit2,newdata= Data_sim2$X[201:220,])
+#Predicted responses vs true responses in testing data
+predict(fit1, newdata = test_X)
+test_Y
 
 
 

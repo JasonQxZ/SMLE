@@ -1,13 +1,13 @@
 #' Extract log-likelihood
 #' 
 #' This is a method function written to extract log-liklihood from \code{'smle'} and \code{'selection'} objects. 
-#' It refits the model by \code{\link[stats]{glm}} based on the response and the selected features after screening(selection), 
-#' and returns an object of \code{\link[stats]{logLik}} from the generic.
+#' It refits the model by \code{\link[stats]{glm}()} based on the response and the selected features after screening (selection), 
+#' and returns an object of \code{'logLik'} from the generic.
 #' @import stats
 #' @param object Object of class \code{'smle'} or \code{'sdata'}. 
 #' @param ... Forwarded arguments.
 #' @return Returns an object of class \code{'logLik'}. This is a number with at least one attribute,
-#'  \code{"df"} (degrees of freedom), giving the number of (estimated) parameters in the model. For more details, see the generic \code{'logLik'} in \pkg{stats}.
+#'  \code{"df"} (degrees of freedom), giving the number of (estimated) parameters in the model. For more details, see the generic \code{\link[stats]{logLik}()} in \pkg{stats}.
 #' @rdname logLik
 #' @method logLik smle
 #' @examples

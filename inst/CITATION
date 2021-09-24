@@ -1,0 +1,28 @@
+bibentry(bibtype = "Manual",
+  title        = "{SMLE}:An {R} Package for Joint Feature Screening in Ultrahigh-dimensional GLMs",
+  author       = c(person(given = "Qianxiang",
+                          family = "Zang",
+                          email = "qzang023@uottawa.ca"),
+                  person(given = "Chen",
+                          family = "Xu",
+                          email = "cx3@uottawa.ca"),
+                   person(given = "Kelly",
+                          family = "Burkett",
+                          email = "kburkett@uottawa.ca")),
+  year         = "2020",
+
+  header       = "To cite SMLE package in publications use:"
+)
+bibentry(bibtype = "Article",
+  title        = "The sparse MLE for ultrahigh-dimensional feature screening",
+  author       = c(person(given = "Chen",
+                          family = "Xu"),
+                   person(given = "Jiahua",
+                          family = "Chen")),
+  journal = "Journal of the American Statistical Association",
+  volume = "109",
+  number = "507",
+  pages = "1257-1269",
+  year  = "2014",
+  header       = "To cite SMLE method in publications use:"
+)

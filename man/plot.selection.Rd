@@ -7,9 +7,9 @@
 \method{plot}{selection}(x, ...)
 }
 \arguments{
-\item{x}{A \code{'selection'} object as the output from \code{smle_select}.}
+\item{x}{A \code{'selection'} object as the output from \code{\link{smle_select}()}.}
 
-\item{...}{Additional arguments to the \code{plot} function.}
+\item{...}{Additional arguments to the \code{\link[base]{plot}()} function.}
 }
 \value{
 No return value.
@@ -20,9 +20,9 @@ This function constructs a sparsity vs. selection criterion curve for a \code{'s
 }
 \examples{
 set.seed(1)
-Data<-Gen_Data(correlation="MA",family = "gaussian")
-fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
-fit_s<-smle_select(fit,vote=TRUE)
+Data <- Gen_Data(correlation = "MA", family = "gaussian")
+fit <- SMLE(Data$Y, Data$X, k = 20, family = "gaussian")
+fit_s <- smle_select(fit, vote = TRUE)
 plot(fit_s)
 
 }

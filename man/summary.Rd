@@ -3,14 +3,14 @@
 \name{summary.smle}
 \alias{summary.smle}
 \alias{summary.selection}
-\title{Summary of an object from class \code{'smle'} or \code{'selection'}}
+\title{Summarize SMLE-screening and selection}
 \usage{
 \method{summary}{smle}(object, ...)
 
 \method{summary}{selection}(object, ...)
 }
 \arguments{
-\item{object}{Fitted \code{'smle'} or \code{'selection'} object.}
+\item{object}{A \code{'smle'} or \code{'selection'} object.}
 
 \item{...}{This argument is not used and listed for method consistency.}
 }
@@ -23,8 +23,8 @@ In particular, it shows the features retained after SMLE-screening (or selection
 }
 \examples{
 set.seed(1)
-Data<-Gen_Data(correlation="MA",family = "gaussian")
-fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
+Data <- Gen_Data(correlation = "MA", family = "gaussian")
+fit <- SMLE(Y = Data$Y, X = Data$X, k = 20, family = "gaussian")
 summary(fit)
 fit_s <- smle_select(fit)
 summary(fit_s)

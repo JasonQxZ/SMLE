@@ -27,14 +27,14 @@
 Return argument invisibly.
 }
 \description{
-This functions prints information about the fitted model from a call to \code{\link{SMLE}} or \code{\link{smle_select}},
- or about the simulated data from a call to \code{Gen_data}. The object passed as an argument to print is returned invisibly.
+This function prints information about the fitted model from a call to \code{\link{SMLE}()} or \code{\link{smle_select}()},
+ or about the simulated data from a call to \code{\link{Gen_Data}()}. The object passed as an argument to print is returned invisibly.
 }
 \examples{
 set.seed(1)
-Data<-Gen_Data(correlation="MA",family = "gaussian")
+Data<-Gen_Data(correlation = "MA", family = "gaussian")
 Data
-fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
-fit
+fit<-SMLE(Y = Data$Y, X = Data$X, k = 20, family = "gaussian")
+print(fit)
 summary(fit)
 }

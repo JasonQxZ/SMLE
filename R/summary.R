@@ -1,10 +1,10 @@
-#' Summary of an object from class \code{'smle'} or \code{'selection'}
+#' Summarize SMLE-screening and selection
 #'
 #' @rdname summary
 #' @description This function prints a summary of a \code{'smle'} (or a \code{'selection'}) object.
 #' In particular, it shows the features retained after SMLE-screening (or selection) with the related convergence information.
 #' @import stats
-#' @param object Fitted \code{'smle'} or \code{'selection'} object.
+#' @param object A \code{'smle'} or \code{'selection'} object.
 #'
 #' @param ... This argument is not used and listed for method consistency.
 #'
@@ -14,8 +14,8 @@
 #' @method summary smle
 #' @examples
 #' set.seed(1)
-#' Data<-Gen_Data(correlation="MA",family = "gaussian")
-#' fit<-SMLE(Data$Y,Data$X,k=20,family = "gaussian")
+#' Data <- Gen_Data(correlation = "MA", family = "gaussian")
+#' fit <- SMLE(Y = Data$Y, X = Data$X, k = 20, family = "gaussian")
 #' summary(fit)
 #' fit_s <- smle_select(fit)
 #' summary(fit_s)
@@ -24,7 +24,7 @@ summary.smle <- function(object, ...){
   
   lg<-logLik(object)
   
-  family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
+  family<-switch(object$family, "gaussian" = gaussian(),  "binomial" = binomial(), "poisson"=  poisson())
   
   ans=list()
   ans$family = object$family
@@ -35,6 +35,8 @@ summary.smle <- function(object, ...){
   ans$size = object$num_retained
   ans$ID_retained  =object$ID_retained
   ans$coef_retained = object$coef_retained
+  ans$X = object$X
+  
   
   if( !is.null(object$Intercept) ){
     ans$intercept= object$intercept
@@ -78,7 +80,7 @@ summary.selection <- function(object, ...){
   ans$ID_selected  =object$ID_selected
   ans$coef_selected = object$coef_selected
   ans$gamma_ebic = object$gamma_ebic 
-  
+  ans$X = object$X
   
   if( !is.null(object$Intercept) ){
     ans$intercept= object$intercept

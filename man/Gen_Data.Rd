@@ -6,7 +6,7 @@
 \usage{
 Gen_Data(
   n = 200,
-  p = 5000,
+  p = 1000,
   sigma = 1,
   num_ctgidx = NULL,
   pos_ctgidx = NULL,
@@ -15,7 +15,7 @@ Gen_Data(
   level_ctgidx = NULL,
   effect_truecoef = NULL,
   correlation = c("ID", "AR", "MA", "CS"),
-  rho = NULL,
+  rho = 0.2,
   family = c("gaussian", "binomial", "poisson")
 )
 }
@@ -26,7 +26,7 @@ Gen_Data(
 
 \item{sigma}{Parameter for noise level.}
 
-\item{num_ctgidx}{The number of features that are categorical. Set to FALSE for only numerical features. Default is FALSE.}
+\item{num_ctgidx}{The number of features that are categorical. Set to \code{FALSE} for only numerical features. Default is \code{FALSE}.}
 
 \item{pos_ctgidx}{Vector of indices denoting which columns are categorical.}
 
@@ -34,19 +34,19 @@ Gen_Data(
 
 \item{pos_truecoef}{Vector of indices denoting which features (columns) affect the response variable. If not specified, positions are randomly sampled. See Details for more information.}
 
-\item{level_ctgidx}{A vector to indicate the levels of categorical features in \code{'pos_ctgidx'}. Default is 2.}
+\item{level_ctgidx}{A vector to indicate the levels of categorical features in \code{pos_ctgidx}. Default is 2.}
 
-\item{effect_truecoef}{Effects size corresponding to the features in \code{'pos_truecoef'}. If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled.  See Details.}
+\item{effect_truecoef}{Effects size corresponding to the features in \code{pos_truecoef}. If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled.  See Details.}
 
-\item{correlation}{Correlation structure among features. \code{correlation = 'ID'} for independent,
-\code{correlation = 'MA'} for moving average, \code{correlation = 'CS'} for compound symmetry, \code{correlation = 'AR'} 
-for auto regressive Default is \code{'ID'}. For more information see Details.}
+\item{correlation}{Correlation structure among features. \code{correlation = "ID"} for independent,
+\code{correlation = 'MA'} for moving average, \code{correlation = "CS"} for compound symmetry, \code{correlation = "AR"} 
+for auto regressive Default is \code{"ID"}. For more information see Details.}
 
-\item{rho}{Parameter controlling the correlation strength. See Details.}
+\item{rho}{Parameter controlling the correlation strength, default is \code{0.2}. See Details.}
 
 \item{family}{Model type for the response variable.
-\code{'gaussian'} for normally distributed data, \code{'poisson'} for non-negative counts,
-\code{'binomial'} for binary (0-1).}
+\code{"gaussian"} for normally distributed data, \code{poisson} for non-negative counts,
+\code{"binomial"} for binary (0-1).}
 }
 \value{
 \item{call}{The call that produced this object.}
@@ -92,20 +92,23 @@ one of \eqn{j} or \eqn{h} are in the set of important features.
 
 Auto-regressive (AR): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with
 
-cov\eqn{(x_j, x_h) = \rho^{|j-h|}} for all \eqn{j} and \eqn{h}. The correlation strength \eqn{\rho} is controlled by argument rho.
+cov\eqn{(x_j, x_h) = \rho^{|j-h|}} for all \eqn{j} and \eqn{h}. 
 
-Then, generate the response variable \eqn{Y} according to its response type. 
-For Gaussian model, \eqn{\bold{y} =X ^T \cdot \beta + \epsilon} where 
-\eqn{\epsilon\ \in} \eqn{N( 0, 1)}.
-For the binary model let \eqn{\pi = P(Y = 1|x)}. Sample \eqn{\bold{y}} from Bernoulli(\eqn{\pi}) where logit\eqn{(\pi) = X^T \cdot\beta}.
-Finally, for the Poisson model, \eqn{\bold{y}} is generated from Poisson distribution with the link \eqn{\pi} = exp\eqn{(X^T \cdot \beta )}.
-For more details see reference below.
+The correlation strength \eqn{\rho} is controlled by argument \code{rho}. 
+Then, we generate the response variable \eqn{Y} according to its response type. 
+For Gaussian model, \eqn{y_i =\bold{x_i}^T \bold{\beta} + \epsilon_i} where 
+\eqn{\epsilon_i\ \in} \eqn{N( 0, 1)} for \eqn{i} from \eqn{1} to \eqn{n}. 
+For the binary model let \eqn{\pi_i = P(Y = 1|\bold{x_i})}. We sample \eqn{y_i} 
+from Bernoulli(\eqn{\pi_i}) where logit\eqn{(\pi_i) = \bold{x_i}^T \bold{\beta}}.
+Finally, for the Poisson model, \eqn{y_i} is generated from Poisson distribution 
+with the link \eqn{\pi_i} = exp\eqn{(\bold{x_i}^T \bold{\beta} )}.
+For more details see the reference below.
 }
 \examples{
 
 #Simulating data with binomial response and auto-regressive structure.
 set.seed(1)
-Data<-Gen_Data(n =100, p = 1000,family ="binomial",correlation = "AR")
+Data <- Gen_Data(n = 500, p = 2000, family = "binomial", correlation = "AR")
 cor(Data$X[,1:5])
 print(Data)
 
