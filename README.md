@@ -58,7 +58,9 @@ R softeware and R package glmnet
                          effect_truecoef = (0.8)*c(2,-3,-3,2,-4))
     fit_path <- SMLE(Y = Data_sim$Y, X = Data_sim$X , k = 10 , coef_initial = rep(0,1000))
     plot(fit_path)
-  
+![plot2](https://user-images.githubusercontent.com/46462586/135018692-46cc1c8f-d3db-4b6a-8e08-8cded3257a6b.png)
+![plot_zoom](https://user-images.githubusercontent.com/46462586/135018693-9b111e5d-f5bd-4caa-8a27-9af9bdb4b522.png)
+
 For more examples, please refer to the [Vignette](https://github.com/JasonQxZ/SMLE/blob/main/vignette/vignette.md)
 ## License
 
