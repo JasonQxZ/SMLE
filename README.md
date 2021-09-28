@@ -55,6 +55,8 @@ R softeware and R package glmnet
 
     Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
     fit<-SMLE(Data$Y, Data$X, k=9, family = "gaussian")
+  
+    For more examples, please refer to the [Vignette](https://example.com)
 ## License
 
 Distributed under the GPL-3 License.
