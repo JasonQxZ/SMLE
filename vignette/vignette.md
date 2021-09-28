@@ -1,25 +1,3 @@
-Introduction
-============
-
-This vignette describes how one can use the **SMLE** package to perform
-Ultra-high dimensional screening. Suppose the data
-{(*y*<sub>*i*</sub>, **x**<sub>*i*</sub>), *i* = 1, …, *n*} are
-collected independently from (*Y*, **x**), where *Y* is a response
-variable and **x** = (*x*<sub>1</sub>, …, *x*<sub>*p*</sub>) is a
-*p*-dimensional covariate (feature) vector.
-
-Under GLM setting:
-*f*(*y*; *θ*) = exp (*θ**y* − *b*(*θ*) + *c*(*y*)), and *θ* = **x****β**,
-where **β** = (*β*<sub>1</sub>, …, *β*<sub>*p*</sub>)<sup>*T*</sup> is a
-*p*-dimensional regression coefficient.
-
-SMLE iteratively estimate the problem:
-$$
-\\hat{\\boldsymbol{\\beta}}\_{k}=\\max\\limits\_{\\beta}  \\sum\_{i=1}^{n} \[y\_{i} \\cdot \\boldsymbol{x}\_{i} \\boldsymbol{\\beta} - b( \\boldsymbol{x}\_{i} \\boldsymbol{\\beta}) \]\\quad  \\text{subject to}\\quad ||\\beta||\_0 \\leq k,
-$$
-
-The theory and algorithms in this implementation are described in Xu and
-Chen ([2014](#ref-Chen+Chen:2014)).
 
 Usage
 =====
@@ -35,7 +13,7 @@ auto-regressive structure, where the adjacent features have a high
 correlation of *ρ* = 0.9. The response variable *Y* is generated based
 on the following logistic model with success rate *π* and linear
 predictor:
-logit(*π*) = 2*x*<sub>1</sub> + 3*x*<sub>3</sub> − 3*x*<sub>5</sub> + 3*x*<sub>7</sub> − 4*x*<sub>9</sub>.
+logit(π) = 2*x*<sub>1</sub> + 3*x*<sub>3</sub> − 3*x*<sub>5</sub> + 3*x*<sub>7</sub> − 4*x*<sub>9</sub>.
 
     library(SMLE)
 
