@@ -52,9 +52,12 @@ R softeware and R package glmnet
 
 
 ## Usage 
-
-    Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
-    fit<-SMLE(Data$Y, Data$X, k=9, family = "gaussian")
+    set.seed(1)
+    Data_sim <- Gen_Data(n = 200, p = 1000, correlation = "AR", rho = 0.9, sigma = 1,
+                         family = "gaussian", pos_truecoef = c(1,3,5,7,9),
+                         effect_truecoef = (0.8)*c(2,-3,-3,2,-4))
+    fit_path <- SMLE(Y = Data_sim$Y, X = Data_sim$X , k = 10 , coef_initial = rep(0,1000))
+    plot(fit_path)
   
 For more examples, please refer to the [Vignette](https://github.com/JasonQxZ/SMLE/blob/main/vignette/vignette.md)
 ## License
