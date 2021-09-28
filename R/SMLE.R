@@ -201,7 +201,7 @@
 #' summary(fit)
 #' Data$subset_true %in% fit$ID_retained # Sure screening check.
 #' plot(fit)
-#' 
+#' \donttest{
 #' # Example 2:
 #' set.seed(1)
 #' Data_sim2 <- Gen_Data(n = 420, p = 1000, family = "gaussian", num_ctgidx = 5, 
@@ -224,13 +224,14 @@
 #' fit
 #' fit_s <- SMLE(rating ~., data = df, selection = TRUE)
 #' fit_s
+#' }
 #' 
-SMLE <- function (object, ...)
+SMLE <- function (formula, ...)
   UseMethod("SMLE")
 
 #' @rdname SMLE
 #' @export
-SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL, 
+SMLE.default<-function(formula=NULL, X=NULL,Y=NULL,data=NULL, k=NULL, 
                        family=c("gaussian","binomial","poisson"),
                        categorical = NULL , keyset = NULL, intercept = TRUE ,
                        group = TRUE , codingtype = NULL , coef_initial=NULL,
@@ -246,9 +247,9 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
   cl[[1]] <- as.name("SMLE")
   
   ####Input object is a design matrix
-  if(is.null(Y)&is.null(object)){stop("Response required")}
+  if(is.null(Y)&is.null(formula)){stop("Response required")}
   if(is.null(X)&is.null(data)){stop("Feature Matrix required")}
-  if(is.null(Y)&!is.null(object)){Y<-object}
+  if(is.null(Y)&!is.null(formula)){Y<-formula}
   if(is.null(X)&!is.null(data)){X<-data}
   
   Data_X<-X
@@ -294,14 +295,27 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
     if(group==FALSE &codingtype!="all"){stop("codingtype should be 'all' when group = FALSE")}
     
     
-    S<-Standardize(X[,-CI])
+    name<-dimnames(X[,-CI])
     
-    Xs<-S$Xs
+    center = colMeans(X[,-CI])
     
-    X_mean<-S$X_mean
+    X.c = sweep(X[,-CI], 2, center)
     
-    X_sd<- S$X_sd
+    unit.var = apply(X.c, 2, sd)
     
+    if(sum(unit.var==0)!=0){
+      zero_var = (1:dim(X)[2])[unit.var==0]
+      X.c<-X.c[,-zero_var]
+      unit.var<-unit.var[-zero_var]
+    }
+    
+    val = sweep(X.c, 2, unit.var, "/")
+    
+    Xs <- as.matrix(val,dimnames=name)
+    
+    X_mean<-center
+    
+    X_sd<- unit.var
     
     for(i in 1:length(CI)){
       
@@ -352,13 +366,27 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
     
     if(standardize== TRUE){
       
-      S<-Standardize(X)
+      name<-dimnames(X)
       
-      Xs<-S$Xs
+      center = colMeans(X)
       
-      X_mean<-S$X_mean
+      X.c = sweep(X, 2, center)
       
-      X_sd<- S$X_sd
+      unit.var = apply(X.c, 2, sd)
+      
+      if(sum(unit.var==0)!=0){
+        zero_var = (1:dim(X)[2])[unit.var==0]
+        X.c<-X.c[,-zero_var]
+        unit.var<-unit.var[-zero_var]
+      }
+      
+      val <- sweep(X.c, 2, unit.var, "/")
+      
+      Xs <- as.matrix(val,dimnames=name)
+
+      X_mean<-center
+      
+      X_sd<- unit.var
       
     }
     
@@ -387,15 +415,14 @@ SMLE.default<-function(object=NULL, X=NULL,Y=NULL,data=NULL, k=NULL,
 }
 
 #' @rdname SMLE
-#' @param object An object of class \code{'formula'} (or one that can be coerced to that class): a symbolic description of the model to be fitted.
+#' @param formula An object of class \code{'formula'} (or one that can be coerced to that class): a symbolic description of the model to be fitted.
 #' @param data An optional data frame, list or environment (or object coercible by \code{\link[base]{as.data.frame}()} to a \code{'data frame'}) containing the features in the model. 
 #' @export
-SMLE.formula<- function (object, data, categorical=NULL,...) {
+SMLE.formula<- function(formula, data, categorical=NULL,...) {
   
   ## keep call (of generic)
   cl <- match.call()
   cl[[1]] <- as.name("SMLE")
-  
   ## model frame
   mf <- match.call(expand.dots = FALSE)
   m <- c("formula", "data")
@@ -409,9 +436,9 @@ SMLE.formula<- function (object, data, categorical=NULL,...) {
   mt <- attr(mf, "terms")
   
   ## model matrix and response
-  x <- model.frame(mt, mf)[,-1]
+  x <- model.matrix(mt, mf, contrasts= NULL)[,-1]
   y <- model.response(mf, "numeric")
-  
+
   if(is.null(categorical)){
     
     CI<-(1:dim(x)[2])[sapply(x,is.factor)]
@@ -422,11 +449,11 @@ SMLE.formula<- function (object, data, categorical=NULL,...) {
       
     }else{
       
-      x<- as.matrix(x, ncol=dim(x)[2],categorical= FALSE,...)
+      x<- as.matrix(x, ncol=dim(x)[2],...)
       
       
       ## fit subsets
-      ans <- SMLE(Y=y, X=x, ...)
+      ans <- SMLE(Y = y, X = x,categorical = FALSE, ...)
     }
   }
   

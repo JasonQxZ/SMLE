@@ -217,7 +217,7 @@ fit <- SMLE(Y = Data$Y, X = Data$X, k = 9, family = "gaussian")
 summary(fit)
 Data$subset_true \%in\% fit$ID_retained # Sure screening check.
 plot(fit)
-
+\donttest{
 # Example 2:
 set.seed(1)
 Data_sim2 <- Gen_Data(n = 420, p = 1000, family = "gaussian", num_ctgidx = 5, 
@@ -240,6 +240,7 @@ fit <- SMLE(rating ~., data = df)
 fit
 fit_s <- SMLE(rating ~., data = df, selection = TRUE)
 fit_s
+}
 
 }
 \references{

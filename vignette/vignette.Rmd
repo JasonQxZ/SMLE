@@ -1,0 +1,132 @@
+---
+title: "An Introduction to SMLE"
+author: "Qianxiang"
+date: "9/25/2021"
+bibliography: bibliography.bib
+output: rmarkdown::html_vignette
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{An Introduction to SMLE}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+# Introduction
+
+This vignette describes how one can use the **SMLE** package to perform Ultra-high dimensional screening.
+Suppose the data $\{(y_{i}, \boldsymbol{x}_{i}), i=1,\ldots,n \}$ are collected independently from $(Y, \boldsymbol{x})$, where $Y$ is a response variable and $\boldsymbol{x}=(x_{1}, \ldots, x_{p})$ is a $p$-dimensional covariate (feature) vector.
+
+Under GLM setting:
+$$
+f(y; \theta)=\exp(\theta y - b(\theta) + c(y) ),\
+\text{and}\ \theta = \boldsymbol{x}\boldsymbol{\beta},
+$$
+where $\boldsymbol{\beta}=(\beta_{1}, \ldots, \beta_{p})^{T}$ is a $p$-dimensional regression coefficient.
+
+SMLE iteratively estimate the problem:
+$$
+\hat{\boldsymbol{\beta}}_{k}=\max\limits_{\beta}  \sum_{i=1}^{n} [y_{i} \cdot \boldsymbol{x}_{i} \boldsymbol{\beta} - b( \boldsymbol{x}_{i} \boldsymbol{\beta}) ]\quad  \text{subject to}\quad ||\beta||_0 \leq k,
+$$
+
+
+The theory and algorithms in this implementation are described in @Chen+Chen:2014.
+
+
+# Usage
+## A demo code for SMLE-screening
+
+First we show how to use `SMLE` to conduct feature screening and post-screening selection via a simulated example. We generate a dataset with $n=400$ observations and $p=1000$ features. We generate the feature matrix $X$ from a multivariate normal distribution with an auto-regressive structure, where the adjacent features have a high correlation of $\rho=0.9$. The response variable $Y$ is generated based on the following logistic model with success rate $\pi$ and linear predictor:
+$$ \mbox{logit}(\pi) = 2x_1 + 3x_3 - 3x_5 + 3x_7 - 4x_9. $$
+
+```{r}
+library(SMLE)
+
+set.seed(1)
+
+Data_eg <- Gen_Data(n = 400, p = 1000, family = "binomial",
+correlation = "AR", rho = 0.9, pos_truecoef = c(1,3,5,7,9),
+effect_truecoef = c(2,3,-3,3,-4))
+
+Data_eg
+
+```
+In this setup, the feature matrix contains only five features that are causally-related to the response, as indicated in the model. Some features have marginal effects to response due to the correlation structure. From the true model, we know that $x_2$ is not causally-related to the response. Yet, we can see that the marginal effect of $x_2$ appears to be pretty high; thus, this irrelevant feature is likely to be retained in the model if the screening is done based on marginal effects only.
+
+```{r}
+coef(summary(glm(Data_eg$Y ~ Data_eg$X[,2], family = "binomial")))
+
+```
+
+The following code shows the simplest function call to `SMLE()`, where we aim to retain only $k=10$ important features out of $p=1000$.
+
+
+```{r}
+fit1 <- SMLE(Data_eg$Y, Data_eg$X, k = 10, family = "binomial")
+
+summary(fit1)
+```
+
+The function returns a `'smle'` object and `summary()` function confirms that a refined set of 10 features is selected after 59 IHT iterations. We can see that all 5 causal features used to generate the response are retained in the refined set. This indicates that screening is successful; the dimensionality of the feature space is reduced from $p=1000$ down to $k=10$ without losing any important information. In this example, `SMLE()` accurately removes $x_2,x_4,x_6,x_8$, as its screening naturally incorporates the joint effects among features.
+
+## Further selection after screeening
+
+Note that the refined set returned in the model still contains some irrelevant features; this is to be expected (the `k` always chosen to be larger than the actual number of casual features), as the goal of feature screening is merely to remove most irrelevant features before conducting an in-depth analysis. One may conduct an elaborate selection on the refined set to further identify the causal features.
+
+As can be seen below, `smle_select()` returns a `'selection'` object `"fit1_s"`, which exactly identifies the five features in the true data generating model. 
+
+
+```{r}
+fit1_s <- smle_select(fit1, criterion = "ebic")
+
+summary(fit1_s)
+
+```
+
+
+## An example for categorical features.
+
+Categorical features fed in the package will be convert to `'factor'` and dummy coded during the iterations.
+In this example, we generate a dataset with causal categorical features and separate it into training and testing groups in order to perform a prediction task. 
+```{r}
+set.seed(1)
+Data_sim2 <- Gen_Data(n = 420, p = 1000, family = "gaussian", num_ctgidx = 5, 
+                      pos_ctgidx = c(1,3,5,7,9), effect_truecoef= c(1,2,3,-4,-5),
+                      pos_truecoef = c(1,3,5,7,8), level_ctgidx = c(3,3,3,4,5))
+
+train_X <- Data_sim2$X[1:400,]; test_X <- Data_sim2$X[401:420,]
+train_Y <- Data_sim2$Y[1:400]; test_Y <- Data_sim2$Y[401:420]
+
+test_X[1:5,1:10]
+```
+Users may specify whether to treat those dummy covariates as a single group feature or as individual features, and which type of dummy coding is used by arguments: `gourp` and `codyingtype`. Note that the number of features retained in the model may less than the `k` specified when `group` is `FALSE` since one categorical feature may be chose several times by its covariates. More details see the package manual. 
+
+```{r}
+fit_1 <- SMLE(train_Y, train_X, family = "gaussian", group = TRUE, codingtype = "standard", k = 10)
+fit_1
+predict(fit_1, newdata = test_X)
+
+fit_2 <- SMLE(train_Y, train_X, family = "gaussian", group = FALSE, codingtype = "all", k = 10)
+fit_2
+predict(fit_2, newdata = test_X)
+```
+
+
+## Formula interface
+
+`SMLE` always works in low dimensional as a selection method. Although it is not recommend, interface to `'formula'` object provides user a better understanding to the package in high dimension.
+
+```{r}
+library(datasets)
+data("attitude")
+SMLE(rating+complaints ~ complaints + complaints:privileges + learning + raises*advance, data = attitude)
+```
+
+
+
+

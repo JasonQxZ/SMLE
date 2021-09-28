@@ -31,9 +31,10 @@ and 4) the number of features changed in the current active set.
 By default, the second plot shows the solution path (estimated coefficient by iteration step) for the retained features.
 }
 \examples{
+\donttest{
 set.seed(1)
 Data <- Gen_Data(correlation = "CS")
 fit <- SMLE(Data$Y, Data$X, k = 20, family = "gaussian")
 plot(fit)
-
+}
 }

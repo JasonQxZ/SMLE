@@ -21,11 +21,12 @@
 #' @importFrom graphics plot.new
 #' @method plot smle
 #' @examples
+#' \donttest{
 #' set.seed(1)
 #' Data <- Gen_Data(correlation = "CS")
 #' fit <- SMLE(Data$Y, Data$X, k = 20, family = "gaussian")
 #' plot(fit)
-#'
+#'}
 
 plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
   

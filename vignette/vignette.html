@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Qianxiang" />
+
+
+<title>An Introduction to SMLE</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">An Introduction to SMLE</h1>
+<h4 class="author">Qianxiang</h4>
+<h4 class="date">9/25/2021</h4>
+
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This vignette describes how one can use the <strong>SMLE</strong> package to perform Ultra-high dimensional screening. Suppose the data <span class="math inline">\(\{(y_{i}, \boldsymbol{x}_{i}), i=1,\ldots,n \}\)</span> are collected independently from <span class="math inline">\((Y, \boldsymbol{x})\)</span>, where <span class="math inline">\(Y\)</span> is a response variable and <span class="math inline">\(\boldsymbol{x}=(x_{1}, \ldots, x_{p})\)</span> is a <span class="math inline">\(p\)</span>-dimensional covariate (feature) vector.</p>
+<p>Under GLM setting: <span class="math display">\[
+f(y; \theta)=\exp(\theta y - b(\theta) + c(y) ),\
+\text{and}\ \theta = \boldsymbol{x}\boldsymbol{\beta},
+\]</span> where <span class="math inline">\(\boldsymbol{\beta}=(\beta_{1}, \ldots, \beta_{p})^{T}\)</span> is a <span class="math inline">\(p\)</span>-dimensional regression coefficient.</p>
+<p>SMLE iteratively estimate the problem: <span class="math display">\[
+\hat{\boldsymbol{\beta}}_{k}=\max\limits_{\beta}  \sum_{i=1}^{n} [y_{i} \cdot \boldsymbol{x}_{i} \boldsymbol{\beta} - b( \boldsymbol{x}_{i} \boldsymbol{\beta}) ]\quad  \text{subject to}\quad ||\beta||_0 \leq k,
+\]</span></p>
+<p>The theory and algorithms in this implementation are described in <span class="citation">Xu and Chen (<a href="#ref-Chen+Chen:2014" role="doc-biblioref">2014</a>)</span>.</p>
+</div>
+<div id="usage" class="section level1">
+<h1>Usage</h1>
+<div id="a-demo-code-for-smle-screening" class="section level2">
+<h2>A demo code for SMLE-screening</h2>
+<p>First we show how to use <code>SMLE</code> to conduct feature screening and post-screening selection via a simulated example. We generate a dataset with <span class="math inline">\(n=400\)</span> observations and <span class="math inline">\(p=1000\)</span> features. We generate the feature matrix <span class="math inline">\(X\)</span> from a multivariate normal distribution with an auto-regressive structure, where the adjacent features have a high correlation of <span class="math inline">\(\rho=0.9\)</span>. The response variable <span class="math inline">\(Y\)</span> is generated based on the following logistic model with success rate <span class="math inline">\(\pi\)</span> and linear predictor: <span class="math display">\[ \mbox{logit}(\pi) = 2x_1 + 3x_3 - 3x_5 + 3x_7 - 4x_9. \]</span></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(SMLE)</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a>Data_eg &lt;-<span class="st"> </span><span class="kw">Gen_Data</span>(<span class="dt">n =</span> <span class="dv">400</span>, <span class="dt">p =</span> <span class="dv">1000</span>, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="dt">correlation =</span> <span class="st">&quot;AR&quot;</span>, <span class="dt">rho =</span> <span class="fl">0.9</span>, <span class="dt">pos_truecoef =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>),</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="dt">effect_truecoef =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="op">-</span><span class="dv">3</span>,<span class="dv">3</span>,<span class="op">-</span><span class="dv">4</span>))</span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a>Data_eg</span></code></pre></div>
+<pre><code>## Call:
+##  Gen_Data(n = 400, p = 1000, pos_truecoef = c(1, 3, 5, 7, 9), 
+##     effect_truecoef = c(2, 3, -3, 3, -4), correlation = &quot;AR&quot;, 
+##     rho = 0.9, family = &quot;binomial&quot;)
+##  
+## An object of class sdata
+##  
+## Simulated Dataset Properties:
+##  Length of response: 400
+##  Dim of features: 400 x 1000
+##  Correlation: auto regressive
+##  Rho: 0.9
+##  Index of Causal Features: 1,3,5,7,9
+##  Model Type: binomial</code></pre>
+<p>In this setup, the feature matrix contains only five features that are causally-related to the response, as indicated in the model. Some features have marginal effects to response due to the correlation structure. From the true model, we know that <span class="math inline">\(x_2\)</span> is not causally-related to the response. Yet, we can see that the marginal effect of <span class="math inline">\(x_2\)</span> appears to be pretty high; thus, this irrelevant feature is likely to be retained in the model if the screening is done based on marginal effects only.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">coef</span>(<span class="kw">summary</span>(<span class="kw">glm</span>(Data_eg<span class="op">$</span>Y <span class="op">~</span><span class="st"> </span>Data_eg<span class="op">$</span>X[,<span class="dv">2</span>], <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)))</span></code></pre></div>
+<pre><code>##                  Estimate Std. Error   z value     Pr(&gt;|z|)
+## (Intercept)    0.02440072  0.1125979 0.2167067 8.284369e-01
+## Data_eg$X[, 2] 1.10465766  0.1337063 8.2618250 1.434619e-16</code></pre>
+<p>The following code shows the simplest function call to <code>SMLE()</code>, where we aim to retain only <span class="math inline">\(k=10\)</span> important features out of <span class="math inline">\(p=1000\)</span>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>fit1 &lt;-<span class="st"> </span><span class="kw">SMLE</span>(Data_eg<span class="op">$</span>Y, Data_eg<span class="op">$</span>X, <span class="dt">k =</span> <span class="dv">10</span>, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="kw">summary</span>(fit1)</span></code></pre></div>
+<pre><code>## Call:
+##   SMLE(object = Data_eg$Y, X = Data_eg$X, k = 10, family = &quot;binomial&quot;)
+##  
+## An object of class summary.smle
+##  
+## Summary:
+## 
+##   Length of response: 400
+##   Dim of features: 400 x 1000
+##   Model type: binomial
+##   Retained model size: 10
+##   Retained features: 1,3,5,7,9,68,430,536,661,709
+##   Coefficients estimated by IHT:  1.572  3.127 -1.893  2.534 -4.499 -0.348 -0.316  0.579  0.717  0.444
+##   Number of IHT iteration steps: 59</code></pre>
+<p>The function returns a <code>&#39;smle&#39;</code> object and <code>summary()</code> function confirms that a refined set of 10 features is selected after 59 IHT iterations. We can see that all 5 causal features used to generate the response are retained in the refined set. This indicates that screening is successful; the dimensionality of the feature space is reduced from <span class="math inline">\(p=1000\)</span> down to <span class="math inline">\(k=10\)</span> without losing any important information. In this example, <code>SMLE()</code> accurately removes <span class="math inline">\(x_2,x_4,x_6,x_8\)</span>, as its screening naturally incorporates the joint effects among features.</p>
+</div>
+<div id="further-selection-after-screeening" class="section level2">
+<h2>Further selection after screeening</h2>
+<p>Note that the refined set returned in the model still contains some irrelevant features; this is to be expected (the <code>k</code> always chosen to be larger than the actual number of casual features), as the goal of feature screening is merely to remove most irrelevant features before conducting an in-depth analysis. One may conduct an elaborate selection on the refined set to further identify the causal features.</p>
+<p>As can be seen below, <code>smle_select()</code> returns a <code>&#39;selection&#39;</code> object <code>&quot;fit1_s&quot;</code>, which exactly identifies the five features in the true data generating model.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>fit1_s &lt;-<span class="st"> </span><span class="kw">smle_select</span>(fit1, <span class="dt">criterion =</span> <span class="st">&quot;ebic&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="kw">summary</span>(fit1_s)</span></code></pre></div>
+<pre><code>## Call:
+##   Select(object = fit1, criterion = &quot;ebic&quot;)
+##  
+## An object of class summary.selection
+##  
+## Summary:
+##  
+##   Length of response: 400
+##   Dim of features: 400 x 1000
+##   Model type: binomial
+##   Selected model size: 5
+##   Selected features: 1,3,5,7,9
+##   Selection criterion: ebic
+##   Gamma for ebic: 0.5</code></pre>
+</div>
+<div id="an-example-for-categorical-features." class="section level2">
+<h2>An example for categorical features.</h2>
+<p>Categorical features fed in the package will be convert to <code>&#39;factor&#39;</code> and dummy coded during the iterations. In this example, we generate a dataset with causal categorical features and separate it into training and testing groups in order to perform a prediction task.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb9-2"><a href="#cb9-2"></a>Data_sim2 &lt;-<span class="st"> </span><span class="kw">Gen_Data</span>(<span class="dt">n =</span> <span class="dv">420</span>, <span class="dt">p =</span> <span class="dv">1000</span>, <span class="dt">family =</span> <span class="st">&quot;gaussian&quot;</span>, <span class="dt">num_ctgidx =</span> <span class="dv">5</span>, </span>
+<span id="cb9-3"><a href="#cb9-3"></a>                      <span class="dt">pos_ctgidx =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>), <span class="dt">effect_truecoef=</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="op">-</span><span class="dv">4</span>,<span class="op">-</span><span class="dv">5</span>),</span>
+<span id="cb9-4"><a href="#cb9-4"></a>                      <span class="dt">pos_truecoef =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">8</span>), <span class="dt">level_ctgidx =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>))</span>
+<span id="cb9-5"><a href="#cb9-5"></a></span>
+<span id="cb9-6"><a href="#cb9-6"></a>train_X &lt;-<span class="st"> </span>Data_sim2<span class="op">$</span>X[<span class="dv">1</span><span class="op">:</span><span class="dv">400</span>,]; test_X &lt;-<span class="st"> </span>Data_sim2<span class="op">$</span>X[<span class="dv">401</span><span class="op">:</span><span class="dv">420</span>,]</span>
+<span id="cb9-7"><a href="#cb9-7"></a>train_Y &lt;-<span class="st"> </span>Data_sim2<span class="op">$</span>Y[<span class="dv">1</span><span class="op">:</span><span class="dv">400</span>]; test_Y &lt;-<span class="st"> </span>Data_sim2<span class="op">$</span>Y[<span class="dv">401</span><span class="op">:</span><span class="dv">420</span>]</span>
+<span id="cb9-8"><a href="#cb9-8"></a></span>
+<span id="cb9-9"><a href="#cb9-9"></a>test_X[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]</span></code></pre></div>
+<pre><code>##     C1          N2 C3         N4 C5         N6 C7         N8 C9         N10
+## 401  C -0.17405549  B  0.3337833  B -1.8054836  B  0.9696772  C -0.88066391
+## 402  C  0.96129056  C -0.2113226  A -0.6780407  B -2.1994065  C -0.48558301
+## 403  B  0.29382666  A -0.5510979  B -0.4733581  C  1.9480938  B  0.22743281
+## 404  B  0.08099936  B  0.2583611  A  1.0274171  B  0.1798532  B -0.06646135
+## 405  B  0.18366184  A -1.3752104  B -0.5973876  C  0.4150568  B  0.35161359</code></pre>
+<p>Users may specify whether to treat those dummy covariates as a single group feature or as individual features, and which type of dummy coding is used by arguments: <code>gourp</code> and <code>codyingtype</code>. Note that the number of features retained in the model may less than the <code>k</code> specified when <code>group</code> is <code>FALSE</code> since one categorical feature may be chose several times by its covariates. More details see the package manual.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>fit_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">SMLE</span>(train_Y, train_X, <span class="dt">family =</span> <span class="st">&quot;gaussian&quot;</span>, <span class="dt">group =</span> <span class="ot">TRUE</span>, <span class="dt">codingtype =</span> <span class="st">&quot;standard&quot;</span>, <span class="dt">k =</span> <span class="dv">10</span>)</span>
+<span id="cb11-2"><a href="#cb11-2"></a>fit_<span class="dv">1</span></span></code></pre></div>
+<pre><code>## Call:
+##   SMLE(object = train_Y, X = train_X, k = 10, family = &quot;gaussian&quot;, 
+##     group = TRUE, codingtype = &quot;standard&quot;)
+##  
+## An object of class smle
+##  
+## Subset:
+##   Model size: 10
+##   Feature Name: C1,C3,C5,C7,N8,N297,N327,N671,N727,N992
+##   Feature Index: 1,3,5,7,8,297,327,671,727,992</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">predict</span>(fit_<span class="dv">1</span>, <span class="dt">newdata =</span> test_X)</span></code></pre></div>
+<pre><code>##         401         402         403         404         405         406 
+##  -0.9015259  13.0801313 -14.7328909  -2.6187980  -6.8932628  -9.4658403 
+##         407         408         409         410         411         412 
+##   9.3106969   3.5823446   4.8032411  -3.3804086  -5.4039198   5.4538378 
+##         413         414         415         416         417         418 
+##  -6.2625712   8.2882945  -5.1134303   0.5188218   8.0068460  -3.4739318 
+##         419         420 
+##  -9.5672038   6.3228009</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>fit_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">SMLE</span>(train_Y, train_X, <span class="dt">family =</span> <span class="st">&quot;gaussian&quot;</span>, <span class="dt">group =</span> <span class="ot">FALSE</span>, <span class="dt">codingtype =</span> <span class="st">&quot;all&quot;</span>, <span class="dt">k =</span> <span class="dv">10</span>)</span>
+<span id="cb15-2"><a href="#cb15-2"></a>fit_<span class="dv">2</span></span></code></pre></div>
+<pre><code>## Call:
+##   SMLE(object = train_Y, X = train_X, k = 10, family = &quot;gaussian&quot;, 
+##     group = FALSE, codingtype = &quot;all&quot;)
+##  
+## An object of class smle
+##  
+## Subset:
+##   Model size: 5
+##   Feature Name: C1,C3,C5,C7,N8
+##   Feature Index: 1,3,5,7,8</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">predict</span>(fit_<span class="dv">2</span>, <span class="dt">newdata =</span> test_X)</span></code></pre></div>
+<pre><code>##         401         402         403         404         405         406 
+##  -0.9243726  13.1374968 -15.0696386  -3.3249395  -7.3601888 -10.1484939 
+##         407         408         409         410         411         412 
+##   8.7424408   3.6110151   4.5296146  -3.6479939  -5.6094304   7.0635413 
+##         413         414         415         416         417         418 
+##  -7.6369911   8.4131558  -3.9716724   0.5468016   8.0184504  -3.8099618 
+##         419         420 
+##  -8.5262404   4.3285765</code></pre>
+</div>
+<div id="formula-interface" class="section level2">
+<h2>Formula interface</h2>
+<p><code>SMLE</code> always works in low dimensional as an selection method. Although it is not recommend, interface to <code>&#39;formula&#39;</code> object provide user a good understanding to the package in high dimension.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">library</span>(datasets)</span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="kw">data</span>(<span class="st">&quot;attitude&quot;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3"></a></span>
+<span id="cb19-4"><a href="#cb19-4"></a><span class="kw">SMLE</span>(rating <span class="op">~</span><span class="st"> </span>complaints <span class="op">+</span><span class="st"> </span>comlaints<span class="op">:</span>privileges <span class="op">+</span><span class="st"> </span>learning <span class="op">+</span><span class="st"> </span>raises<span class="op">*</span>advnace, <span class="dt">data =</span> attitude)</span></code></pre></div>
+<pre><code>## Call:
+##   SMLE(X = x, Y = y, categorical = FALSE)
+##  
+## An object of class smle
+##  
+## Subset:
+##   Model size: 5
+##   Feature Name: (Intercept),complaints,privileges,learning,critical
+##   Feature Index: 1,2,3,4,6</code></pre>
+<div id="refs" class="references">
+<div id="ref-Chen+Chen:2014">
+<p>Xu, Chen, and Jiahua Chen. 2014. “The Sparse Mle for Ultrahigh-Dimensional Feature Screening.” <em>Journal of the American Statistical Association</em> 109 (507): 1257–69.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

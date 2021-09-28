@@ -105,13 +105,13 @@ with the link \eqn{\pi_i} = exp\eqn{(\bold{x_i}^T \bold{\beta} )}.
 For more details see the reference below.
 }
 \examples{
-
+\donttest{
 #Simulating data with binomial response and auto-regressive structure.
 set.seed(1)
 Data <- Gen_Data(n = 500, p = 2000, family = "binomial", correlation = "AR")
 cor(Data$X[,1:5])
 print(Data)
-
+}
 
 }
 \references{

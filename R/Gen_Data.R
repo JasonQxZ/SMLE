@@ -103,13 +103,13 @@
 #' @export
 #'
 #' @examples
-#' 
+#' \donttest{
 #' #Simulating data with binomial response and auto-regressive structure.
 #' set.seed(1)
 #' Data <- Gen_Data(n = 500, p = 2000, family = "binomial", correlation = "AR")
 #' cor(Data$X[,1:5])
 #' print(Data)
-#'
+#' }
 #'
 Gen_Data<-function(n = 200,p = 1000,sigma = 1,
                    num_ctgidx = NULL,  pos_ctgidx = NULL,
