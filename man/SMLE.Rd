@@ -6,10 +6,9 @@
 \alias{SMLE.formula}
 \title{Joint feature screening via sparse maximum likelihood estimation for GLMs}
 \usage{
-SMLE(object, ...)
 
 \method{SMLE}{default}(
-  object = NULL,
+  formula = NULL,
   X = NULL,
   Y = NULL,
   data = NULL,
@@ -31,41 +30,40 @@ SMLE(object, ...)
   ...
 )
 
-\method{SMLE}{formula}(object, data, categorical = NULL, ...)
+\method{SMLE}{formula}(formula, data, categorical = NULL, k = NULL, keyset = NULL, ...)
 }
 \arguments{
-\item{object}{An object of class \code{'formula'} (or one that can be coerced to that class): a symbolic description of the model to be fitted.}
+\item{formula}{An object of class \code{'formula'} (or one that can be coerced to that class): a symbolic description of the model to be fitted. It should be \code{NULL} when \code{X} and \code{Y} are used.}
 
-\item{...}{Additional arguments to be passed to \code{\link{smle_select}()} if \code{selection=TRUE}. 
-See \code{\link{smle_select}()} documentation for more details.}
-
-\item{X}{The \eqn{n \times p} feature matrix \eqn{X} with each column denoting a feature
+\item{X}{The \eqn{n} by \eqn{p} feature matrix \eqn{X} with each column denoting a feature
 (covariate) and each row denoting an observation vector. The input should be
 a \code{'matrix'} object for numerical data, and \code{'data.frame'} for categorical
 data (or a mixture of numerical and categorical data). The algorithm will
 treat covariates having class \code{'factor'} as categorical data and extend the data
 frame dimension by the dummy columns needed for coding the categorical features.}
 
-\item{Y}{The response vector \eqn{\bold{y}} of dimension \eqn{n \times 1}. Quantitative for
+\item{Y}{The response vector \eqn{Y} of dimension \eqn{n} by \eqn{1}. Quantitative for
 \code{family = "gaussian"}, non-negative counts for \code{family = "poisson"},
-binary (0-1) for \code{family = "binomial"}. Input \eqn{\bold{y}} should be \code{'numeric'}.}
+binary (0-1) for \code{family = "binomial"}. Input \eqn{Y} should be \code{'numeric'}.}
 
-\item{data}{An optional data frame, list or environment (or object coercible by \code{\link[base]{as.data.frame}()} to a \code{'data frame'}) containing the features in the model.}
+\item{data}{An optional data frame, list or environment (or object coercible by \code{\link[base]{as.data.frame}()} to a \code{'data.frame'}) containing the features in the model. It is required if \code{'formula'} is used.}
 
 \item{k}{Total number of features (including \code{keyset}) to be retained 
 after screening. Default is the largest integer not 
-exceeding \eqn{\frac{1}{2}\log(n)n^{1/3}}.}
+exceeding \eqn{0.5}log\eqn{(n) n^{1/3}}.}
 
-\item{family}{Model assumption between \eqn{\bold{y}} and \eqn{X}; the default model is Gaussian
+\item{family}{Model assumption between \eqn{Y} and \eqn{X}; the default model is Gaussian
 linear.}
 
 \item{categorical}{A logical flag whether the input feature matrix includes
 categorical features. If \code{categorical = TRUE}, a model intercept will
 be used in the screening process. Default is \code{NULL}.}
 
-\item{keyset}{A vector to indicate a set of key features that do not
-participate in feature screening and are forced to remain in the model.
-Default is \code{NULL}}
+\item{keyset}{A numeric vector with column indices for the key features that 
+do not participate in feature screening and are forced to remain in the model.
+The column indices for the key features should be from \code{data} if \code{'formula'} is used
+or in \code{X} if \code{X} and \code{Y} are provided. The class of \code{keyset} 
+can be \code{'numeric'},\code{'integer'} or \code{'character'}. Default is \code{NULL}.}
 
 \item{intercept}{A logical flag to indicate whether to an intercept be used in
 the model. An intercept will not participate in screening.}
@@ -87,7 +85,7 @@ closest to \eqn{n-1}.}
 
 \item{max_iter}{Maximum number of iteration steps. Default is 500.}
 
-\item{tol}{A tolerance level to stop the iteration, when the squared sum of
+\item{tol}{A tolerance level to stop the iterations, when the squared sum of
 differences between two successive coefficient updates is below it.
 Default is \eqn{10^{-2}}.}
 
@@ -106,13 +104,19 @@ standardize. Default is \code{standardize=TRUE}.}
 to boost the screening efficiency with a little sacrifice of accuracy.
 Default is \code{FALSE}, see Details.}
 
-\item{U_rate}{Decreasing rate in tuning step parameter \eqn{u^{-1}} in IHT
+\item{U_rate}{Decreasing rate in tuning step parameter \eqn{1/u} in IHT
 algorithm. See Details.}
 
 \item{penalize_mod}{A logical flag to indicate whether adjustment is used in
-ranking groups of features. This augment is applicable only when
-\code{categorical= TRUE} with \code{group=T}; the default is \code{TRUE}:
-a factor of \eqn{\sqrt{J}} is divided from the \eqn{L_2} effect of a group with \eqn{J} members.}
+ranking groups of features. This argument is applicable only when
+\code{categorical= TRUE} with \code{group=TRUE}. When \code{penalize_mod=TRUE}, 
+a factor of \eqn{\sqrt J} is divided from the \eqn{L_2} effect of a group with \eqn{J} members. 
+Default is \code{TRUE}.}
+
+
+\item{...}{Additional arguments to be passed to \code{\link{smle_select}()} if \code{selection=TRUE}. 
+See \code{\link{smle_select}()} documentation for more details.}
+
 }
 \value{
 \item{call}{The call that produced this object.}
@@ -120,7 +124,9 @@ a factor of \eqn{\sqrt{J}} is divided from the \eqn{L_2} effect of a group with 
 \item{ID_retained}{A vector indicating the features retained after SMLE-screening.
 The output includes both features retained by \code{\link{SMLE}()} and the features specified in \code{keyset}.}
 
-\item{coef_retained}{The vector of coefficients estimated by IHT for the retained features.}
+\item{coef_retained}{The vector of coefficients estimated by IHT for the retained features. When the 
+retained set contains a categorical feature, the value returns a group effect if
+\code{group=TRUE}, or returns the strongest dummy covariate effect if \code{group=FALSE}.}
 
 \item{path_retained}{IHT iteration path with columns recording the coefficient updates.}
 
@@ -132,65 +138,58 @@ The output includes both features retained by \code{\link{SMLE}()} and the featu
 
 \item{likelihood_iter}{A list of log-likelihood updates over the IHT iterations. }
 
-\item{Usearch}{A vector giving the number of attempts to find a proper \eqn{u^{-1}} at each iteration step.}
+\item{Usearch}{A vector giving the number of attempts to find a proper \eqn{1/u} at each iteration step.}
 
-\item{family}{A character return of argument.}
-
-\item{X,Y}{Original data input.}
-
-\item{ctg}{A logical flag whether the input feature matrix includes
-categorical features}
-
-\item{FD}{A matrix contains feature indices retained at each iteration step.}
-
-\item{I}{A list containing data objects used by the function during iterations.
-
-\code{Y}: Same as input \eqn{\bold{y}}.
+\item{modified_data}{A list containing data objects generated by SMLE. 
 
 \code{CM}: Design matrix of class \code{'matrix'} for numeric features (or \code{'data.frame'} with categorical features).
 
 \code{DM}: A matrix with dummy variable features added. (only if there are categorical features).
 
-\code{IM}: Iteration path matrix with columns recording IHT coefficient updates.
-
 \code{dum_col}: Number of levels for all categorical features.
 
 \code{CI}: Indices of categorical features in \code{CM}.
 
-\code{beta0}: Inital value of regression coefficient for IHT.
-
 \code{DFI}: Indices of categorical features in \code{IM}.
 
-\code{codingtype}: Same as input.
+ }
+\item{iteration_data}{A list containing data objects that track the coefficients over iterations.
+
+\code{IM}: Iteration path matrix with columns recording IHT coefficient updates.
+
+\code{beta0}: Inital value of regression coefficient for IHT.
 
 \code{feature_name}: A list contains the names of selected features.
- }
+
+\code{FD}: A matrix that contains feature indices retained at each iteration step.
+} 
+\code{X}, \code{Y}, \code{data}, \code{family}, \code{categorical} and \code{codingtype} are return of arguments passed in the function call.
 }
 \description{
-Input a \eqn{n \times 1} response \eqn{\bold{y}} and a \eqn{n \times p} feature matrix \eqn{X};
+Input a \eqn{n} by \eqn{1} response \eqn{Y} and a \eqn{n} by \eqn{p} feature matrix \eqn{X};
 the function uses SMLE to retain only a set of \eqn{k<n} features that seem
 to be most related to the response variable. It thus serves as a pre-processing step for an
 elaborative analysis. In SMLE, the joint effects between features are naturally
-accounted; this makes the screening more reliable. The function uses
+accounted for; this makes the screening more reliable. The function uses the
 efficient iterative hard thresholding (IHT) algorithm with step parameter
 adaptively tuned for fast convergence. Users can choose to further conduct
 an elaborative selection after SMLE-screening. See \code{\link{smle_select}()} for more details.
 }
 \details{
-With the input \eqn{\bold{y}} and \eqn{X}, \code{\link{SMLE}()} conducts joint feature screening by running
+With the input \eqn{Y} and \eqn{X}, \code{\link{SMLE}()} conducts joint feature screening by running
 iterative hard thresholding algorithm (IHT), where the default initial value is set to
 be the Lasso estimate with the sparsity closest to the sample size minus one.
 
-In \code{\link{SMLE}()}, the initial value for parameter \eqn{u^{-1}} is set to be
-\eqn{\frac{1}{||X||^2_{\infty}}} and recursively decrease the value of 
-\eqn{u^{-1}} by \code{U_rate} to guarantee the likelihood increment.This strategy is called \eqn{u}-search.
+In \code{\link{SMLE}()}, the initial value for parameter \eqn{1/u} is set to be
+\eqn{1/||X||^2_{\infty}} and recursively decrease the value of 
+\eqn{1/u} by \code{U_rate} to guarantee the likelihood increment.This strategy is called \eqn{u}-search.
 
 \code{\link{SMLE}()} terminates IHT iterations when either \code{tol} or \code{max_iter} is
 satisfied. When \code{fast = TRUE}, the algorithm also stops when the non-zero
 members of the coefficient estimates remain the same for 10 successive
 iterations or the log-likelihood difference between coefficient estimates is less
 than \eqn{0.01} times the log-likelihood increase of the first step, or 
-\eqn{\sqrt{k}\cdot}\code{tol} is satisfied.
+\code{tol}\eqn{\sqrt k} is satisfied.
 
 In \code{\link{SMLE}()}, categorical features are coded by dummy covariates with the
 method specified in \code{codingtype}. Users can use \code{group} to specify
@@ -199,9 +198,11 @@ individual features.
 When \code{group=TRUE} with \code{penalize_mod = TRUE}, the effect for a group
 of \eqn{J} dummy covariates is computed by
 
-\deqn{ \beta_i = \frac{1}{\sqrt{J}} \cdot \sqrt{(\beta_1)^2+...+(\beta_J)^2}}
+\deqn{ \beta_i = \sqrt{(\beta_1)^2+...+(\beta_J)^2}/\sqrt J,}
 
-which will be treated as a single feature in IHT iterations.
+which will be treated as a single feature in IHT iterations. When \code{group = FALSE}, 
+a group of \eqn{J} dummy covariates will be treated as \eqn{J} individual features in the IHT iterations;  in this case, 
+a categorical feature is retained after screening when at least one of the corresponding dummy covariates is retained.
 
 Since feature screening is usually a preprocessing step, users may wish to
 further conduct an elaborative feature selection after screening. This can
@@ -225,7 +226,7 @@ Data_sim2 <- Gen_Data(n = 420, p = 1000, family = "gaussian", num_ctgidx = 5,
                       pos_truecoef = c(1,3,5,7,8), level_ctgidx = c(3,3,3,4,5))
 train_X <- Data_sim2$X[1:400,]; test_X <- Data_sim2$X[401:420,]
 train_Y <- Data_sim2$Y[1:400]; test_Y <- Data_sim2$Y[401:420]
-fit <- SMLE(train_Y, train_X, family = "gaussian", group = TRUE, k = 15)
+fit <- SMLE(Y = train_Y, X = train_X, family = "gaussian", group = TRUE, k = 15)
 predict(fit, newdata = test_X)
 test_Y
 
@@ -238,9 +239,8 @@ colnames(noise) <- paste("Noise", seq(100), sep = ".")
 df <- data.frame(cbind(attitude, noise))
 fit <- SMLE(rating ~., data = df)
 fit
-fit_s <- SMLE(rating ~., data = df, selection = TRUE)
-fit_s
 }
+
 
 }
 \references{

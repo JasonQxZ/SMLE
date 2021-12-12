@@ -5,17 +5,21 @@
 \alias{coef.selection}
 \title{Extract coefficients from fitted model}
 \usage{
-\method{coef}{smle}(object, ...)
+\method{coef}{smle}(object, refit = TRUE, ...)
 
-\method{coef}{selection}(object, ...)
+\method{coef}{selection}(object, refit = TRUE, ...)
 }
 \arguments{
 \item{object}{Returned object from either the function \code{\link{SMLE}()} or \code{\link{smle_select}()}.}
 
+\item{refit}{A logical flag that controls what coefficients are being return. Default is \code{TRUE}.}
+
 \item{...}{This argument is not used and listed for method consistency.}
 }
 \value{
-Fitted coefficients based on the screened or selected model specified in the object.
+Fitted coefficients based on the screened or selected model specified in the object. 
+If \code{refit=TRUE}, the coefficients are estimated by re-fitting the final 
+screened/selected model with \code{\link{glm}()}. If \code{refit=FALSE} the coefficients estimated by the IHT algorithm are returned.
 }
 \description{
 Extract coefficients from fitted model for either a \code{'smle'} or \code{'selection'} object.
@@ -24,7 +28,7 @@ Extract coefficients from fitted model for either a \code{'smle'} or \code{'sele
 
 set.seed(1)
 Data<-Gen_Data(n=100, p=5000, family = "gaussian", correlation="ID")
-fit<-SMLE(Y=Data$Y, X=Data$X, k=15, family = "gaussian")
+fit<-SMLE(Y = Data$Y, X = Data$X, k=15, family = "gaussian")
 coef(fit)
 fit_s<-smle_select(fit)
 coef(fit_s)

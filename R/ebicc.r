@@ -33,16 +33,44 @@ ctg_ebicc<-function(Y,X_s,family,tune,codingtype,
   fss<-function(v,codingtype){
 
     ff<- SMLE(Y=Y, X=X_s, k=v, family=family,codingtype = codingtype,categorical = T,group=T)
-
+    
+    if(v ==1 ){
+      
+      if(is.factor(X_s[,ff$ID_retained])){
+        
+        if(codingtype =="all"){
+          
+          dummy_f <- nlevels(X_s[,ff$ID_retained])
+          
+        }else{
+          
+          dummy_f <- nlevels(X_s[,ff$ID_retained])-1
+          
+        }
+        
+        fit <- glm(Y ~ X_s[,ff$ID_retained], family=family)
+        
+        ll <- stats::logLik(fit)
+        
+        return(list(d_f= dummy_f + 1, likelihood = ll))
+        
+      }else
+        
+        fit <- glm(Y ~ X_s[,ff$ID_retained], family=family)
+        
+        ll<-logLik(ff)
+      
+        return(list(d_f= v+1, likelihood = ll))
+      
+    }
     X_v <- X_s[,ff$ID_retained]
-
-    Ci <- sapply(X_v,is.factor)
-
+    Ci <- sapply(X_v, is.factor)
+    
     if( any(sapply(X_v,is.factor)) ){
       # if X_v contains categorical  features
 
       X_dummy <- as.matrix(suppressWarnings(dummy.data.frame(X_v ,sep="_",codingtype = codingtype)))
-
+      
       if(codingtype =="all"){
 
         dummy_f <- sum(sapply(list(X_v[,Ci]),nlevels)-1)
@@ -54,13 +82,13 @@ ctg_ebicc<-function(Y,X_s,family,tune,codingtype,
       }
       fit <- glm(Y ~ X_dummy, family=family)
       ll <- stats::logLik(fit)
-      return(list(d_f= dummy_f + v, likelihood = ll))
+      return(list(d_f= dummy_f + v + 1, likelihood = ll))
 
     }else{
       #X_v is a matrix
       X_v =  as.matrix(X_v)
       ll<-logLik(ff)
-      return(list(d_f= v, likelihood = ll))
+      return(list(d_f= v+1, likelihood = ll))
 
     }
   }

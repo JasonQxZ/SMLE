@@ -36,19 +36,20 @@ summary.smle <- function(object, ...){
   ans$ID_retained  =object$ID_retained
   ans$coef_retained = object$coef_retained
   ans$X = object$X
+  ans$data = object$data
+  ans$iteration_data = object$iteration_data
   
-  
-  if( !is.null(object$Intercept) ){
+  if( !is.null(object$intercept) ){
     ans$intercept= object$intercept
     
   }else{ans$intercept =NULL}
   
   
-  if(object$ctg==TRUE){
+  if(object$categorical==TRUE){
     
-    ans$ctg = TRUE
-    ans$CI = object$I$CI
-    ans$levels = nlevels(object$X[,object$I$CI])
+    ans$categorical = TRUE
+    ans$CI = object$modified_data$CI
+    ans$levels = nlevels(object$X[,object$modified_data$CI])
   
   }
   
@@ -81,16 +82,17 @@ summary.selection <- function(object, ...){
   ans$coef_selected = object$coef_selected
   ans$gamma_ebic = object$gamma_ebic 
   ans$X = object$X
+  ans$data = object$data
   
-  if( !is.null(object$Intercept) ){
+  if( !is.null(object$intercept) ){
     ans$intercept= object$intercept
     
   }else{ans$intercept =NULL}
   
-  if(object$ctg==TRUE){
-    ans$ctg = TRUE
-    ans$CI = object$I$CI
-    ans$levels = nlevels(object$X[,object$I$CI])
+  if(object$categorical==TRUE){
+    ans$categorical = TRUE
+    ans$CI = object$modified_data$CI
+    ans$levels = nlevels(object$X[,object$modified_data$CI])
     
   }
   

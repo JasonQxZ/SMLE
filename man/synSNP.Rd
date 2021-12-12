@@ -5,7 +5,7 @@
 \alias{synSNP}
 \title{Synthetic genetic association study dataset}
 \format{
-An object of class \code{'matrix'} with 800 rows and 10,032 columns.
+An object of class \code{'data.frame'} with 800 rows and 10,032 columns.
 }
 \usage{
 data(synSNP)

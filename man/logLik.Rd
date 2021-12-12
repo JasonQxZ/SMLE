@@ -10,7 +10,7 @@
 \method{logLik}{selection}(object, ...)
 }
 \arguments{
-\item{object}{Object of class \code{'smle'} or \code{'sdata'}.}
+\item{object}{An object of class \code{'smle'} or \code{'sdata'}.}
 
 \item{...}{Forwarded arguments.}
 }
@@ -19,7 +19,7 @@ Returns an object of class \code{'logLik'}. This is a number with at least one a
  \code{"df"} (degrees of freedom), giving the number of (estimated) parameters in the model. For more details, see the generic \code{\link[stats]{logLik}()} in \pkg{stats}.
 }
 \description{
-This is a method function written to extract log-liklihood from \code{'smle'} and \code{'selection'} objects. 
+This is a method written to extract the log-likelihood from \code{'smle'} and \code{'selection'} objects. 
 It refits the model by \code{\link[stats]{glm}()} based on the response and the selected features after screening (selection), 
 and returns an object of \code{'logLik'} from the generic.
 }

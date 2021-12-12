@@ -14,7 +14,7 @@
 #' @docType data
 #'
 #' @usage data(synSNP)
-#' @format An object of class \code{'matrix'} with 800 rows and 10,032 columns.
+#' @format An object of class \code{'data.frame'} with 800 rows and 10,032 columns.
 #' @examples
 #' \donttest{
 #' data(synSNP)

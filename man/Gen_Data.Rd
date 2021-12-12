@@ -20,7 +20,7 @@ Gen_Data(
 )
 }
 \arguments{
-\item{n}{Sample size, number of rows of for the feature matrix to be generated.}
+\item{n}{Sample size, number of rows for the feature matrix to be generated.}
 
 \item{p}{Number of columns for the feature matrix to be generated.}
 
@@ -34,9 +34,9 @@ Gen_Data(
 
 \item{pos_truecoef}{Vector of indices denoting which features (columns) affect the response variable. If not specified, positions are randomly sampled. See Details for more information.}
 
-\item{level_ctgidx}{A vector to indicate the levels of categorical features in \code{pos_ctgidx}. Default is 2.}
+\item{level_ctgidx}{Vector to indicate the number of levels for the categorical features in \code{pos_ctgidx}. Default is 2.}
 
-\item{effect_truecoef}{Effects size corresponding to the features in \code{pos_truecoef}. If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled.  See Details.}
+\item{effect_truecoef}{Effect size corresponding to the features in \code{pos_truecoef}. If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled.  See Details.}
 
 \item{correlation}{Correlation structure among features. \code{correlation = "ID"} for independent,
 \code{correlation = 'MA'} for moving average, \code{correlation = "CS"} for compound symmetry, \code{correlation = "AR"} 
@@ -50,58 +50,55 @@ for auto regressive Default is \code{"ID"}. For more information see Details.}
 }
 \value{
 \item{call}{The call that produced this object.}
-\item{Y}{Response variable vector of length \eqn{n}}
+\item{Y}{Response variable vector of length \eqn{n}.}
 
 \item{X}{Feature matrix or dataframe (matrix if \code{num_ctgidx =FALSE} and dataframe otherwise).}
 
 \item{subset_true}{Vector of column indices of X for the features that affect the response variables (relevant features).}
 
-\item{coef_true}{Vector of effects for the relevant features.}
+\item{coef_true}{Vector of effects for the features that affect the response variables.}
 
-\item{ctg}{Logical flag wether the model contains categorical features.}
+\item{categorical}{Logical flag whether the model contains categorical features.}
 
-\item{CI}{Indices of categorical features when \code{ctg = TRUE}.}
+\item{CI}{Indices of categorical features when \code{categorical = TRUE}.}
 
-\item{rho,family,correlation}{Return of arguments.}
+rho,family,correlation are return of arguments passed in the function call.
 }
 \description{
 This function generates synthetic datasets from GLMs with a user-specified correlation structure.
 It permits both numerical and categorical features, whose quantity can be larger than the sample size.
 }
 \details{
-Simulated data \eqn{(y_i , \bold{x_i})} for \eqn{i = 1, . . . , n} are generated as follows:
-First, we generate a \eqn{p \times 1} model coefficient vector beta with all entries being zero, except on the positions specified in \code{pos_truecoef},
+Simulated data \eqn{(y_i , x_i)} where \eqn{ x_i = (x_{i1},x_{i2} , . . . , x_{ip})} are generated as follows:
+First, we generate a \eqn{p} by \eqn{1} model coefficient vector beta with all entries being zero, except for the positions specified in \code{pos_truecoef},
 on which \code{effect_truecoef} is used. When \code{pos_truecoef} is not specified, we randomly choose \code{num_truecoef} positions from the coefficient
 vector. When \code{effect_truecoef} is not specified, we randomly set the strength of the true model coefficients as follow:
-\deqn{(0.5+U) \cdot Z}
-where \eqn{U} is a uniform distribution from 0 to 1,  and \eqn{Z} is a binomial distribution \eqn{P(Z=1)=1/2,P(Z=-1)=1/2}.
+\deqn{(0.5+U) Z,}
+where \eqn{U} is sampled from a uniform distribution from 0 to 1,  and \eqn{Z} is sampled from a binomial distribution \eqn{P(Z=1)=1/2,P(Z=-1)=1/2}.
 
-Next, we generate a \eqn{n \times p} feature matrix \eqn{X} based on the choice in
-\code{correlation} specified as follows.
+Next, we generate a \eqn{n} by \eqn{p} feature matrix \eqn{X} according to the model selected with
+\code{correlation} and specified as follows.
 
 Independent (ID):  all features are independently generated from \eqn{N( 0, 1)}.
 
 Moving average (MA): candidate features \eqn{x_1,..., x_p} are joint normal,
 marginally \eqn{N( 0, 1)}, with
 
-cov\eqn{(x_j, x_{j-1}) = \rho}, cov\eqn{(x_j, x_{j-2}) = \frac{\rho}{2}} and cov\eqn{(x_j, x_h) = 0} for \eqn{|j-h| \geq 3}.
+\eqn{cov(x_j, x_{j-1}) = \rho}, \eqn{cov(x_j, x_{j-2}) = \rho/2} and \eqn{cov(x_j, x_h) = 0} for \eqn{|j-h|>3}.
 
-Compound symmetry (CS): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with cov\eqn{(x_j, x_h) =\frac{\rho}{2}} if \eqn{j} ,\eqn{h}
-are both in the set of important features and \eqn{cov(x_j, x_h) =  \rho } when only
+Compound symmetry (CS): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with \eqn{cov(x_j, x_h) =\rho/2} if \eqn{j}, \eqn{h}
+are both in the set of important features and \eqn{cov(x_j, x_h)=\rho} when only
 one of \eqn{j} or \eqn{h} are in the set of important features.
 
 Auto-regressive (AR): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with
 
-cov\eqn{(x_j, x_h) = \rho^{|j-h|}} for all \eqn{j} and \eqn{h}. 
+\eqn{cov(x_j, x_h) = \rho^{|j-h|}} for all \eqn{j} and \eqn{h}. The correlation strength \eqn{\rho} is controlled by the argument \code{rho}. 
 
-The correlation strength \eqn{\rho} is controlled by argument \code{rho}. 
-Then, we generate the response variable \eqn{Y} according to its response type. 
-For Gaussian model, \eqn{y_i =\bold{x_i}^T \bold{\beta} + \epsilon_i} where 
-\eqn{\epsilon_i\ \in} \eqn{N( 0, 1)} for \eqn{i} from \eqn{1} to \eqn{n}. 
-For the binary model let \eqn{\pi_i = P(Y = 1|\bold{x_i})}. We sample \eqn{y_i} 
-from Bernoulli(\eqn{\pi_i}) where logit\eqn{(\pi_i) = \bold{x_i}^T \bold{\beta}}.
-Finally, for the Poisson model, \eqn{y_i} is generated from Poisson distribution 
-with the link \eqn{\pi_i} = exp\eqn{(\bold{x_i}^T \bold{\beta} )}.
+
+Then, we generate the response variable \eqn{Y} according to its response type, which is controlled by the argument \code{family}
+For the Gaussian model, \eqn{y_i =x_i\beta + \epsilon_i} where \eqn{\epsilon_i} is \eqn{N( 0, 1)} for \eqn{i} from \eqn{1} to \eqn{n}. 
+For the binary model let \eqn{\pi_i = P(Y = 1|x_i)}. We sample \eqn{y_i} from Bernoulli(\eqn{\pi_i}) where logit\eqn{(\pi_i) = x_i \beta}.
+Finally, for the Poisson model, \eqn{y_i} is generated from the Poisson distribution with the link \eqn{\pi_i} = exp\eqn{(x_i\beta )}.
 For more details see the reference below.
 }
 \examples{

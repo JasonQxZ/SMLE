@@ -41,8 +41,12 @@ vote_update.selection<-function(object, vote_threshold = 0.6, ...){
     
     IP_f<-summary(IP)[order(summary(IP),decreasing= T)]/max(summary(IP))
     
-    object$ID_voted<-object$subset[as.numeric(names(IP_f[IP_f>=vote_threshold]))] 
+    ID_names<-object$subset[as.numeric(names(IP_f[IP_f>=vote_threshold]))] 
     
+    if(!is.null(object$data)){
+      
+      ID_names <- colnames(object$X)[ID_names]
+    }
     return(object)
     
     }

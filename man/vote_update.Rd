@@ -5,18 +5,17 @@
 \alias{vote_update.selection}
 \title{Extract and adjust voting from SMLE selection}
 \usage{
-vote_update(object, ...)
-
 \method{vote_update}{selection}(object, vote_threshold = 0.6, ...)
 }
 \arguments{
 \item{object}{A \code{'selection'} object as the output from \code{\link{smle_select}()}.}
 
-\item{...}{This argument is not used and listed for method consistency.}
-
 \item{vote_threshold}{A voting threshold in percentage. A feature is
 considered to be important when it receives votes passing the threshold.
 Default is 0.6.}
+
+\item{...}{This argument is not used and listed for method consistency.}
+
 }
 \value{
 The function returns a vector indicating the features selected by

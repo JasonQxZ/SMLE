@@ -22,7 +22,7 @@
 #' 2) \code{'sdata'} object, as the output from \code{\link{Gen_Data}()}; 
 #' 3) other response and feature matrix input by users.
 #'
-#' Note that this function is mainly design to conduct an elaborative selection
+#' Note that this function is mainly designed to conduct an elaborative selection
 #' after feature screening. We do not recommend using it directly for
 #' ultra-high-dimensional data without screening.
 #' 
@@ -33,24 +33,22 @@
 #' @importFrom parallel detectCores mclapply
 #'
 #' @param object Object of class \code{'smle'} or \code{'sdata'}. Users can also
-#' input a response vector and a feature matrix. See examples
+#' input a response vector and a feature matrix. 
 #'
 #'
 #'
 #' @return
 #' \item{call}{The call that produced this object.}
 #' \item{ID_selected}{A list of selected features.}
-#' \item{coef_selected}{Fitted model coefficients based on the selected
-#' features.}
-#' \item{intercept}{Fitted model intercept based on the selected features.}
-#' \item{criterion_value}{Values of selection criterion for the candidate models
-#' with various sparsity.}
-#' \item{X,Y}{Original data input.}
-#' \item{ctg}{A logical flag whether the input feature matrix includes categorical features}
-#' \item{ID_pool}{A vector contains all features selected during voting. }
-#' \item{ID_voted}{Vector containing the features selected when \code{vote = T}.}
-#' \item{CI}{Indices of categorical features when \code{ctg = TRUE}.}
-#' \item{family,gamma_ebic,gamma_seq,criterion,vote,codyingtype,vote_threshold}{Return of arguments passed in the function call.}
+#' \item{coef_selected}{Fitted model coefficients.}
+#' \item{intercept}{Fitted model intercept.}
+#' \item{criterion_value}{Values of selection criterion for the candidate models with various sparsity.}
+#' \item{categorical}{A logical flag whether the input feature matrix includes categorical features}
+#' \item{ID_pool}{A vector containing all features selected during voting. }
+#' \item{ID_voted}{A vector containing the features selected when \code{vote = T}.}
+#' \item{CI}{Indices of categorical features when \code{categorical = TRUE}.}
+#' \code{X}, \code{Y}, \code{family}, \code{gamma_ebic}, \code{gamma_seq}, \code{criterion}, \code{vote},
+#'  \code{codyingtype}, \code{vote_threshold} are return of arguments passed in the function call.
 #' @examples
 #'
 #' set.seed(1)
@@ -70,21 +68,6 @@
 smle_select<-function(object, ...){
   UseMethod("smle_select")
 }
-#' @rdname  smle_select
-#'
-#' @method smle_select smle
-#'
-#' @export
-#'
-smle_select.smle<-function(object,...){
-  cl<-match.call()
-  cl[[1]] <- as.name("Select")
-  Data<-structure(list( Y=object$Y, X=object$X, family=object$family),class = "sdata")
-  S<-smle_select(Data,subset =object$ID_retained,...)
-  S$call <- cl
-  return(S)
-}
-
 #'
 #' @rdname smle_select
 #'
@@ -103,7 +86,7 @@ smle_select.smle<-function(object,...){
 #'
 #' @param gamma_ebic The EBIC tuning parameter, in \eqn{[0 , 1]}. Default is 0.5.
 #'
-#' @param vote The logical flag for whether to perform the voting procedure.Only available when \code{criterion ="ebic"}.
+#' @param vote The logical flag for whether to perform the voting procedure. Only available when \code{criterion ="ebic"}.
 #' 
 #' @param criterion Selection criterion. One of "\code{ebic}","\code{bic}","\code{aic}". Default is "\code{ebic}".
 #'
@@ -129,7 +112,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
                             parallel = FALSE, num_clusters=NULL,...){
   cl<-match.call()
   
-  cl[[1]] <- as.name("Select")
+  cl[[1]] <- as.name("smle_select")
   
   #input check
   X<-object$X
@@ -158,7 +141,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
 
       }
 
-  k_max=dim(X_s)[2]
+  k_max = dim(X_s)[2]
   
   if ( is.null(vote_threshold) ){
 
@@ -187,7 +170,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
                                                     all,standard,DV")}
 
   #-----------------------------Algorithm-start---------------------------------
-  ctg =FALSE
+  categorical =FALSE
   
   CI = (1:dim(X_s)[2])[sapply(X_s,is.factor)]
   
@@ -195,7 +178,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
     
     #if sub matrix X_s has any categorical features
     
-    ctg= TRUE
+    categorical= TRUE
     
     criter_value<-ctg_ebicc(Y,X_s,family,criterion,codingtype,
                             k_min,k_max,n,pp,gamma_ebic,parallel,num_clusters)
@@ -297,7 +280,7 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
           
           num_selected = length(f_s$coef_retained),
 
-          vote=vote,criterion=criterion,
+          vote = vote,criterion = criterion,
           
           ID_pool= IP,
           
@@ -305,9 +288,9 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
 
           criterion_value=criter_value,
 
-          ID_voted=ID_Voted,
+          ID_voted = ID_Voted,
           
-          ctg = ctg, CI= sort(CI),
+          categorical = categorical, CI= sort(CI),
           
           vote_threshold=vote_threshold,
 
@@ -323,8 +306,10 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
 #' @rdname smle_select
 #'
 #' @method smle_select default
+#' 
+#' @param Y Input response vector (when \code{object = NULL}).
 #'
-#' @param X Input features matrix (when feature matrix input by users).
+#' @param X Input features matrix (when \code{object = NULL}).
 #'
 #' @param family Model assumption; see \code{\link{SMLE}()} documentation. Default is Gaussian linear.
 #'
@@ -335,24 +320,62 @@ smle_select.sdata<-function(object, k_min=1, k_max=NULL, subset=NULL,
 #'
 #' @export
 #'
-smle_select.default<-function(object, X=NULL, family='gaussian',...){
+smle_select.default<-function(object = NULL,Y =NULL, X=NULL, family='gaussian',...){
   cl<-match.call()
-  cl[[1]] <- as.name("Select")
+  cl[[1]] <- as.name("smle_select")
   if ( any(sapply(X,as.factor) ==TRUE) ){
-   ctg = TRUE
+   categorical = TRUE
   }else{
-   ctg =FALSE
+   categorical =FALSE
+  }
+  if(is.null(object)){
+    
+    Data<-structure(list(Y=Y,X=X,family=family,categorical = categorical),class = "sdata")
+  
+  }else{
+    
+    Data<-structure(list(Y=object,X=X,family=family,categorical = categorical),class = "sdata")
+    
     }
 
-  Data<-structure(list(Y=object,X=X,family=family,ctg = ctg),class = "sdata")
+  
 
 
   S<-smle_select(Data,...)
   S$call <- cl
   return(S)
 }
+#' @rdname  smle_select
+#'
+#' @method smle_select smle
+#'
+#' @export
+#'
+smle_select.smle<-function(object,...){
+  cl<-match.call()
+  cl[[1]] <- as.name("smle_select")
+  Data<-structure(list( Y=object$Y, X=object$X, family=object$family),class = "sdata")
+  if(!is.null(object$data)){
+    data<-object$data
+    X <- object$X
+    index <- sort((1:length(colnames(X)))[colnames(X) %in% object$iteration_data$feature_name])
+    S<-smle_select(Data,subset =index,...)
+    feature_name <- colnames(X)[S$ID_selected]
+    S$ID_selected <-  sort((1:length(names(data)))[names(data) %in% feature_name])
+    if(S$vote == TRUE){
+      
+      vote_name<-colnames(X)[S$ID_voted]
+      S$ID_voted <-sort((1:length(names(data)))[names(data) %in% vote_name])
 
-
+    }
+    
+    S$data<- data
+  
+  }else{    S<-smle_select(Data,subset =object$ID_retained,...)}
+  
+  S$call <- cl
+  return(S)
+}
 
 
 

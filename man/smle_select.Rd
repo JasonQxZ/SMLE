@@ -2,15 +2,11 @@
 % Please edit documentation in R/smle_select.R
 \name{smle_select}
 \alias{smle_select}
-\alias{smle_select.smle}
 \alias{smle_select.sdata}
 \alias{smle_select.default}
+\alias{smle_select.smle}
 \title{Elaborative post-screening selection with SMLE}
 \usage{
-smle_select(object, ...)
-
-\method{smle_select}{smle}(object, ...)
-
 \method{smle_select}{sdata}(
   object,
   k_min = 1,
@@ -27,13 +23,13 @@ smle_select(object, ...)
   ...
 )
 
-\method{smle_select}{default}(object, X = NULL, family = "gaussian", ...)
+\method{smle_select}{default}(object = NULL, Y = NULL, X = NULL, family = "gaussian", ...)
+
+\method{smle_select}{smle}(object, ...)
 }
 \arguments{
 \item{object}{Object of class \code{'smle'} or \code{'sdata'}. Users can also
-input a response vector and a feature matrix. See examples}
-
-\item{...}{Further arguments passed to or from other methods.}
+input a response vector and a feature matrix.}
 
 \item{k_min}{The lower bound of candidate model sparsity. Default is 1.}
 
@@ -46,7 +42,7 @@ object is the input.}
 
 \item{gamma_ebic}{The EBIC tuning parameter, in \eqn{[0 , 1]}. Default is 0.5.}
 
-\item{vote}{The logical flag for whether to perform the voting procedure.Only available when \code{criterion ="ebic"}.}
+\item{vote}{The logical flag for whether to perform the voting procedure. Only available when \code{criterion ="ebic"}.}
 
 \item{criterion}{Selection criterion. One of "\code{ebic}","\code{bic}","\code{aic}". Default is "\code{ebic}".}
 
@@ -63,27 +59,30 @@ Default is \code{FALSE}. See Details.}
 \item{num_clusters}{The number of compute clusters to use when 
 \code{parallel = TRUE}. The default will be 2 times cores detected.}
 
-\item{X}{Input features matrix (when feature matrix input by users).}
+\item{Y}{Input response vector (when \code{object = NULL}).}
+
+\item{X}{Input features matrix (when \code{object = NULL}).}
 
 \item{family}{Model assumption; see \code{\link{SMLE}()} documentation. Default is Gaussian linear.
 
 When input is a \code{'smle'} or \code{'sdata'} object, the same
 model will be used in the selection.}
+
+\item{...}{Further arguments passed to or from other methods.}
+
 }
 \value{
 \item{call}{The call that produced this object.}
 \item{ID_selected}{A list of selected features.}
-\item{coef_selected}{Fitted model coefficients based on the selected
-features.}
-\item{intercept}{Fitted model intercept based on the selected features.}
-\item{criterion_value}{Values of selection criterion for the candidate models
-with various sparsity.}
-\item{X,Y}{Original data input.}
-\item{ctg}{A logical flag whether the input feature matrix includes categorical features}
-\item{ID_pool}{A vector contains all features selected during voting. }
-\item{ID_voted}{Vector containing the features selected when \code{vote = T}.}
-\item{CI}{Indices of categorical features when \code{ctg = TRUE}.}
-\item{family,gamma_ebic,gamma_seq,criterion,vote,codyingtype,vote_threshold}{Return of arguments passed in the function call.}
+\item{coef_selected}{Fitted model coefficients.}
+\item{intercept}{Fitted model intercept.}
+\item{criterion_value}{Values of selection criterion for the candidate models with various sparsity.}
+\item{categorical}{A logical flag whether the input feature matrix includes categorical features}
+\item{ID_pool}{A vector containing all features selected during voting. }
+\item{ID_voted}{A vector containing the features selected when \code{vote = T}.}
+\item{CI}{Indices of categorical features when \code{categorical = TRUE}.}
+\code{X}, \code{Y}, \code{family}, \code{gamma_ebic}, \code{gamma_seq}, \code{criterion}, \code{vote},
+ \code{codyingtype}, \code{vote_threshold} are return of arguments passed in the function call.
 }
 \description{
 The features retained after screening are still likely to contain some that 
@@ -106,7 +105,7 @@ This function accepts three types of input objects;
 2) \code{'sdata'} object, as the output from \code{\link{Gen_Data}()}; 
 3) other response and feature matrix input by users.
 
-Note that this function is mainly design to conduct an elaborative selection
+Note that this function is mainly designed to conduct an elaborative selection
 after feature screening. We do not recommend using it directly for
 ultra-high-dimensional data without screening.
 }

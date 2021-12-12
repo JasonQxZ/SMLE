@@ -13,7 +13,7 @@
 #' @examples
 #' set.seed(1)
 #' Data <- Gen_Data(correlation = "MA", family = "gaussian")
-#' fit <- SMLE(Data$Y, Data$X, k = 20, family = "gaussian")
+#' fit <- SMLE(Y = Data$Y, X = Data$X, k = 20, family = "gaussian")
 #' fit_s <- smle_select(fit, vote = TRUE)
 #' plot(fit_s)
 #'
@@ -21,19 +21,18 @@
 #'
 #'
 plot.selection<-function(x,...){
-  ## new plot
-  plot.new()
-  plot(x$criterion_value,xlab="Model sparsity", ylab= paste(x$criterion,"value"),...)
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
+  plot(x$criterion_value,xlab="Model sparsity", ylab= paste(x$criterion,"value"), cex.axis = 1.5, cex.lab = 1.5,...)
   if(x$vote ==TRUE){
-
     dev.new()
-    percent <- function(x, digits = 2, format = "f", ...) {
-    paste0(formatC(100 * x, format = format, digits = digits), "%")
-    }
     y<-data.frame("Proportion"= sort(summary(x$ID_pool),decreasing = T)/length(x$gamma_seq))
     ID_names<- x$subset[as.numeric(names(summary(x$ID_pool)[order(summary(x$ID_pool),decreasing= T)]))]
+    if(!is.null(x$data)){
+      ID_names <- colnames(x$X)[ID_names]
+    }
     barplot(y$Proportion,names.arg =ID_names ,
-            xlab = "Candidate Features IDs",ylab="Features Voting Proportion",main="Voting results"
-            )
+            xlab = "Candidate Features IDs",ylab="Features Voting Proportion",main="Voting results", 
+            cex.axis = 1.5, cex.lab = 1.5)
   }
 }

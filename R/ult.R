@@ -187,7 +187,7 @@ GroupHard<-function(Beta_t,I,k,Screening_index,penalize_mod){
 }
 
 
-Group_Beta<-function(Beta_t,I,penalize_mod){
+Group_Beta<-function(Beta_t,I,penalize_mod = F,max=FALSE){
 
   num<-as.vector(Beta_t)
   
@@ -206,6 +206,7 @@ Group_Beta<-function(Beta_t,I,penalize_mod){
     if(i %in% ci){
       j<-match(i,ci)
       if(penalize_mod){x<-append(x,sqrt(crossprod(Beta_t[I$DFI[[j]]]))/sqrt(I$dum_col[j]))}
+      else if(max == T){x<-append(x,max(abs(Beta_t[I$DFI[[j]]])))}
       else{x<-append(x,sqrt(crossprod(Beta_t[I$DFI[[j]]])))}
     }else{
       x<-append(x,num[1])

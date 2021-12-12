@@ -12,7 +12,7 @@ out most irrelevant features in preparation for a more elaborate analysis. This 
 \tabular{ll}{
 Package: \tab smle\cr
 Type: \tab Package\cr
-Version: \tab 2.0-0\cr
+Version: \tab 2.0-2\cr
 Date: \tab 2021-09-24\cr
 License: \tab GPL-3\cr
 }
@@ -43,7 +43,7 @@ Data <- Gen_Data(n = 200, p = 5000, correlation = "MA",family = "gaussian")
 print(Data)
 
 # joint feature screening via SMLE
-fit <- SMLE(Data$Y, Data$X, k = 10, family = "gaussian")
+fit <- SMLE(Y = Data$Y, X = Data$X, k = 10, family = "gaussian")
 print(fit)
 summary(fit)
 plot(fit)

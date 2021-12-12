@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{A \code{'smle'} object as the output from \code{\link{SMLE}()}.}
 
-\item{num_path}{Number of top coefficients to be shown.
+\item{num_path}{The number of top coefficients to be shown.
 Default is equal to the number of features retained in the model.}
 
 \item{which_path}{A vector to control which features are shown in addition to the paths for the most significant coefficients.}
@@ -34,7 +34,7 @@ By default, the second plot shows the solution path (estimated coefficient by it
 \donttest{
 set.seed(1)
 Data <- Gen_Data(correlation = "CS")
-fit <- SMLE(Data$Y, Data$X, k = 20, family = "gaussian")
+fit <- SMLE(Y = Data$Y,X = Data$X, k = 20, family = "gaussian")
 plot(fit)
 }
 }

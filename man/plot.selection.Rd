@@ -21,7 +21,7 @@ This function constructs a sparsity vs. selection criterion curve for a \code{'s
 \examples{
 set.seed(1)
 Data <- Gen_Data(correlation = "MA", family = "gaussian")
-fit <- SMLE(Data$Y, Data$X, k = 20, family = "gaussian")
+fit <- SMLE(Y = Data$Y, X = Data$X, k = 20, family = "gaussian")
 fit_s <- smle_select(fit, vote = TRUE)
 plot(fit_s)
 

@@ -5,24 +5,24 @@
 \alias{predict.selection}
 \title{Prediction based on SMLE screening and selection}
 \usage{
-\method{predict}{smle}(object, newdata = NULL, ...)
+\method{predict}{smle}(object, newdata = NULL, type = c("link", "response", "terms"), ...)
 
-\method{predict}{selection}(object, newdata = NULL, ...)
+\method{predict}{selection}(object, newdata = NULL, type = c("link", "response", "terms"), ...)
 }
 \arguments{
 \item{object}{A \code{'smle'} or \code{'selection'} object.}
 
-\item{newdata}{Matrix of new values for the features at which predictions are to be made using the final model 
-from \code{\link{SMLE}()} or \code{\link{smle_select}()}. If omitted, the function returns the fitted 
-response values based on the training data.}
+\item{newdata}{\code{'matrix'} or \code{'data.frame'} of new values  of new values for the features at which predictions are to be made. If omitted, the fitted linear predictors are used.}
+
+\item{type}{The type of prediction required by \code{\link[stats]{predict.glm}()}.}
 
 \item{...}{Further arguments passed to \code{\link[stats]{predict.glm}()}.}
 }
 \value{
-A prediction vector. The length of the vector equals to the number of observations of the data fitted in.
+A prediction vector with length equal to the number of rows of \code{newdata}.
 }
 \description{
-This function returns the predicted response values for a fitted model of class \code{'smle'} or \code{'selection'}.
+For a model object of class \code{'smle'} or \code{'selection'}, this function returns the predicted response values after re-fitting the model using \code{\link{glm}}.
 }
 \examples{
 
@@ -30,7 +30,7 @@ set.seed(1)
 Data_sim <- Gen_Data(n = 420, p = 1000, sigma = 0.5, family = "gaussian")
 train_X <- Data_sim$X[1:400,]; test_X <- Data_sim$X[401:420,]
 train_Y <- Data_sim$Y[1:400]; test_Y <- Data_sim$Y[401:420]
-fit1 <- SMLE(train_Y, train_X, family = "gaussian", k = 10)
+fit1 <- SMLE(Y = train_Y, X = train_X, family = "gaussian", k = 10)
 
 #Fitted responses vs true responses in training data
 predict(fit1)[1:10]

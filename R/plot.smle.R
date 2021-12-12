@@ -9,7 +9,7 @@
 #'
 #' @param x A \code{'smle'} object as the output from \code{\link{SMLE}()}.
 #' 
-#' @param num_path Number of top coefficients to be shown.
+#' @param num_path The number of top coefficients to be shown.
 #' Default is equal to the number of features retained in the model.
 #' @param which_path A vector to control which features are shown in addition to the paths for the most significant coefficients.
 #' @param out_plot A number from 1 to 5 indicating which plot is to be shown in the separate window; the default for solution path plot is "5".
@@ -24,22 +24,27 @@
 #' \donttest{
 #' set.seed(1)
 #' Data <- Gen_Data(correlation = "CS")
-#' fit <- SMLE(Data$Y, Data$X, k = 20, family = "gaussian")
+#' fit <- SMLE(Y = Data$Y,X = Data$X, k = 20, family = "gaussian")
 #' plot(fit)
 #'}
 
 plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
   
   ## new plot
-  plot.new()
   oldpar <- par(no.readonly = TRUE)
-
-  on.exit(par(oldpar))
+  on.exit(par(oldpar),add = TRUE)
 
   #-------------------check
   nsteps<-x$steps
 
   Feature_path<-x$path_retained
+  
+  if(!is.null(x$data)){
+    
+    X <- x$X
+    x$ID_retained<- sort((1:length(colnames(X)))[colnames(X) %in% x$iteration_data$feature_name])
+  
+    }
 
   #--------------------plot-------------
   if(out_plot==5){
@@ -53,17 +58,17 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
   plot(x$coef_dist, x=1:length(x$coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
        main=" Coefficient convergence",type="b" )
 
-  plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
+  plot(y=x$Usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
 
   title("U-search")
 
-  plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
+  plot(y=x$iteration_data$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
 
   title("Retained feature change")
 
   dev.new()
 
-  if(is.null(num_path)){num_path=x$k}
+  if(is.null(num_path)){num_path=length(x$ID_retained)}
 
   TOP_index<- x$ID_retained[sort(abs(x$coef_retained),decreasing = T,index.return=T)$ix][1:num_path]
 
@@ -71,22 +76,22 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
 
   Feature_path<-Feature_path[TOP_index,]
 
-  plot(NULL, xlim=c(1,nsteps+1), ylim=c(floor(min(Feature_path[,nsteps])),ceiling(max(Feature_path[,nsteps]))),xlab="steps",ylab="coefficients",...)
+  plot(NULL, xlim=c(1,nsteps+1), ylim=c(floor(min(Feature_path[,nsteps])),ceiling(max(Feature_path[,nsteps]))),xlab="steps",ylab="coefficients",cex.lab = 1.5,cex.axis = 1.5 ,...)
 
   title("Solution path")
 
-  lines(rep(0,nsteps),lty=1,lwd=1,col="black")
+  lines(rep(0,nsteps+1),lty=1,lwd=1,col="black")
   
   A<-lapply(1:length(TOP_index),function(i){lines(Feature_path[i,],lty=i,col=rainbow(length(TOP_index))[i])})
 
-  legend("topright",lty=1:length(TOP_index),cex=0.5,col=rainbow(length(TOP_index)),
+  legend("topright",lty=1:length(TOP_index),cex=1,col=rainbow(length(TOP_index)),
            legend=TOP_index,bty="n")
     
   }else if(out_plot==1){
 
     par(mfrow=c(2,2))
     
-    if(is.null(num_path)){num_path=5}
+    if(is.null(num_path)){num_path=length(x$ID_retained)}
     
     TOP_value<-rep(0,num_path)
     
@@ -112,10 +117,10 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
     plot(x$coef_dist, x=1:length(x$coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
          main=" Coefficient convergence",type="b" )
     title(' Coefficient convergence')
-    plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
+    plot(y=x$Usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
     title("U-search")
     #
-    plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
+    plot(y=x$iteration_data$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
     title("Retained feature change")
 
   dev.new()
@@ -125,7 +130,7 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
   
     par(mfrow=c(2,2))
     
-    if(is.null(num_path)){num_path=5}
+    if(is.null(num_path)){num_path= length(x$ID_retained)}
     
     TOP_value<-rep(0,num_path)
     
@@ -150,9 +155,9 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
     
     plot(y=x$likelihood_iter,x=1:nsteps,xlab="steps",ylab="log-likelihood",type="b")
     title("Likelihood convergence")
-    plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
+    plot(y=x$Usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
     title("U-search")
-    plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
+    plot(y=x$iteration_data$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
     title("Retained feature change")
 
     dev.new()
@@ -164,7 +169,7 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
     
     par(mfrow=c(2,2))
       
-      if(is.null(num_path)){num_path=5}
+      if(is.null(num_path)){num_path= length(x$ID_retained)}
       
       TOP_value<-rep(0,num_path)
       
@@ -187,15 +192,15 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
       legend("topright",lty=1:length(TOP_index),cex=0.5,col=rainbow(length(TOP_index)),
              legend=TOP_index,bty="n")
       title('Coefficient convergence')
-    plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
+    plot(y=x$iteration_data$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
     title("Retained feature change")
     dev.new()
-    plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="Soulution path",...)
+    plot(y=x$Usearch,x=1:nsteps,xlab="steps",ylab="Soulution path",...)
     title("U-search")
   }else if(out_plot==4){
     par(mfrow=c(2,2))
     
-    if(is.null(num_path)){num_path=5}
+    if(is.null(num_path)){num_path= length(x$ID_retained)}
     
     TOP_value<-rep(0,num_path)
     
@@ -224,10 +229,10 @@ plot.smle<-function(x,num_path=NULL,which_path=NULL,out_plot=5,...){
     plot(x$coef_dist, x=1:length(x$coef_dist),xlab="steps",ylab="L2-dist b/w beta updates",
          main=" Coefficient convergence",type="b" )
     title(' Coefficient convergence')
-    plot(y=x$usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
+    plot(y=x$Usearch,x=1:nsteps,xlab="steps",ylab="No. of tries")
     title("U-search")
     dev.new()
-    plot(y=x$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
+    plot(y=x$iteration_data$FD,x=1:nsteps,xlab="steps",ylab="No. of changes")
     title("Retained feature change")
   }
 }
