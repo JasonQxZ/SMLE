@@ -4,7 +4,7 @@
 \alias{plot.smle}
 \title{Plots to visualize SMLE screening}
 \usage{
-\method{plot}{smle}(x, num_path = NULL, which_path = NULL, out_plot = 5, ...)
+\method{plot}{smle}(x, num_path = NULL, label = TRUE, which_path = NULL, out_plot = 1, ...)
 }
 \arguments{
 \item{x}{A \code{'smle'} object as the output from \code{\link{SMLE}()}.}
@@ -12,10 +12,12 @@
 \item{num_path}{The number of top coefficients to be shown.
 Default is equal to the number of features retained in the model.}
 
+\item{label}{Logical flag for whether to label each curve with the feature index. Default is \code{TRUE}.}
+
 \item{which_path}{A vector to control which features are shown in addition to the paths for the most significant coefficients.}
 
-\item{out_plot}{A number from 1 to 5 indicating which plot is to be shown in the separate window; the default for solution path plot is "5".
-See Description for plot labels 1-4.}
+\item{out_plot}{A number from 1 to 5 indicating which plot is to be shown in the separate window; the default for solution path plot is "1".
+See Description for plot labels 2-5.}
 
 \item{...}{Additional arguments passed to the second plot.}
 }
@@ -23,12 +25,14 @@ See Description for plot labels 1-4.}
 No return value.
 }
 \description{
-This function returns two plot windows. By default, the first contains 4 plots to assess convergence:
-1) log-likelihood,  
-2) Euclidean distance between the current and the previous coefficient estimates,   
-3) the number of tries in u-search (see details of \code{\link{SMLE}()}),  
-and 4) the number of features changed in the current active set.
-By default, the second plot shows the solution path (estimated coefficient by iteration step) for the retained features.
+This function returns two plot windows. By default, the first shows 
+1) the solution path (estimated coefficient by iteration step) for 
+the retained features.
+By default, the second plot contains 4 plots to assess convergence:
+2) log-likelihood,  
+3) Euclidean distance between the current and the previous coefficient estimates,   
+4) the number of tries in u-search (see details of \code{\link{SMLE}()}),  
+and 5) the number of features changed in the current active set.
 }
 \examples{
 \donttest{

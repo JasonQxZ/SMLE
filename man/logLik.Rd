@@ -20,7 +20,7 @@ Returns an object of class \code{'logLik'}. This is a number with at least one a
 }
 \description{
 This is a method written to extract the log-likelihood from \code{'smle'} and \code{'selection'} objects. 
-It refits the model by \code{\link[stats]{glm}()} based on the response and the selected features after screening (selection), 
+It refits the model by \code{\link[stats]{glm}()} based on the response and the features selected after screening or selection, 
 and returns an object of \code{'logLik'} from the generic.
 }
 \examples{

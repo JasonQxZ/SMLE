@@ -31,23 +31,18 @@ vote_update<-function(object, ...){
 #' @export
 vote_update.selection<-function(object, vote_threshold = 0.6, ...){
   
-  if(is.null(vote_threshold)){
-    
-    return(object$ID_voted)
-    
-  }else{
-    
     IP<-object$ID_pool
     
     IP_f<-summary(IP)[order(summary(IP),decreasing= T)]/max(summary(IP))
     
-    ID_names<-object$subset[as.numeric(names(IP_f[IP_f>=vote_threshold]))] 
+    ID_names<-object$subset[sort(as.numeric(names(IP_f[IP_f>=vote_threshold])))] 
     
     if(!is.null(object$data)){
       
       ID_names <- colnames(object$X)[ID_names]
+      
     }
-    return(object)
     
-    }
+    return(ID_names)
+
 }

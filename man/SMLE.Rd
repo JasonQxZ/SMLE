@@ -6,6 +6,7 @@
 \alias{SMLE.formula}
 \title{Joint feature screening via sparse maximum likelihood estimation for GLMs}
 \usage{
+SMLE(formula = NULL, ...)
 
 \method{SMLE}{default}(
   formula = NULL,
@@ -14,26 +15,30 @@
   data = NULL,
   k = NULL,
   family = c("gaussian", "binomial", "poisson"),
-  categorical = NULL,
   keyset = NULL,
   intercept = TRUE,
+  categorical = TRUE,
   group = TRUE,
   codingtype = NULL,
   coef_initial = NULL,
   max_iter = 500,
-  tol = 0.01,
+  tol = 10^(-3),
   selection = F,
   standardize = TRUE,
   fast = FALSE,
+  U = 1,
   U_rate = 0.5,
   penalize_mod = TRUE,
   ...
 )
 
-\method{SMLE}{formula}(formula, data, categorical = NULL, k = NULL, keyset = NULL, ...)
+\method{SMLE}{formula}(formula, data, k = NULL, keyset = NULL, categorical = NULL, ...)
 }
 \arguments{
 \item{formula}{An object of class \code{'formula'} (or one that can be coerced to that class): a symbolic description of the model to be fitted. It should be \code{NULL} when \code{X} and \code{Y} are used.}
+
+\item{...}{Additional arguments to be passed to \code{\link{smle_select}()} if \code{selection = TRUE}. 
+See \code{\link{smle_select}()} documentation for more details.}
 
 \item{X}{The \eqn{n} by \eqn{p} feature matrix \eqn{X} with each column denoting a feature
 (covariate) and each row denoting an observation vector. The input should be
@@ -52,12 +57,9 @@ binary (0-1) for \code{family = "binomial"}. Input \eqn{Y} should be \code{'nume
 after screening. Default is the largest integer not 
 exceeding \eqn{0.5}log\eqn{(n) n^{1/3}}.}
 
-\item{family}{Model assumption between \eqn{Y} and \eqn{X}; the default model is Gaussian
-linear.}
-
-\item{categorical}{A logical flag whether the input feature matrix includes
-categorical features. If \code{categorical = TRUE}, a model intercept will
-be used in the screening process. Default is \code{NULL}.}
+\item{family}{Model assumption between \eqn{Y} and \eqn{X}; 
+either a character string representing one of the built-in families, or else a glm() family object. 
+The default model is Gaussian linear.}
 
 \item{keyset}{A numeric vector with column indices for the key features that 
 do not participate in feature screening and are forced to remain in the model.
@@ -68,15 +70,24 @@ can be \code{'numeric'},\code{'integer'} or \code{'character'}. Default is \code
 \item{intercept}{A logical flag to indicate whether to an intercept be used in
 the model. An intercept will not participate in screening.}
 
+\item{categorical}{A logical flag for whether the input feature matrix includes 
+categorical features( either \code{'factor'} or \code{'character'}). \code{FALSE} 
+treats all features as numerical and not check for whether there are categorical features; 
+\code{TRUE} treats the data as having some categorical features and the algorithm 
+determines which columns contain the categorical features. If all features are 
+known to be numerical, it will be faster to run SMLE with this argument set to 
+\code{FALSE}. we will need to find which columns are the categorical features.
+Default is \code{TRUE}.}
+
 \item{group}{Logical flag for whether to treat the dummy covariates of a
 categorical feature as a group. (Only for categorical data, see Details).
 Default is \code{TRUE}.}
 
 \item{codingtype}{Coding types for categorical features; default is \code{"DV"}.
-\code{Codingtype = "all"} Convert each level to a 0-1 vector.
-\code{Codingtype = "DV"} conducts deviation coding for each level in
+\code{codingtype = "all"} convert each level to a 0-1 vector.
+\code{codingtype = "DV"} conducts deviation coding for each level in
 comparison with the grand mean.
-\code{Codingtype = "standard"} conducts standard dummy coding for each level
+\code{codingtype = "standard"} conducts standard dummy coding for each level
 in comparison with the reference level (first level).}
 
 \item{coef_initial}{A \eqn{p}-dimensional vector for the initial coefficient 
@@ -87,7 +98,7 @@ closest to \eqn{n-1}.}
 
 \item{tol}{A tolerance level to stop the iterations, when the squared sum of
 differences between two successive coefficient updates is below it.
-Default is \eqn{10^{-2}}.}
+Default is \eqn{10^{-3}}.}
 
 \item{selection}{A logical flag to indicate whether an elaborate selection
 is to be conducted by \code{\link{smle_select}()} after screening.
@@ -98,25 +109,24 @@ is to be conducted by \code{\link{smle_select}()} after screening.
 performing feature screening. The resulting coefficients are
 always returned on the original scale. 
 If features are in the same units already, you might not wish to
-standardize. Default is \code{standardize=TRUE}.}
+standardize. Default is \code{standardize = TRUE}.}
 
 \item{fast}{Set to \code{TRUE} to enable early stop for SMLE-screening. It may help
 to boost the screening efficiency with a little sacrifice of accuracy.
 Default is \code{FALSE}, see Details.}
+
+\item{U}{A numerical multiplier of initial tuning step parameter in 
+IHT algorithm. Default is 1. For binomial model, a larger initial value is recommended; a
+smaller one is recommended for poisson model.}
 
 \item{U_rate}{Decreasing rate in tuning step parameter \eqn{1/u} in IHT
 algorithm. See Details.}
 
 \item{penalize_mod}{A logical flag to indicate whether adjustment is used in
 ranking groups of features. This argument is applicable only when
-\code{categorical= TRUE} with \code{group=TRUE}. When \code{penalize_mod=TRUE}, 
+\code{categorical = TRUE} with \code{group = TRUE}. When \code{penalize_mod = TRUE}, 
 a factor of \eqn{\sqrt J} is divided from the \eqn{L_2} effect of a group with \eqn{J} members. 
 Default is \code{TRUE}.}
-
-
-\item{...}{Additional arguments to be passed to \code{\link{smle_select}()} if \code{selection=TRUE}. 
-See \code{\link{smle_select}()} documentation for more details.}
-
 }
 \value{
 \item{call}{The call that produced this object.}
@@ -126,7 +136,7 @@ The output includes both features retained by \code{\link{SMLE}()} and the featu
 
 \item{coef_retained}{The vector of coefficients estimated by IHT for the retained features. When the 
 retained set contains a categorical feature, the value returns a group effect if
-\code{group=TRUE}, or returns the strongest dummy covariate effect if \code{group=FALSE}.}
+\code{group = TRUE}, or returns the strongest dummy covariate effect if \code{group = FALSE}.}
 
 \item{path_retained}{IHT iteration path with columns recording the coefficient updates.}
 
@@ -180,9 +190,12 @@ With the input \eqn{Y} and \eqn{X}, \code{\link{SMLE}()} conducts joint feature 
 iterative hard thresholding algorithm (IHT), where the default initial value is set to
 be the Lasso estimate with the sparsity closest to the sample size minus one.
 
-In \code{\link{SMLE}()}, the initial value for parameter \eqn{1/u} is set to be
-\eqn{1/||X||^2_{\infty}} and recursively decrease the value of 
-\eqn{1/u} by \code{U_rate} to guarantee the likelihood increment.This strategy is called \eqn{u}-search.
+In \code{\link{SMLE}()}, the initial value for step size parameter \eqn{1/u} is 
+determined as follows. When \code{coef_initial = 0}, we set \eqn{1/u = U / \sqrt{p}}.
+When \code{coef_initial != 0}, we generate a sub-matrix \eqn{X_0} using the columns of \eqn{X} 
+corresponding to the non-zero positions of \code{coef_initial} and set
+\eqn{1/u = U/\sqrt{p}||X||^2_{\infty}} and recursively decrease the value of step size by 
+\code{U_rate} to guarantee the likelihood increment. This strategy is called \eqn{u}-search.
 
 \code{\link{SMLE}()} terminates IHT iterations when either \code{tol} or \code{max_iter} is
 satisfied. When \code{fast = TRUE}, the algorithm also stops when the non-zero
@@ -195,13 +208,13 @@ In \code{\link{SMLE}()}, categorical features are coded by dummy covariates with
 method specified in \code{codingtype}. Users can use \code{group} to specify
 whether to treat those dummy covariates as a single group feature or as
 individual features.
-When \code{group=TRUE} with \code{penalize_mod = TRUE}, the effect for a group
+When \code{group = TRUE} with \code{penalize_mod = TRUE}, the effect for a group
 of \eqn{J} dummy covariates is computed by
 
 \deqn{ \beta_i = \sqrt{(\beta_1)^2+...+(\beta_J)^2}/\sqrt J,}
 
 which will be treated as a single feature in IHT iterations. When \code{group = FALSE}, 
-a group of \eqn{J} dummy covariates will be treated as \eqn{J} individual features in the IHT iterations;  in this case, 
+a group of \eqn{J} dummy covariates will be treated as \eqn{J} individual features in the IHT iterations; in this case, 
 a categorical feature is retained after screening when at least one of the corresponding dummy covariates is retained.
 
 Since feature screening is usually a preprocessing step, users may wish to
@@ -213,8 +226,8 @@ selection method on the output of \code{\link{SMLE}()}.
 
 # Example 1:
 set.seed(1)
-Data <- Gen_Data(n= 200, p = 5000, family = "gaussian", correlation = "ID")
-fit <- SMLE(Y = Data$Y, X = Data$X, k = 9, family = "gaussian")
+Data <- Gen_Data( n= 200, p = 5000, family = "gaussian", correlation = "ID")
+fit <- SMLE( Y = Data$Y , X = Data$X, k = 9,family = "gaussian")
 summary(fit)
 Data$subset_true \%in\% fit$ID_retained # Sure screening check.
 plot(fit)
@@ -245,8 +258,8 @@ fit
 }
 \references{
 UCLA Statistical Consulting Group. \emph{coding systems for categorical
-variables in regression analysis}. \url{https://stats.idre.ucla.edu/spss
-/faq/coding-systems-for-categorical-variables-in-regression-analysis-2/}.
+variables in regression analysis}. \url{https://stats.oarc.ucla.edu/r/library
+/r-library-contrast-coding-systems-for-categorical-variables/}.
 Retrieved May 28, 2020.
 
 Xu, C. and Chen, J. (2014). The Sparse MLE for Ultrahigh-Dimensional Feature

@@ -23,16 +23,35 @@
 plot.selection<-function(x,...){
   oldpar <- par(no.readonly = TRUE)
   on.exit(par(oldpar))
-  plot(x$criterion_value,xlab="Model sparsity", ylab= paste(x$criterion,"value"), cex.axis = 1.5, cex.lab = 1.5,...)
-  if(x$vote ==TRUE){
-    dev.new()
+  
+  plt1<-function(){
+    
+    invisible(plot( x= seq(from =x$k_min, to =x$k_max),y = x$criterion_value,xlab="number of features in model", ylab= paste(x$criterion,"value"),...))
+    
+  }
+  
+  plt2<-function(){
+    
     y<-data.frame("Proportion"= sort(summary(x$ID_pool),decreasing = T)/length(x$gamma_seq))
     ID_names<- x$subset[as.numeric(names(summary(x$ID_pool)[order(summary(x$ID_pool),decreasing= T)]))]
     if(!is.null(x$data)){
       ID_names <- colnames(x$X)[ID_names]
     }
-    barplot(y$Proportion,names.arg =ID_names ,
-            xlab = "Candidate Features IDs",ylab="Features Voting Proportion",main="Voting results", 
-            cex.axis = 1.5, cex.lab = 1.5)
+    invisible(barplot(y$Proportion,names.arg =ID_names ,
+            xlab = "candidate features IDs",ylab="features voting proportion",main="voting results", 
+            ...))
   }
+  
+
+  if(x$vote ==TRUE){
+    plt1()
+    plt2()
+  }else{
+
+    plt1()
+    
+  }
+  
+  
+ 
 }

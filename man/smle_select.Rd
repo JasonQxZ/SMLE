@@ -7,6 +7,8 @@
 \alias{smle_select.smle}
 \title{Elaborative post-screening selection with SMLE}
 \usage{
+smle_select(object, ...)
+
 \method{smle_select}{sdata}(
   object,
   k_min = 1,
@@ -14,22 +16,32 @@
   subset = NULL,
   gamma_ebic = 0.5,
   vote = FALSE,
+  keyset = NULL,
   criterion = "ebic",
-  codingtype = NULL,
+  codingtype = c("DV", "standard", "all"),
   gamma_seq = c(seq(0, 1, 0.2)),
-  vote_threshold = NULL,
+  vote_threshold = 0.6,
   parallel = FALSE,
   num_clusters = NULL,
   ...
 )
 
-\method{smle_select}{default}(object = NULL, Y = NULL, X = NULL, family = "gaussian", ...)
+\method{smle_select}{default}(
+  object = NULL,
+  Y = NULL,
+  X = NULL,
+  family = "gaussian",
+  keyset = NULL,
+  ...
+)
 
 \method{smle_select}{smle}(object, ...)
 }
 \arguments{
 \item{object}{Object of class \code{'smle'} or \code{'sdata'}. Users can also
 input a response vector and a feature matrix.}
+
+\item{...}{Further arguments passed to or from other methods.}
 
 \item{k_min}{The lower bound of candidate model sparsity. Default is 1.}
 
@@ -42,13 +54,16 @@ object is the input.}
 
 \item{gamma_ebic}{The EBIC tuning parameter, in \eqn{[0 , 1]}. Default is 0.5.}
 
-\item{vote}{The logical flag for whether to perform the voting procedure. Only available when \code{criterion ="ebic"}.}
+\item{vote}{The logical flag for whether to perform the voting procedure. Only available when \code{criterion = "ebic"}.}
+
+\item{keyset}{A numeric vector with column indices for the key features that 
+do not participate in feature screening and are forced to remain in the model. See SMLE for details.}
 
 \item{criterion}{Selection criterion. One of "\code{ebic}","\code{bic}","\code{aic}". Default is "\code{ebic}".}
 
 \item{codingtype}{Coding types for categorical features; for more details see \code{\link{SMLE}()} documentation.}
 
-\item{gamma_seq}{The sequence of values for \code{gamma_ebic} when \code{vote =TRUE}.}
+\item{gamma_seq}{The sequence of values for \code{gamma_ebic} when \code{vote = TRUE}.}
 
 \item{vote_threshold}{A relative voting threshold in percentage. A feature is
 considered to be important when it receives votes passing the threshold. Default is 0.6.}
@@ -67,9 +82,6 @@ Default is \code{FALSE}. See Details.}
 
 When input is a \code{'smle'} or \code{'sdata'} object, the same
 model will be used in the selection.}
-
-\item{...}{Further arguments passed to or from other methods.}
-
 }
 \value{
 \item{call}{The call that produced this object.}

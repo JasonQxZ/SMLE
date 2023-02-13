@@ -18,8 +18,8 @@
 }
 \value{
 Fitted coefficients based on the screened or selected model specified in the object. 
-If \code{refit=TRUE}, the coefficients are estimated by re-fitting the final 
-screened/selected model with \code{\link{glm}()}. If \code{refit=FALSE} the coefficients estimated by the IHT algorithm are returned.
+If \code{refit = TRUE}, the coefficients are estimated by re-fitting the final 
+screened/selected model with \code{\link{glm}()}. If \code{refit = FALSE} the coefficients estimated by the IHT algorithm are returned.
 }
 \description{
 Extract coefficients from fitted model for either a \code{'smle'} or \code{'selection'} object.

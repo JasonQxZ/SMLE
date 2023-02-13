@@ -11,11 +11,15 @@
 #' @details
 #'
 #' Simulated data \eqn{(y_i , x_i)} where \eqn{ x_i = (x_{i1},x_{i2} , . . . , x_{ip})} are generated as follows:
-#' First, we generate a \eqn{p} by \eqn{1} model coefficient vector beta with all entries being zero, except for the positions specified in \code{pos_truecoef},
-#' on which \code{effect_truecoef} is used. When \code{pos_truecoef} is not specified, we randomly choose \code{num_truecoef} positions from the coefficient
-#' vector. When \code{effect_truecoef} is not specified, we randomly set the strength of the true model coefficients as follow:
+#' First, we generate a \eqn{p} by \eqn{1} model coefficient vector beta with all 
+#' entries being zero, except for the positions specified in \code{pos_truecoef},
+#' on which \code{effect_truecoef} is used. When \code{pos_truecoef} is not specified, 
+#' we randomly choose \code{num_truecoef} positions from the coefficient
+#' vector. When \code{effect_truecoef} is not specified, we randomly set the strength 
+#' of the true model coefficients as follow:
 #' \deqn{(0.5+U) Z,}
-#' where \eqn{U} is sampled from a uniform distribution from 0 to 1,  and \eqn{Z} is sampled from a binomial distribution \eqn{P(Z=1)=1/2,P(Z=-1)=1/2}.
+#' where \eqn{U} is sampled from a uniform distribution from 0 to 1,  
+#' and \eqn{Z} is sampled from a binomial distribution \eqn{P(Z=1)=1/2,P(Z=-1)=1/2}.
 #'
 #' Next, we generate a \eqn{n} by \eqn{p} feature matrix \eqn{X} according to the model selected with
 #' \code{correlation} and specified as follows.
@@ -27,7 +31,8 @@
 #'
 #' \eqn{cov(x_j, x_{j-1}) = \rho}, \eqn{cov(x_j, x_{j-2}) = \rho/2} and \eqn{cov(x_j, x_h) = 0} for \eqn{|j-h|>3}.
 #'
-#' Compound symmetry (CS): candidate features \eqn{x_1,..., x_p} are joint normal, marginally \eqn{N( 0, 1)}, with \eqn{cov(x_j, x_h) =\rho/2} if \eqn{j}, \eqn{h}
+#' Compound symmetry (CS): candidate features \eqn{x_1,..., x_p} are joint normal,
+#'  marginally \eqn{N( 0, 1)}, with \eqn{cov(x_j, x_h) =\rho/2} if \eqn{j}, \eqn{h}
 #' are both in the set of important features and \eqn{cov(x_j, x_h)=\rho} when only
 #' one of \eqn{j} or \eqn{h} are in the set of important features.
 #' 
@@ -52,11 +57,13 @@
 #'
 #' @param level_ctgidx  Vector to indicate the number of levels for the categorical features in \code{pos_ctgidx}. Default is 2.
 #'
-#' @param effect_truecoef  Effect size corresponding to the features in \code{pos_truecoef}. If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled.  See Details.
+#' @param effect_truecoef  Effect size corresponding to the features in \code{pos_truecoef}. 
+#' If not specified, effect size is sampled based on a uniform distribution and direction is randomly sampled. See Details.
 #'
 #' @param pos_ctgidx Vector of indices denoting which columns are categorical.
 #'
-#' @param pos_truecoef Vector of indices denoting which features (columns) affect the response variable. If not specified, positions are randomly sampled. See Details for more information.
+#' @param pos_truecoef Vector of indices denoting which features (columns) affect the response variable. 
+#' If not specified, positions are randomly sampled. See Details for more information.
 #'
 #' @param family Model type for the response variable.
 #' \code{"gaussian"} for normally distributed data, \code{poisson} for non-negative counts,
@@ -64,7 +71,7 @@
 #'
 #' @param correlation Correlation structure among features. \code{correlation = "ID"} for independent,
 #' \code{correlation = 'MA'} for moving average, \code{correlation = "CS"} for compound symmetry, \code{correlation = "AR"} 
-#' for auto regressive Default is \code{"ID"}. For more information see Details.
+#' for auto regressive. Default is \code{"ID"}. For more information see Details.
 #'
 #' @param rho Parameter controlling the correlation strength, default is \code{0.2}. See Details.
 #'
@@ -84,7 +91,7 @@
 #' \item{call}{The call that produced this object.}
 #' \item{Y}{Response variable vector of length \eqn{n}.}
 #'
-#' \item{X}{Feature matrix or dataframe (matrix if \code{num_ctgidx =FALSE} and dataframe otherwise).}
+#' \item{X}{Feature matrix or data.frame (matrix if \code{num_ctgidx =FALSE} and data.frame otherwise).}
 #'
 #' \item{subset_true}{Vector of column indices of X for the features that affect the response variables (relevant features).}
 #'
@@ -114,315 +121,318 @@ Gen_Data<-function(n = 200,p = 1000,sigma = 1,
                    level_ctgidx = NULL,  effect_truecoef= NULL,
                    correlation = c("ID","AR","MA","CS"),
                    rho = 0.2, family = c("gaussian","binomial","poisson")){
-
-
-
-  ##-----------------------------------------------------Argument Check and Initialize Parameters--------------------------------------------------------
+  
+  
+  
+  ##--------------Argument Check and Initialize Parameters----------
+  
   correlation=match.arg(correlation)
+  
   if(is.null(correlation)){correlation <- 'ID'}
+  
   family=match.arg(family)
+  
   cl<-match.call()
+  
   cl[[1]] <- as.name("Gen_Data")
   
   #Argument check for coefficients
+  
+  if (n < 0 || p < 0 || n%%1!=0 || p%%1!=0){
+    
+    stop("Both n and p must be positive integers")
+    
+  }
+  
+  
+  
   if (is.null(num_truecoef) ) {
-
+    
     if (is.null(pos_truecoef) ) {
-
-      ## No value for num_,pos_ truecoef, num_truecoef =5 for default and pos is randomly sampled from 1:p
-
-      num_truecoef<-5; pos_truecoef <- sample(1:p , size = num_truecoef , replace = F)
-
-      }else{
-
-      num_truecoef = length(pos_truecoef)
-
-      }
-  }else{
-
-    if (!(class(num_truecoef) %in% c("numeric",'integer'))| length(num_truecoef) != 1 | num_truecoef%%1 != 0 | num_truecoef < 0){
-
-      stop("The number of features affect the response variable should be an postive integer.")
-
-      }
-    if (is.null(pos_truecoef)) {
-
-      # Randomly sample from 1:p.
-
-      pos_truecoef <- sample(1:p , size = num_truecoef , replace = F)
-
-      }else{
-
-        if (!(class(pos_truecoef) %in% c("numeric",'integer'))  | any(pos_truecoef%%1 != 0) |  any(pos_truecoef <= 0) ){
-
-          stop("Position for features affects the response variable should be a list of postive integer.")
-        }
-        if ( length(pos_truecoef) != num_truecoef ) {
-
-          stop("Coeffiention length does not match")
-
-        }
-        if ( length( pos_truecoef ) != length( unique( pos_truecoef ) ) ) {
-
-          pos_truecoef <- unique( pos_truecoef )
-
-          warning("Position for features affects the response variable should be unique.")
-
-        }
-      }
-  }
-
-
-  #effects
-
-  if ( is.null(effect_truecoef )){
-
-      #effect_truecoef <- runif( num_truecoef , min = -1 , max = 1 )
-
-      effect_truecoef <- (0.5+abs(rnorm(num_truecoef))) * sample(c(1,-1),num_truecoef,replace = T)
-
-  }else{
-
-    if (length(effect_truecoef) != num_truecoef){
-
-      stop("Effects should match number of non-zero features.")
-
-    }
-
-  }
-
-  ##------------------------------------------Create Data-----------------------------------------------
-
-  #Numerical data
-
-  D<-Numeric_Gen(n, p, pos_truecoef, effect_truecoef, correlation, rho, family, sigma,cl )
-
-  # Numerical data and Categorical parameter check
-
-
-  if ( is.null(num_ctgidx) ) {
-
-    if ( is.null(pos_ctgidx) ){
-
-      # Numerical data as default
-
-      num_ctgidx<- 0
-
-      return(  D  )
-
-      }else{
-
-        num_ctgidx <- length( pos_ctgidx )
-
-      }
-
-  }else{
-    if ( num_ctgidx== 0 ) { return( D ) }
-
-    if (!(class(num_ctgidx) %in% c("numeric",'integer'))| length(num_ctgidx) != 1 | num_ctgidx %%1 != 0 | num_ctgidx < 0){
-
-      stop("The number of categorical features should be an postive integer.")
-    }
-
-    if( is.null(pos_ctgidx)  ){
-
-    pos_ctgidx <- sample( 1:p, num_ctgidx, replace = FALSE )
-
+      
+      ## If no input value for number and position of coefficient, 5 is assigned as numbers and position is randomly sampled from 1:p.
+      
+      num_truecoef <- 5
+      
+      pos_truecoef <- sample(1:p , size = num_truecoef , replace = FALSE)
+      
     }else{
-
-      if ( !(class(pos_ctgidx) %in% c("numeric",'integer')) | any(pos_ctgidx%%1 != 0) |  any(pos_ctgidx <= 0) ){
-
-        stop("Position for categorical features should be a list of postive integer.")
+      
+      num_truecoef = length(pos_truecoef)
+      
+    }
+  }else{
+    
+    if (!(class(num_truecoef) %in% c('numeric','integer'))| length(num_truecoef) != 1 | num_truecoef%%1 != 0 | num_truecoef < 0){
+      
+      #  Catch the error of negative non-integer input.
+      
+      stop("The number of features affecting the response variable should be a positive integer.")
+      
+    }
+    if (is.null(pos_truecoef)) {
+      
+      # Randomly sample from 1:p.
+      
+      pos_truecoef <- sample(1:p , size = num_truecoef , replace = F)
+      
+    }else{
+      
+      if (!(class(pos_truecoef) %in% c('numeric','integer'))  | any(pos_truecoef%%1 != 0) |  any(pos_truecoef <= 0) ){
+        
+        stop("Position of features affecting the response variable should be a list of positive integers.")
+      }
+      
+      if ( length( pos_truecoef ) != length( unique( pos_truecoef ) ) ) {
+        
+        # Duplicated elements will be ignored. 
+        
+        pos_truecoef <- unique( pos_truecoef )
+        
+        warning("Position of features affecting the response variable should be unique.")
+        
+      }
+      if ( length(pos_truecoef) != num_truecoef ) {
+        
+        stop("Value of 'num_truecoef' must match the length of 'pos_truecoef'.")
+        
+      }
+    }
+  }
+  
+  
+  # Initial effects check
+  
+  if ( is.null(effect_truecoef )){
+    
+    # A good sample setting for SMLE screening.
+    
+    effect_truecoef <- ( 0.5 + abs( rnorm( num_truecoef ))) * sample( c(1,-1),
+                                                    num_truecoef , replace = TRUE)
+    
+  }else{
+    
+    if (length(effect_truecoef) != num_truecoef){
+      
+      stop("Length of 'effect_truecoef' does not match the specified number of causal features ('num_truecoef').")
+      
+    }
+    
+  }
+  
+  # Numerical data and Categorical parameter check
+  
+  output_ctg = TRUE
+  
+  if ( is.null(num_ctgidx) ) {
+    
+    if ( is.null(pos_ctgidx) ){
+      
+      # Output numerical data if nothing specified. 
+      
+      num_ctgidx <- 0
+      
+      output_ctg <- FALSE
+      
+    }else{
+      
+      num_ctgidx <- length( pos_ctgidx )
+      
+    }
+    
+  }else{
+    
+    if ( !num_ctgidx ) {
+      
+      output_ctg <- FALSE
+      
+    }
+    
+    if (!(class(num_ctgidx) %in% c('numeric','integer'))| length(num_ctgidx) != 1 | num_ctgidx %%1 != 0 | num_ctgidx < 0){
+      
+      stop("The number of categorical features must be a positive integer.")
+    }
+    
+    if( is.null(pos_ctgidx)  ){
+      
+      pos_ctgidx <- sample( 1:p, num_ctgidx, replace = FALSE )
+      
+    }else{
+      
+      if ( !(class(pos_ctgidx) %in% c('numeric','integer')) | any(pos_ctgidx%%1 != 0) |  any(pos_ctgidx <= 0) ){
+        
+        stop("The vector 'pos_ctgidx' must be a list of positive integers.")
+      }
+      
+      if ( length( pos_ctgidx ) != length( unique( pos_ctgidx ) ) ) {
+        
+        pos_ctgidx <- unique( pos_ctgidx )
+        
+        warning("Positions provided for the categorcial features should be unique.")
+        
       }
       if ( length(pos_ctgidx) != num_ctgidx ) {
-
-        stop("Position length does not match the number of categorical features")
-
+        
+        stop("The length of 'pos_ctgidx' does not match the specified number of categorical features (num_ctgidx).")
+        
       }
-      if ( length( pos_ctgidx ) != length( unique( pos_ctgidx ) ) ) {
-
-        pos_ctgidx <- unique( pos_ctgidx )
-
-        warning("Position for categorcial features should be unique.")
-
-      }
-      }
-
     }
-
-
-    #level of categorical data
-
-    if ( is.null(level_ctgidx )){
-
-      level_ctgidx <- 2
-
-    }
-
-
-    if (length( level_ctgidx ) == 1 & all(level_ctgidx >= 0) ){
-
-      # Same level for all categorical data
-
-
-      Z<-lapply(seq(1:p),function(i){if (i %in% pos_ctgidx){
-
-        cut(D$X[,i],breaks = level_ctgidx,labels = LETTERS[1:level_ctgidx])
-
-      }else{D$X[,i]}
-
-
-        }
-        )
-
-    }else if( length( level_ctgidx ) == length( pos_ctgidx )){
-
-
-      Z<-lapply(seq(1:p),function(i){if (i %in% pos_ctgidx){
-
-        j<-match(i,pos_ctgidx); cut(D$X[,i],breaks = level_ctgidx[j],labels = LETTERS[1:level_ctgidx[j]])
-
-        }else{D$X[,i]}
-        }
-        )
-
-    }else{
-
-       stop("level of categorical features does not match position of categorical feature" )
-
-    }
-
-    cn<-unlist(lapply(seq(1:p),function(i){if (i %in% pos_ctgidx){paste0("C",i)}else(paste0("N",i))}))
-
-    Z<-as.data.frame(Z,stringsAsFactors = FALSE)
-
-    colnames(Z)<-cn
+  }
+  
+  
+  #Default level of categorical data
+  
+  if ( is.null(level_ctgidx )){
     
-    correlation=switch(correlation,
-                       
-                       'ID'='independent',
-                       
-                       'MA'='moving average',
-                       
-                       "AR"="auto regressive",
-                       
-                       'CS'='compound symmetry')
-
-    D<-list(call = cl, Y = D$Y,X = Z , subset_true = sort(pos_truecoef), coef_true= effect_truecoef,
-
-            family = family, categorical = TRUE, correlation = correlation, rho = rho, CI= sort(pos_ctgidx))
-
-    class(D) <- "sdata"
-
-    return(D)
-
+    level_ctgidx <- 2
   }
-
-
-  Gen_DesignMatrix<-function(correalation=c('ID','AR','MA','CS'),
-                             N,P,pos_truecoef,rho){
-
-    correalation<-match.arg(correalation)
-
-    if (N < 0 || P < 0 || N%%1!=0 || P%%1!=0){
-
-      stop("N,P should be postive integers")
-
+  
+  ##------------------------------------------Create Data-----------------------------------------------
+  
+  #Numerical data
+  
+  D<-Numeric_Gen(n, p, pos_truecoef, effect_truecoef, correlation, rho, family, sigma,cl )
+  
+  correlation = switch(correlation,
+                     
+                     'ID' = 'independent',
+                     
+                     'MA' = 'moving average',
+                     
+                     'AR' = 'auto regressive',
+                     
+                     'CS' = 'compound symmetry')
+  
+  if( output_ctg ){
+    
+    if (length( level_ctgidx ) == 1 ){
+      
+      # Same level for all categorical data
+      
+      level_ctgidx <- rep(level_ctgidx, times = length( pos_ctgidx ) )
+      
     }
-
-    if(correalation=='ID'){
-
-      return(matrix(rnorm(N*P), nrow=N, ncol=P))
-
-    }else if(correalation=='MA'){
-
-      Z<-matrix(rnorm(N*(P+2)), nrow=N, ncol=P+2)
-
-      return(sapply(seq(1:P),function(i){
-
-        sqrt(1-rho)*Z[,i]+sqrt(rho/2)*Z[,i+1]+sqrt(rho/2)*Z[,i+2]
-
-      }))
-
-    }else if( correalation=='AR'){
-
-      ar1_cor <- function(P, rho) {
-
-        exponent <- abs(matrix(1:P - 1, nrow = P, ncol = P, byrow = TRUE) - (1:P - 1))
-
-        rho^exponent
-
+    
+    if(length( level_ctgidx ) != length( pos_ctgidx )){
+      
+      stop("The length of the vector 'level_ctgidx' should be the same as the length of the vector 'pos_ctgidx'.")
+    
       }
+      
+    Z <- data.frame(D$X)
+      
+    for(i in 1:length(pos_ctgidx)){
+        
+        Z[,pos_ctgidx[i]] <- cut(D$X[,pos_ctgidx[i]],breaks = level_ctgidx[i],labels = LETTERS[1:level_ctgidx[i]])
+        
+      }
+      
+    colnames(Z)[pos_ctgidx] <- paste0('C',pos_ctgidx)
 
-      return(mvnfast::rmvn(n = N, mu = rep(0,P), ar1_cor(P,rho)))
-
-    }else{
-
-      CC<-matrix(rho, ncol=P, nrow=P)
-
-      CC[pos_truecoef, pos_truecoef]<- rho/2
-
-      diag(x=CC)<-1
-      if(!is.positive.definite(CC)){ stop("The Given Correlation matrix is not positive difinite") }
-      return(mvnfast::rmvn(n = N, mu = rep(0,P), CC))
-
-    }
-
+    # Set name
+    
+    Data_out <- list(call = cl, Y = D$Y , X = Z , subset_true = sort(pos_truecoef),
+                     
+                     coef_true = effect_truecoef , family = family, categorical = TRUE , 
+                     
+                     correlation = correlation , rho = rho , CI = sort(pos_ctgidx))
+    
+  }else{ 
+    
+    Data_out <- D 
+    
+    Data_out$correlation = correlation
   }
+  
+  class(Data_out) <- 'sdata'
+  
+  return(Data_out)
+  
+}
 
 
-  Numeric_Gen<-function(n , p , pos_truecoef , effect_truecoef, correlation, rho, family, sigma, cl ){
-
-    numeric_data<-Gen_DesignMatrix(correlation,n,p,pos_truecoef=pos_truecoef,rho)
-
-    BETA<-matrix(0, nrow=p, ncol=1)
-
-    BETA[pos_truecoef, 1] <- effect_truecoef
-
-    theta<-tcrossprod(as.matrix(numeric_data),t(BETA))
-
-    if(family=="gaussian"){
-
-      Y<- theta + rnorm(n, mean = 0, sd = sigma)
-
-    }else if(family=="binomial"){
-
-      pi <- exp(theta) / (1 + exp(theta))
-
-      Y  <- rbinom(n, size = 1, prob = pi)
-
-    }else{
-
-      mmu <- exp(theta)
-
-      Y  <- rpois(n, lambda = mmu)
-
+Gen_DesignMatrix<-function(correlation=c('ID','AR','MA','CS'),
+                           N,P,pos_truecoef,rho){
+  
+  correlation<-match.arg(correlation)
+  
+  #In all cases, a matrix consisting of the numeric features is returned.
+  if(correlation=='ID'){
+    
+    return(matrix(rnorm(N*P), nrow=N, ncol=P))
+    
+  }else if(correlation=='MA'){
+    
+    Z<-matrix(rnorm(N*(P+2)), nrow=N, ncol=P+2)
+    
+    return(sapply(seq(1:P),function(i){
+      
+      sqrt(1-rho)*Z[,i]+sqrt(rho/2)*Z[,i+1]+sqrt(rho/2)*Z[,i+2]
+      
+    }))
+    
+  }else if( correlation=='AR'){
+    
+    ar1_cor <- function(P, rho) {
+      
+      exponent <- abs(matrix(1:P - 1, nrow = P, ncol = P, byrow = TRUE) - (1:P - 1))
+      
+      rho^exponent
+      
     }
-    correlation=switch(correlation,
-
-                       'ID'='independent',
-
-                       'MA'='moving average',
-
-                       "AR"="auto regressive",
-
-                       'CS'='compound symmetry')
-
-    D<-list(call = cl, Y = Y,X = numeric_data , subset_true = sort(pos_truecoef), coef_true= effect_truecoef[order(pos_truecoef)],
-            family = family, categorical = FALSE, correlation = correlation,rho=rho,CI = NULL)
-
-    class(D)<-"sdata"
-
-    return(D)
-
+    
+    return(mvnfast::rmvn(n = N, mu = rep(0,P), ar1_cor(P,rho)))
+    
+  }else{
+    
+    CC<-matrix(rho, ncol=P, nrow=P)
+    
+    CC[pos_truecoef, pos_truecoef]<- rho/2
+    
+    diag(x=CC)<-1
+    
+    if(!is.positive.definite(CC)){ stop("The given correlation matrix is not 
+        positive difinite. Please try a different rho to get a valid matrix.") }
+    
+    return(mvnfast::rmvn(n = N, mu = rep(0,P), CC))
+    
   }
+  
+}
 
 
-
-
-
-
-
-
-
-
+Numeric_Gen<-function(n , p , pos_truecoef , effect_truecoef, correlation, 
+                      rho, family, sigma, cl ){
+  
+  numeric_data<-Gen_DesignMatrix(correlation,n,p,pos_truecoef=pos_truecoef,rho)
+  
+  Beta <- rep(0,p)
+  
+  Beta[pos_truecoef] <- effect_truecoef
+  
+  theta <- numeric_data %*% Beta
+  
+  if(family=='gaussian'){
+    
+    Y<-  rnorm(n, mean = theta, sd = sigma)
+    
+  }else if(family=='binomial'){
+    
+    pi <- exp(theta) / (1 + exp(theta))
+    
+    Y  <- rbinom(n, size = 1, prob = pi)
+    
+  }else{
+    
+    mmu <- exp(theta)
+    
+    Y  <- rpois(n, lambda = mmu)
+    
+  }
+  
+  return(list(call = cl, Y = Y,X = numeric_data , subset_true = sort(pos_truecoef), 
+              coef_true= effect_truecoef[order(pos_truecoef)],
+              family = family, categorical = FALSE, correlation = correlation,
+              rho=rho))
+  
+}

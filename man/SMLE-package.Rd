@@ -12,8 +12,8 @@ out most irrelevant features in preparation for a more elaborate analysis. This 
 \tabular{ll}{
 Package: \tab smle\cr
 Type: \tab Package\cr
-Version: \tab 2.0-2\cr
-Date: \tab 2021-09-24\cr
+Version: \tab 2.1-0\cr
+Date: \tab 2023-01-04\cr
 License: \tab GPL-3\cr
 }
 Input a \eqn{n \times 1} response vector Y and a \eqn{n \times p} predictor (feature) matrix X. The package outputs a set of \eqn{k < n} features that seem to be most relevant for joint regression. Moreover, the package provides a data simulator that generates synthetic datasets from high-dimensional GLMs, which accommodate both numerical and categorical features with commonly used correlation structures. \cr

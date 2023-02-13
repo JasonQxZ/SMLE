@@ -24,23 +24,13 @@ summary.smle <- function(object, ...){
   
   lg<-logLik(object)
   
-  family<-switch(object$family, "gaussian" = gaussian(),  "binomial" = binomial(), "poisson"=  poisson())
-  
-  ans=list()
-  ans$family = object$family
-  ans$steps = object$steps
-  ans$loglikelihood = lg
-  ans$DimY= length(object$Y)
-  ans$DimX= dim(object$X)
-  ans$size = object$num_retained
-  ans$ID_retained  =object$ID_retained
-  ans$coef_retained = object$coef_retained
-  ans$X = object$X
-  ans$data = object$data
-  ans$iteration_data = object$iteration_data
+  ans=list( family = object$family, steps = object$steps , loglikelihood = lg,
+            DimY= length(object$Y), DimX= dim(object$X) , size = object$num_retained,
+            ID_retained  =object$ID_retained, coef_retained = object$coef_retained,
+            X = object$X , data = object$data , iteration_data = object$iteration_data)
   
   if( !is.null(object$intercept) ){
-    ans$intercept= object$intercept
+     ans$intercept= object$intercept
     
   }else{ans$intercept =NULL}
   
@@ -66,24 +56,13 @@ summary.selection <- function(object, ...){
   
   lg<-logLik(object)
   
-  family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
-  ans=list()
-  ans$family = object$family
-  ans$steps = object$steps
-  ans$loglikelihood = lg
-  ans$DimY= length(object$Y)
-  ans$DimX= dim(object$X)
-  ans$size = object$num_selected
-  ans$coef = object$coef_selected
-  ans$vote = object$vote
-  ans$ID_voted = object$ID_voted
-  ans$criterion = object$criterion
-  ans$ID_selected  =object$ID_selected
-  ans$coef_selected = object$coef_selected
-  ans$gamma_ebic = object$gamma_ebic 
-  ans$X = object$X
-  ans$data = object$data
-  
+  ans=list( family = object$family, steps = object$steps , loglikelihood = lg,
+            DimY= length(object$Y), DimX= dim(object$X) , size = object$num_selected,
+            ID_selected  =object$ID_selected , coef_selected = object$coef_selected,
+            vote = object$vote ,  ID_voted = object$ID_voted , criterion = object$criterion,
+            criterion = object$criterion , gamma_ebic = object$gamma_ebic, 
+            X = object$X , data = object$data , iteration_data = object$iteration_data)
+
   if( !is.null(object$intercept) ){
     ans$intercept= object$intercept
     

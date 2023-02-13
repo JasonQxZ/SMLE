@@ -23,13 +23,8 @@
 
 
 print.smle<-function(x,...){
+  
   catln <- function (...)  base::cat(..., "\n", sep = "")
-  print <- function (..., skip = 0, indent = 0){
-    output <- capture.output(base::print(...))
-    if (skip > 0) output <- output[-seq_len(skip)]
-    indent <- paste0(rep(" ", indent), collapse = "")
-    cat(paste0(indent, output, "\n"), sep = "")
-  }
   
   ## call
   catln("Call:")
@@ -55,12 +50,6 @@ print.smle<-function(x,...){
 #' @rdname print
 print.selection<-function(x,...){
   catln <- function (...)  base::cat(..., "\n", sep = "")
-  print <- function (..., skip = 0, indent = 0) {
-    output <- capture.output(base::print(...))
-    if (skip > 0) output <- output[-seq_len(skip)]
-    indent <- paste0(rep(" ", indent), collapse = "")
-    cat(paste0(indent, output, "\n"), sep = "")
-  }
   
   ## call
   catln("Call:")
@@ -75,7 +64,7 @@ print.selection<-function(x,...){
       catln("  Features selected by voting: ",  paste(x$ID_voted, sep = "\n", collapse = ", "))
     }else{
       if( !is.null(colnames(x$X))){ catln("  Feature name: ", paste(colnames(x$X)[x$ID_selected], sep = "", collapse = ", "))}  
-      catln("  Feature index: ", paste(x$ID_selected, sep = "\n", collapse = ", "))}
+      catln("  Selected feature index: ", paste(x$ID_selected, sep = "\n", collapse = ", "))}
     ## done
     return(invisible(x))
     
@@ -86,7 +75,7 @@ print.selection<-function(x,...){
       catln("  Features selected by voting: ",  paste(x$ID_voted, sep = "\n", collapse = ", "))
     }else{
       catln("  Feature name: ", paste(names(x$data)[x$ID_selected], sep = "", collapse = ", "))  
-      catln("  Feature index: ", paste(x$ID_selected, sep = "\n", collapse = ", "))}
+      catln("  Selected feature index: ", paste(x$ID_selected, sep = "\n", collapse = ", "))}
     ## done
     return(invisible(x))
     
@@ -104,12 +93,6 @@ print.selection<-function(x,...){
 print.summary.smle <- function(x, ...){
   
   catln <- function (...)  base::cat(..., "\n", sep = "")
-  print <- function (..., skip = 0, indent = 0){
-    output <- capture.output(base::print(...))
-    if (skip > 0) output <- output[-seq_len(skip)]
-    indent <- paste0(rep(" ", indent), collapse = "")
-    cat(paste0(indent, output, "\n"), sep = "")
-  }
   catln("Call:")
   catln("  ", paste(deparse(x$call), sep = "\n", collapse = "\n"))
   catln(" ")
@@ -119,14 +102,15 @@ print.summary.smle <- function(x, ...){
   cat("\n")
   catln("  Length of response: " , x$DimY)
   catln("  Dim of features: " , paste(x$DimX,collapse = ' x '))
-  catln("  Model type: " , x$family)
-  catln("  Retained model size: ", x$size)
+  catln("  Model type: " , x$family$family)
+  catln("  Model size: ", x$size)
   
   if( !is.null(x$iteration_data$feature_name)){ catln("  Feature name: ", paste(x$iteration_data$feature_name, sep = "", collapse = ", "))}
-  catln("  Retained features: ", paste(x$ID_retained, sep = "\n", collapse = ", "))
+  catln("  Feature index: ", paste(x$ID_retained, sep = "\n", collapse = ", "))
+  if( !is.null(x$intercept)){ catln("  Intercept: ", x$intercept)}
   catln("  Coefficients estimated by IHT: ", paste(format(x$coef_retained, digits = 3,trim = TRUE),collapse = ', '))
   catln("  Number of IHT iteration steps: ",as.character(x$steps))
-
+  
   
   invisible(x)
 }
@@ -137,12 +121,6 @@ print.summary.smle <- function(x, ...){
 print.summary.selection <- function(x, ...){
   
   catln <- function (...)  base::cat(..., "\n", sep = "")
-  print <- function (..., skip = 0, indent = 0){
-    output <- capture.output(base::print(...))
-    if (skip > 0) output <- output[-seq_len(skip)]
-    indent <- paste0(rep(" ", indent), collapse = "")
-    cat(paste0(indent, output, "\n"), sep = "")
-  }
   catln("Call:")
   catln("  ", paste(deparse(x$call), sep = "\n", collapse = "\n"))
   catln(" ")
@@ -152,11 +130,11 @@ print.summary.selection <- function(x, ...){
   catln(" ")
   catln("  Length of response: " , x$DimY)
   catln("  Dim of features: " , paste(x$DimX,collapse = ' x '))
-  catln("  Model type: " , x$family)
+  catln("  Model type: " , x$family$family)
   catln("  Selected model size: ", x$size)
   if( !is.null(x$data)){ catln("  Feature name: ", paste(names(x$data)[x$ID_selected], sep = "", collapse = ", "))
     }else if( !is.null(colnames(x$X))){ catln("  Feature name: ", paste(colnames(x$X)[x$ID_selected], sep = "", collapse = ", "))}
-  catln("  Selected features: ", paste(x$ID_selected, sep = "\n", collapse = ", "))
+  catln("  Selected feature index: ", paste(x$ID_selected, sep = "\n", collapse = ", "))
   catln("  Selection criterion: ", x$criterion)
   if(x$criterion=='ebic'){  catln("  Gamma for ebic: ", as.character(x$gamma_ebic))}
   if(x$vote==TRUE){  catln("  Features selected by voting: ",  paste(x$ID_voted, sep = "\n", collapse = ", "))}
@@ -171,13 +149,7 @@ print.summary.selection <- function(x, ...){
 #' @rdname print
 print.sdata<-function(x,...){
   catln <- function (...)  base::cat(..., "\n", sep = "")
-  print <- function (..., skip = 0, indent = 0) {
-    output <- capture.output(base::print(...))
-    if (skip > 0) output <- output[-seq_len(skip)]
-    indent <- paste0(rep(" ", indent), collapse = "")
-    cat(paste0(indent, output, "\n"), sep = "")
-  }
-  
+
   ## call
   catln("Call:")
   catln(" ", paste(deparse(x$call), sep = "\n", collapse = "\n"))

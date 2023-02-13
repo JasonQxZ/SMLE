@@ -39,9 +39,9 @@
 #' 
 predict.smle<-function(object,newdata = NULL, type = c("link", "response", "terms"), ...){
   
-  family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson" = poisson())
-  
   if(!is.null(object$data)){
+    
+    # When formula is used and feature column names are used instead of indices
     
     model = object$data[,object$ID_retained]
     
@@ -51,15 +51,13 @@ predict.smle<-function(object,newdata = NULL, type = c("link", "response", "term
     
     if(!is.null(newdata)){
       
-      newdata<- newdata[(1:dim(newdata)[2])[names(newdata) %in% object$iteration_data$feature_name]]
+      newdata<- newdata[which(names(newdata) %in% names(object$data[object$ID_retained]))]
       
       }
      
-    fit<-glm(Y~.,data = data ,family = family)
-    
-    return(predict.glm(fit, newdata=newdata ,type = type,...))
-    
   }else{
+    
+    # Set up the data objects to include only the retained features.
     
     model = object$X[,object$ID_retained]
     
@@ -73,86 +71,58 @@ predict.smle<-function(object,newdata = NULL, type = c("link", "response", "term
       
       if(!is.null(colnames(newdata))){
         
-        newdata<- newdata[(1:dim(newdata)[2])[names(newdata) %in% colnames(object$X[,object$ID_retained])]]
+        newdata<- newdata[which(names(newdata) %in% colnames(object$X[,object$ID_retained]))]
         
       }else{
         
         newdata <- data.frame(newdata[,object$ID_retained])
         
-        names(newdata)<-names(data)[-1]
-        
+        names(newdata)<-names(data)[-1] # Don’t add first column name, which is for (Y)
+      
       }
+      
+      
      }
+  }
+  
+  if(!is.null(newdata)){
     
-    fit<-glm(Y~.,data = data ,family = family)
+    if(length(newdata) == 0 ){ stop("No feature in the newdata contributes to the model.")}
     
-    return(predict.glm(fit, newdata=newdata ,type = type,...))
     }
+  
+  # Re-fit the glm model with only the retained features included.
+  
+  fit<-glm(Y~.,data = data ,family = object$family)
+  
+  return(predict.glm(fit, newdata=newdata ,type = type,...))
+  
   }
 #' @rdname predict
 #'
 #' @export
 #' @method predict selection
-#' @examples
 #'
+#' 
 #'
 predict.selection<-function(object,newdata = NULL,type = c("link", "response", "terms"), ...){
   
-  if(object$vote == TRUE){ ID <- object$ID_voted}else{ID<- object$ID_selected}
-  
-  family<-switch(object$family, "gaussian" = gaussian(),  "binomial"=binomial(), "poisson"=poisson())
-  
-  if(!is.null(object$data)){
+  if(object$vote == TRUE){ 
     
-    model = object$data[,ID]
-    
-    data = data.frame( Y = object$Y, model)
-    
-    names(data) <- c("Y",names(object$data)[ID])
-    
-    if(!is.null(newdata)){
-      
-      newdata<- newdata[(1:dim(newdata)[2])[names(newdata) %in% names(object$data[ID])]]
-
-    }
-    
-    fit<-glm(Y~.,data = data ,family = family)
-    
-    return(predict.glm(fit, newdata=newdata ,type = type,...))
+    object$ID_retained <- object$ID_voted
     
   }else{
     
-    model = object$X[,ID]
+    object$ID_retained <- object$ID_selected
     
-    if(is.null(colnames(model))){ colnames(model) <- ID }
-    
-    data = data.frame( Y = object$Y, model)
-    
-    names(data) <- c("Y",colnames(model))
-    
-    if(!is.null(newdata)){
-      
-      if(!is.null(colnames(newdata))){
-        
-        newdata<- newdata[(1:dim(newdata)[2])[names(newdata) %in% colnames(object$X[,ID])]]
-        
-      }else{     
-        
-        newdata <- data.frame(newdata[,object$ID])
-      
-        names(newdata)<-names(data)[-1]
-        
-        
-      }
-      
-
-
-    }
-    
-    fit<-glm(Y~.,data = data ,family = family)
-    
-    return(predict.glm(fit, newdata=newdata ,type = type,...))
   }
+  
+  object$coef_retained <- object$coef_selected
+  
+  class(object) <- 'smle'
+  
+  return(predict(object,newdata = newdata,type = type, ...))
+
 }
     
 

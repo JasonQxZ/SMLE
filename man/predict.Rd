@@ -12,7 +12,7 @@
 \arguments{
 \item{object}{A \code{'smle'} or \code{'selection'} object.}
 
-\item{newdata}{\code{'matrix'} or \code{'data.frame'} of new values  of new values for the features at which predictions are to be made. If omitted, the fitted linear predictors are used.}
+\item{newdata}{Matrix of new values for the features at which predictions are to be made. If omitted, the fitted linear predictors are used.}
 
 \item{type}{The type of prediction required by \code{\link[stats]{predict.glm}()}.}
 
@@ -39,8 +39,6 @@ train_Y[1:10]
 #Predicted responses vs true responses in testing data
 predict(fit1, newdata = test_X)
 test_Y
-
-
 
 
 
