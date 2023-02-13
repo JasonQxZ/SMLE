@@ -51,3 +51,10 @@ Removed all methods for 'sdata' object but print().
 
 [unreleased]: https://github.com/JasonQxZ/SMLE/compare/SMLE_1.1.2...HEAD
 [1.1.3]: https://github.com/JasonQxZ/SMLE/compare/SMLE_1.1.1...SMLE_1.1.4
+
+
+## [2.1.0] - 2023-01-21
+
+### Added
+
+Incorporated more R functions/methods appropriate for GLMs in order to make our functions as agnostic to the selected model/link as possible.
